@@ -1,0 +1,74 @@
+<div class="mat-dialog-container">
+  <button type="button" class="close-modal" (click)="onCancel()" aria-label="Fermer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card building-form">
+    <div class="form-grid grid-2x2">
+    <div class="form-group">
+      <input type="text" id="name" formControlName="name" class="underline-input" required placeholder="Nom du bâtiment" />
+      <label for="name" class="label">Nom du bâtiment</label>
+      <div class="error" *ngIf="form.get('name')?.invalid && (form.get('name')?.touched || form.get('name')?.dirty)">Le nom est requis</div>
+    </div>
+    <div class="form-group">
+      <select id="type" formControlName="type" class="underline-input" required>
+          <option [ngValue]="null">Sélectionner...</option>
+          <option value="résidentiel">Résidentiel</option>
+          <option value="commercial">Commercial</option>
+          <option value="mixte">Mixte</option>
+          <option value="studio">Studio</option>
+          <option value="apartment">Appartement</option>
+          <option value="hotel">Hôtel</option>
+          <option value="villa">Villa</option>
+          <option value="autre">Autre...</option>
+      </select>
+      <label for="type" class="label">Type de bâtiment</label>
+      <input *ngIf="form.get('type')?.value === 'autre'" type="text" id="customType" formControlName="customType" class="underline-input" placeholder="Saisir le type" />
+      <div class="error" *ngIf="form.get('type')?.invalid && (form.get('type')?.touched || form.get('type')?.dirty)">Le type est requis</div>
+      <div class="error" *ngIf="form.get('customType')?.invalid && (form.get('customType')?.touched || form.get('customType')?.dirty)">Le type personnalisé est requis</div>
+    </div>
+    <div class="form-group">
+      <input type="number" id="floors" formControlName="floors" class="underline-input" required min="1" placeholder="Nombre d'étages" />
+      <label for="floors" class="label">Nombre d'étages</label>
+      <div class="error" *ngIf="form.get('floors')?.invalid && (form.get('floors')?.touched || form.get('floors')?.dirty)">Le nombre d'étages est requis</div>
+    </div>
+    <div class="form-group">
+      <input type="number" id="apartments" formControlName="apartments" class="underline-input" required min="1" placeholder="Nombre d'appartements" />
+      <label for="apartments" class="label">Nombre d'appartements</label>
+      <div class="error" *ngIf="form.get('apartments')?.invalid && (form.get('apartments')?.touched || form.get('apartments')?.dirty)">Le nombre d'appartements est requis</div>
+    </div>
+    <div class="form-group">
+      <input type="text" id="address" formControlName="address" class="underline-input" required placeholder="Adresse" />
+      <label for="address" class="label">Adresse</label>
+      <div class="error" *ngIf="form.get('address')?.invalid && (form.get('address')?.touched || form.get('address')?.dirty)">L'adresse est requise</div>
+    </div>
+    <div class="form-group">
+      <input type="text" id="city" formControlName="city" class="underline-input" required placeholder="Ville" />
+      <label for="city" class="label">Ville</label>
+      <div class="error" *ngIf="form.get('city')?.invalid && (form.get('city')?.touched || form.get('city')?.dirty)">La ville est requise</div>
+    </div>
+    <div class="form-group">
+      <input type="text" id="region" formControlName="region" class="underline-input" required placeholder="Quartier / Région" />
+      <label for="region" class="label">Quartier / Région</label>
+      <div class="error" *ngIf="form.get('region')?.invalid && (form.get('region')?.touched || form.get('region')?.dirty)">La région est requise</div>
+    </div>
+    <div class="form-group">
+      <input type="date" id="constructionDate" formControlName="constructionDate" class="underline-input" required placeholder="Date de construction" />
+      <label for="constructionDate" class="label">Date de construction</label>
+      <div class="error" *ngIf="form.get('constructionDate')?.invalid && (form.get('constructionDate')?.touched || form.get('constructionDate')?.dirty)">La date de construction est requise</div>
+    </div>
+  <div class="form-group full-width" style="grid-column: 1 / -1;">
+      <select id="ownerId" formControlName="ownerId" class="underline-input" required>
+        <option [ngValue]="null">Sélectionner...</option>
+        <option *ngFor="let owner of owners" [ngValue]="owner.id">{{ owner.fullName }}</option>
+      </select>
+      <label for="ownerId" class="label">Propriétaire</label>
+      <button type="button" class="btn btn-light" (click)="openOwnerDialog()">Nouveau propriétaire</button>
+      <div class="error" *ngIf="form.get('ownerId')?.invalid && (form.get('ownerId')?.touched || form.get('ownerId')?.dirty)">Le propriétaire est requis</div>
+    </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="onCancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Créer</button>
+    </div>
+  </form>
+</div>

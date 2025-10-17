@@ -1,0 +1,67 @@
+<div class="mat-dialog-container">
+  <button type="button" class="close-modal" (click)="onCancel()" aria-label="Fermer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card rental-form">
+    <div class="form-grid grid-2x2">
+      <div class="form-group">
+        <select id="ownerId" formControlName="ownerId" class="underline-input" (change)="onOwnerChange()" required>
+          <option [ngValue]="0">Sélectionner...</option>
+          <option *ngFor="let owner of owners" [ngValue]="owner.id">{{ owner.name }}</option>
+        </select>
+        <label for="ownerId" class="label">Propriétaire</label>
+        <button type="button" class="btn btn-light" (click)="openOwnerDialog()">Nouveau propriétaire</button>
+        <div class="error" *ngIf="form.get('ownerId')?.invalid && (form.get('ownerId')?.touched || form.get('ownerId')?.dirty)">Propriétaire requis</div>
+      </div>
+      <div class="form-group">
+        <select id="buildingId" formControlName="buildingId" class="underline-input" (change)="onBuildingChange()" required>
+          <option [ngValue]="0">Sélectionner...</option>
+          <option *ngFor="let building of filteredBuildings" [ngValue]="building.id">{{ building.name }}</option>
+        </select>
+        <label for="buildingId" class="label">Bâtiment</label>
+        <button type="button" class="btn btn-light" (click)="openBuildingDialog()">Nouveau bâtiment</button>
+        <div class="error" *ngIf="form.get('buildingId')?.invalid && (form.get('buildingId')?.touched || form.get('buildingId')?.dirty)">Bâtiment requis</div>
+      </div>
+      <div class="form-group">
+        <select id="apartmentId" formControlName="apartmentId" class="underline-input" required>
+          <option [ngValue]="0">Sélectionner...</option>
+          <option *ngFor="let apartment of filteredApartments" [ngValue]="apartment.id">{{ apartment.name }}</option>
+        </select>
+        <label for="apartmentId" class="label">Appartement</label>
+        <button type="button" class="btn btn-light" (click)="openApartmentDialog()">Nouvel appartement</button>
+        <div class="error" *ngIf="form.get('apartmentId')?.invalid && (form.get('apartmentId')?.touched || form.get('apartmentId')?.dirty)">Appartement requis</div>
+      </div>
+      <div class="form-group">
+        <select id="tenantId" formControlName="tenantId" class="underline-input" required>
+          <option [ngValue]="0">Sélectionner...</option>
+          <option *ngFor="let tenant of tenants" [ngValue]="tenant.id">{{ tenant.name }}</option>
+        </select>
+        <label for="tenantId" class="label">Locataire</label>
+        <button type="button" class="btn btn-light" (click)="openTenantDialog()">Nouveau locataire</button>
+        <div class="error" *ngIf="form.get('tenantId')?.invalid && (form.get('tenantId')?.touched || form.get('tenantId')?.dirty)">Locataire requis</div>
+      </div>
+      <div class="form-group">
+        <input type="date" id="startDate" formControlName="startDate" class="underline-input" required placeholder="Date de début" />
+        <label for="startDate" class="label">Date de début</label>
+        <div class="error" *ngIf="form.get('startDate')?.invalid && (form.get('startDate')?.touched || form.get('startDate')?.dirty)">Date début requise</div>
+      </div>
+      <div class="form-group">
+        <input type="date" id="endDate" formControlName="endDate" class="underline-input" placeholder="Date de fin" />
+        <label for="endDate" class="label">Date de fin</label>
+      </div>
+      <div class="form-group">
+        <input type="number" id="price" formControlName="price" class="underline-input" required min="1000" placeholder="Mensualité" />
+        <label for="price" class="label">Mensualité (FCFA)</label>
+        <div class="error" *ngIf="form.get('price')?.invalid && (form.get('price')?.touched || form.get('price')?.dirty)">Prix requis (≥ 1000)</div>
+      </div>
+      <div class="form-group">
+        <input type="number" id="deposit" formControlName="deposit" class="underline-input" min="0" placeholder="Caution" />
+        <label for="deposit" class="label">Caution (FCFA)</label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="onCancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enregistrer</button>
+    </div>
+  </form>
+</div>

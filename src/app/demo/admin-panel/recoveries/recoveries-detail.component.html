@@ -1,0 +1,88 @@
+<div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
+  <button class="btn btn-light" (click)="back()" style="margin-right: 16px;">Retour</button>
+  <h4 style="flex: 1;">Détail du recouvrement</h4>
+</div>
+<div class="content-container">
+  <form *ngIf="editMode" (ngSubmit)="save()" class="form-card recoverie-grid">
+    <div class="form-group">
+      <div class="input-container">
+        <input type="number" id="rentalId" [(ngModel)]="form.rentalId" name="rentalId" class="underline-input" required placeholder="Location" />
+        <label for="rentalId" class="label">
+          <i class="fas fa-file-contract"></i>
+          Location
+        </label>
+      </div>
+      <div class="error" *ngIf="errors.rentalId"><i class="fas fa-exclamation-circle"></i> {{ errors.rentalId }}</div>
+    </div>
+    <div class="form-group">
+      <div class="input-container">
+        <input type="number" id="amount" [(ngModel)]="form.amount" name="amount" class="underline-input" required min="1" placeholder="Montant" />
+        <label for="amount" class="label">
+          <i class="fas fa-money-bill-wave"></i>
+          Montant
+        </label>
+      </div>
+      <div class="error" *ngIf="errors.amount"><i class="fas fa-exclamation-circle"></i> {{ errors.amount }}</div>
+    </div>
+    <div class="form-group">
+      <div class="input-container">
+        <input type="date" id="date" [(ngModel)]="form.date" name="date" class="underline-input" required placeholder="Date" />
+        <label for="date" class="label">
+          <i class="fas fa-calendar-alt"></i>
+          Date
+        </label>
+      </div>
+      <div class="error" *ngIf="errors.date"><i class="fas fa-exclamation-circle"></i> {{ errors.date }}</div>
+    </div>
+    <div class="form-group">
+      <div class="input-container">
+        <input type="text" id="status" [(ngModel)]="form.status" name="status" class="underline-input" required placeholder="Statut" />
+        <label for="status" class="label">
+          <i class="fas fa-info-circle"></i>
+          Statut
+        </label>
+      </div>
+      <div class="error" *ngIf="errors.status"><i class="fas fa-exclamation-circle"></i> {{ errors.status }}</div>
+    </div>
+    <div class="form-group">
+      <div class="input-container">
+        <input type="text" id="name" [(ngModel)]="form.name" name="name" class="underline-input" required placeholder="Recouvreur" />
+        <label for="name" class="label">
+          <i class="fas fa-user"></i>
+          Recouvreur
+        </label>
+      </div>
+      <div class="error" *ngIf="errors.name"><i class="fas fa-exclamation-circle"></i> {{ errors.name }}</div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="cancelEdit()">Annuler</button>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+  </form>
+<div *ngIf="!editMode" class="form-card">
+    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+      <div>
+      <label>Recouvrement</label>
+      <input type="text" class="underline-input" [value]="recovery?.rentalId" readonly/>
+      </div>
+      <button type="button" class="btn btn-link" (click)="enableEdit()" title="Modifier les informations">
+        <i class="fas fa-edit"></i>
+      </button>
+    </div>
+    <div class="form-group">
+      <label>Montant</label>
+      <input type="text" class="underline-input" [value]="recovery?.amount | currency:'XOF' " readonly/>
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="text" class="underline-input" [value]="recovery?.date" readonly/>
+    </div>
+    <div class="form-group">
+      <label>Statut</label>
+      <input type="text" class="underline-input" [value]="recovery?.status" readonly/>
+  </div>
+      <div class="form-group">
+    <label>Recouvreur</label>
+    <input type="text" class="underline-input" [value]="recovery?.name" readonly/>
+    </div>
+</div>

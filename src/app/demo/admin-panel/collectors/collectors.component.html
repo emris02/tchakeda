@@ -1,0 +1,33 @@
+<div class="page-container">
+  <div class="page-header">
+    <h4 class="page-title">Gestion des recouvreurs</h4>
+    <button class="btn btn-primary" (click)="goToNewCollector()"> 
+      <i class="fas fa-plus"></i> Nouveau recouvreur
+    </button>
+  </div>
+  <div class="content-container">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nom complet</th>
+          <th>Pays</th>
+          <th>Téléphone</th>
+          <th>Adresse</th>
+          <th>Maisons à recouvrer</th>
+          <th>Email</th>
+          <!-- Actions supprimées -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let collector of collectors" class="clickable-row" (click)="editCollector(collector)">
+          <td>{{ collector.fullName }}</td>
+          <td>{{ collector.country || '-' }}</td>
+          <td>{{ collector.phone }}</td>
+          <td>{{ collector.address || '-' }}</td>
+          <td>{{ collector.houseCount || 0 }}</td>
+          <td>{{ collector.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

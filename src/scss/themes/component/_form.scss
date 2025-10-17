@@ -1,0 +1,403 @@
+// // ============================
+// //     Form css start
+// // ============================
+
+ .form-group {
+   margin-bottom: 1rem;
+
+   label {
+     font-size: 14px;
+     font-weight: 500;
+   }
+ }
+
+ .input-group-text svg {
+   width: 18px;
+   height: 18px;
+ }
+ .form-control-color-picker {
+   height: 43px;
+   padding: 0.5rem;
+ }
+
+ @media (max-width: 1400px) and (min-width: 1200px) {
+   .input-default {
+     input {
+       width: 150px;
+     }
+   }
+ }
+
+ select.form-control {
+   appearance: none;
+   background: #{$input-bg}
+     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round' class='css-i6dzq1'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")
+     no-repeat right 0.75rem center/18px 25px;
+
+   &[data-multiselectsplitter-firstselect-selector],
+   &[data-multiselectsplitter-secondselect-selector] {
+     background: none;
+   }
+   @media (max-width: 1300px) and (min-width: 1200px) {
+     font-size: 0.8rem;
+   }
+ }
+ .form-floating {
+   > label {
+     top: 1px;
+   }
+   > .form-control:focus,
+   > .form-control:not(:placeholder-shown),
+   > .form-select {
+     ~ label {
+       color: $gray-600;
+     }
+   }
+   > .form-control:focus {
+     ~ label {
+       color: $component-active-bg;
+     }
+   }
+   > input {
+     color: $body-color;
+   }
+ }
+ .bootstrap-select -select {
+   > .dropdown-toggle.btn-light,
+   > .dropdown-toggle.btn-secondary,
+   > .dropdown-toggle.btn-default {
+     border-color: $input-border-color !important;
+     box-shadow: none;
+     background: $input-bg !important;
+     color: $input-color;
+
+     &:focus {
+       outline: none !important;
+     }
+   }
+ }
+
+ .form-check {
+   label {
+     cursor: pointer;
+     input {
+       cursor: pointer;
+     }
+     .form-check-input {
+       float: left;
+     }
+   }
+ }
+ @each $color, $value in $theme-colors {
+   .form-check {
+     .form-check-input {
+       &.input-#{$color} {
+         &:checked {
+           border-color: $value;
+           background-color: $value;
+         }
+       }
+
+       &.input-light-#{$color} {
+         &:checked {
+           border-color: shift-color($value, $soft-bg-level);
+           background-color: shift-color($value, $soft-bg-level);
+
+           &[type='checkbox'] {
+             background-image: escape-svg(
+               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$value}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>")
+             );
+           }
+
+           &[type='radio'] {
+             background-image: escape-svg(
+               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$value}'/></svg>")
+             );
+           }
+         }
+       }
+
+       &.input-#{$color},
+       &.input-light-#{$color} {
+         &:focus {
+           &[type='checkbox'],
+           &[type='radio'] {
+             box-shadow: 0 0 0 0.2rem rgba($value, 0.25);
+           }
+         }
+       }
+     }
+
+     &.form-switch {
+       .form-check-input.input-light-#{$color} {
+         &:checked {
+           background-image: escape-svg(
+             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$value}'/></svg>")
+           );
+         }
+       }
+     }
+   }
+ }
+
+ .input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle),
+ .input-group > .input-group-append:last-child > .input-group-text:not(:last-child),
+ .input-group > .input-group-append:not(:last-child) > .btn,
+ .input-group > .input-group-append:not(:last-child) > .input-group-text,
+ .input-group > .input-group-prepend > .btn,
+ .input-group > .input-group-prepend > .input-group-text {
+   border-right: none;
+ }
+
+//   v1 Start
+
+ .form-v1 {
+   .form-label-group {
+     position: relative;
+     margin-bottom: 1rem;
+   }
+
+   .form-label-group > input,
+   .form-label-group > label {
+     height: 3.125rem;
+     padding: 0.75rem;
+   }
+
+   .form-label-group > label {
+     position: absolute;
+     top: 0;
+     left: 0;
+     display: block;
+     width: 100%;
+     color: #495057;
+     pointer-events: none;
+     cursor: text;
+     border: 1px solid transparent;
+     border-radius: 0.25rem;
+     transition: all 0.1s ease-in-out;
+   }
+
+   .form-label-group input::-webkit-input-placeholder {
+     color: transparent;
+   }
+
+   .form-label-group input::-ms-input-placeholder {
+     color: transparent;
+   }
+
+   .form-label-group input::-moz-placeholder {
+     color: transparent;
+   }
+
+   .form-label-group input::placeholder {
+     color: transparent;
+   }
+
+   .form-label-group input:not(:-moz-placeholder-shown) {
+     padding-top: 1.25rem;
+     padding-bottom: 0.25rem;
+   }
+
+   .form-label-group input:not(:placeholder-shown) {
+     padding-top: 1.25rem;
+     padding-bottom: 0.25rem;
+   }
+
+   .form-label-group input:not(:-moz-placeholder-shown) ~ label {
+     padding-top: 0.25rem;
+     padding-bottom: 0.25rem;
+     font-size: 12px;
+     color: #777;
+   }
+
+   .form-label-group input:not(:placeholder-shown) ~ label {
+     padding-top: 0.25rem;
+     padding-bottom: 0.25rem;
+     font-size: 12px;
+     color: #777;
+   }
+ }
+
+// // v1 end
+// // Date picker start
+
+ .datepicker {
+   width: 265px;
+   padding: 10px;
+
+   &.dropdown-menu {
+     padding: 10px;
+   }
+
+   &.datepicker-orient-top {
+     margin-top: 8px;
+   }
+
+   table {
+     width: 100%;
+   }
+
+   td,
+   th {
+     font-weight: regular;
+     width: 35px;
+     height: 35px;
+   }
+
+   thead {
+     th {
+       color: $headings-color;
+
+       &.datepicker-switch,
+       &.next,
+       &.prev {
+         font-weight: 500;
+         color: $body-color;
+
+         i {
+           font-size: 1.2rem;
+           color: $body-color;
+
+           &:before {
+             line-height: 0;
+             vertical-align: middle;
+           }
+         }
+
+         &:hover {
+           background: $body-bg !important;
+         }
+       }
+
+       &.dow {
+         color: $body-color;
+         font-weight: 500;
+       }
+     }
+   }
+
+   tbody {
+     tr > td {
+       &.day {
+         color: $body-color;
+
+         &:hover {
+           background: $body-bg;
+           color: $body-color;
+         }
+
+         &.old {
+           color: $body-color;
+         }
+
+         &.new {
+           color: $body-color;
+         }
+
+         &.active,
+         &.active:hover,
+         &.selected,
+         &.selected:hover {
+           background: $primary;
+           color: #fff;
+         }
+
+         &.today {
+           position: relative;
+           background: $primary !important;
+           color: #fff !important;
+
+           &:before {
+             content: '';
+             display: inline-block;
+             border: solid transparent;
+             border-width: 0 0 7px 7px;
+             border-bottom-color: #ffffff;
+             border-top-color: $body-color;
+             position: absolute;
+             bottom: 4px;
+             right: 4px;
+           }
+         }
+
+         &.range {
+           background: $body-bg;
+         }
+       }
+
+       span.hour,
+       span.minute,
+       span.month,
+       span.year {
+         color: $body-color;
+
+         &:hover {
+           background: $body-bg;
+         }
+
+         &.active,
+         &.active.focused:hover,
+         &.active:hover,
+         &.focused,
+         &.focused:hover {
+           background: $primary;
+           color: #fff;
+         }
+       }
+     }
+   }
+
+   tfoot {
+     tr > th {
+       &.clear,
+       &.today {
+         font-weight: 500;
+
+         &:hover {
+           background: $body-bg;
+         }
+       }
+     }
+   }
+ }
+
+ // Date picker end
+//   Time picker start
+
+ .bootstrap-timepicker-widget {
+   left: auto;
+   width: 175px;
+
+   .bootstrap-timepicker-hour,
+   .bootstrap-timepicker-meridian,
+   .bootstrap-timepicker-minute,
+   .bootstrap-timepicker-second {
+     border: none;
+     box-shadow: none;
+   }
+
+   table td {
+     > a {
+       border: 0;
+
+       i {
+         font-size: 1.1rem;
+       }
+     }
+   }
+ }
+
+ .bootstrap-timepicker-widget {
+   .bootstrap-timepicker-hour,
+   .bootstrap-timepicker-meridian,
+   .bootstrap-timepicker-minute,
+   .bootstrap-timepicker-second {
+     color: $headings-color;
+   }
+
+   table td > a {
+     &:hover {
+       background: $body-bg;
+     }
+   }
+ }

@@ -1,0 +1,478 @@
+<div class="page-container">
+
+  <!-- ===================== HEADER ===================== -->
+  <div class="page-header">
+    <button class="btn btn-light back-btn" (click)="back()">
+      <i class="fas fa-arrow-left"></i> Recouvreurs
+    </button>
+    <h4 class="page-title">Détails du recouvreur</h4>
+  </div>
+
+  <!-- ===================== MODAL DE SUPPRESSION ===================== -->
+  <div *ngIf="showDeleteConfirm" class="modal-overlay">
+    <div class="modal-card">
+      <h5>Confirmer la suppression</h5>
+      <p>Voulez-vous vraiment supprimer ce recouvreur ? Cette action est irréversible.</p>
+      <div class="form-actions center">
+        <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="delete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INFORMATIONS PERSONNELLES ===================== -->
+  <div class="form-card">
+    <div class="card-header">
+      <h5>Informations personnelles</h5>
+      <div class="action-buttons">
+        <ng-container *ngIf="!editMode">
+          <button class="action-btn edit" (click)="enableEdit()" title="Modifier les informations">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="action-btn delete" title="Supprimer le recouvreur" (click)="showDeleteConfirm = true">
+            <i class="fas fa-trash"></i>
+          </button>
+        </ng-container>
+        <ng-container *ngIf="editMode">
+          <button class="action-btn cancel" title="Annuler les modifications" (click)="cancelEdit()">
+            <i class="fas fa-times"></i>
+          </button>
+          <button class="action-btn save" type="button" title="Valider les modifications" (click)="save()">
+            <i class="fas fa-check"></i>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ===================== MODE ÉDITION ===================== -->
+    <form *ngIf="editMode" (ngSubmit)="save()" class="collector-form">
+      <div class="collector-form-content">
+
+        <!-- Photo et informations personnelles -->
+        <div class="collector-profile-section">
+          <div class="collector-photo-upload">
+            <div class="collector-photo-container">
+              <img *ngIf="form.identityImage" [src]="form.identityImage" alt="Photo d'identité" class="collector-photo" />
+              <div *ngIf="!form.identityImage" class="collector-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+            </div>
+            <div class="image-upload-controls">
+              <input type="file" id="identityImage" accept="image/*" (change)="onIdentityImageSelected($event)" class="file-input" />
+              <label for="identityImage" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-camera"></i> Changer la photo
+              </label>
+              <div class="error" *ngIf="errors.identityImage">{{ errors.identityImage }}</div>
+            </div>
+          </div>
+
+          <!-- Informations personnelles -->
+          <div class="collector-info-grid">
+            <div class="form-group">
+              <div class="input-container">
+                <input type="text" id="fullName" [(ngModel)]="form.fullName" name="fullName" class="underline-input" required placeholder=" " />
+                <label for="fullName" class="label">
+                  <i class="fas fa-user"></i> Nom complet <span class="required">*</span>
+                </label>
+              </div>
+              <div class="error" *ngIf="errors.fullName">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.fullName }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-container">
+                <input type="text" id="country" [(ngModel)]="form.country" name="country" class="underline-input" required placeholder=" " />
+                <label for="country" class="label">
+                  <i class="fas fa-globe"></i> Pays <span class="required">*</span>
+                </label>
+              </div>
+              <div class="error" *ngIf="errors.country">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.country }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-container">
+                <input type="text" id="address" [(ngModel)]="form.address" name="address" class="underline-input" required placeholder=" " />
+                <label for="address" class="label">
+                  <i class="fas fa-map-marker-alt"></i> Adresse <span class="required">*</span>
+                </label>
+              </div>
+              <div class="error" *ngIf="errors.address">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.address }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-container">
+                <input type="number" id="houseCount" [(ngModel)]="form.houseCount" name="houseCount" class="underline-input" required min="0" placeholder=" " />
+                <label for="houseCount" class="label">
+                  <i class="fas fa-home"></i> Nombre de maisons <span class="required">*</span>
+                </label>
+              </div>
+              <div class="error" *ngIf="errors.houseCount">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.houseCount }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-container">
+                <input type="text" id="phone" [(ngModel)]="form.phone" name="phone" class="underline-input" required placeholder=" " />
+                <label for="phone" class="label">
+                  <i class="fas fa-phone"></i> Téléphone <span class="required">*</span>
+                </label>
+              </div>
+              <div class="error" *ngIf="errors.phone">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.phone }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-container">
+                <input type="email" id="email" [(ngModel)]="form.email" name="email" class="underline-input" required placeholder=" " />
+                <label for="email" class="label">
+                  <i class="fas fa-envelope"></i> Email <span class="required">*</span>
+                </label>
+              </div>
+              <div class="error" *ngIf="errors.email">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.email }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zones assignées -->
+        <div class="zones-section" *ngIf="assignedZones.length > 0">
+          <h6>Zones assignées</h6>
+          <div class="zones-grid">
+            <div *ngFor="let zone of assignedZones" class="zone-card">
+              <div class="zone-header">
+                <h6>{{ zone.name }}</h6>
+                <span class="apartments-count">{{ zone.apartmentCount }} appartements</span>
+              </div>
+              <div class="zone-stats">
+                <span class="stat">{{ zone.collectedPayments }} payés</span>
+                <span class="stat">{{ zone.pendingPayments }} en attente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- ===================== MODE VISUALISATION ===================== -->
+    <div *ngIf="!editMode" class="collector-details">
+      <div class="collector-view-content">
+
+        <!-- Section profil -->
+        <div class="collector-profile-section">
+          <!-- Photo du recouvreur à gauche -->
+          <div class="collector-photo-display">
+            <div class="collector-photo-container">
+              <img *ngIf="collector?.identityImage" [src]="collector?.identityImage" alt="Photo du recouvreur" class="collector-photo" />
+              <div *ngIf="!collector?.identityImage" class="collector-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+            </div>
+            <div class="collector-status">
+              <span class="status-badge status-active" *ngIf="isCollectorActive()">Recouvreur actif</span>
+              <span class="status-badge status-completed" *ngIf="!isCollectorActive()">Ancien recouvreur</span>
+            </div>
+          </div>
+
+          <!-- Informations du recouvreur à droite -->
+          <div class="collector-info-display">
+            <div class="details-grid">
+              <div class="info-item">
+                <label><i class="fas fa-user me-2"></i> Nom complet</label>
+                <p class="info-value">{{ collector?.fullName || '-' }}</p>
+              </div>
+
+              <div class="info-item">
+                <label><i class="fas fa-flag me-2"></i> Pays</label>
+                <p class="info-value">{{ collector?.country || '-' }}</p>
+              </div>
+
+              <div class="info-item">
+                <label><i class="fas fa-map-marker-alt me-2"></i> Adresse</label>
+                <p class="info-value">{{ collector?.address || '-' }}</p>
+              </div>
+
+              <div class="info-item">
+                <label><i class="fas fa-home me-2"></i> Nombre de maisons</label>
+                <p class="info-value">{{ collector?.houseCount || '0' }}</p>
+              </div>
+
+              <div class="info-item">
+                <label><i class="fas fa-phone me-2"></i> Téléphone</label>
+                <p class="info-value">
+                  <a [href]="'tel:' + collector?.phone" class="phone-link">
+                    {{ collector?.phone || '-' }}
+                  </a>
+                </p>
+              </div>
+
+              <div class="info-item">
+                <label><i class="fas fa-envelope me-2"></i> Email</label>
+                <p class="info-value">
+                  <a [href]="'mailto:' + collector?.email" class="email-link">
+                    {{ collector?.email || '-' }}
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PERFORMANCE ===================== -->
+  <div class="form-card" *ngIf="collectorPayments.length > 0">
+    <div class="card-header">
+      <h5>Performance du mois</h5>
+    </div>
+    <div class="performance-section">
+      <div class="performance-stats">
+        <div class="performance-item">
+          <div class="performance-value">{{ currentMonthCollection | number }} Fcfa</div>
+          <div class="performance-label">Recouvré ce mois</div>
+        </div>
+        <div class="performance-item">
+          <div class="performance-value">{{ successRate }}%</div>
+          <div class="performance-label">Taux de réussite</div>
+        </div>
+        <div class="performance-item">
+          <div class="performance-value">{{ averageCollectionTime }}j</div>
+          <div class="performance-label">Délai moyen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STATISTIQUES ===================== -->
+  <div class="form-card">
+    <div class="card-header">
+      <h5>Statistiques</h5>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <i class="fas fa-home"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ collector?.houseCount || 0 }}</h3>
+          <p>Maisons assignées</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ completedPayments }}</h3>
+          <p>Paiements recouvrés</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ pendingPayments }}</h3>
+          <p>Paiements en attente</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon info">
+          <i class="fas fa-percentage"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ successRate }}%</h3>
+          <p>Taux de réussite</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FACTURES ET PAIEMENTS ===================== -->
+  <div class="form-card payments-card">
+    <div class="card-header">
+      <h5>Factures et paiements</h5>
+      <div class="payment-summary">
+        <div class="summary-item">
+          <span class="label">Total recouvré:</span>
+          <span class="amount success">{{ totalCollected | number }} Fcfa</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total en attente:</span>
+          <span class="amount warning">{{ totalPending | number }} Fcfa</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Paiements ce mois:</span>
+          <span class="amount info">{{ currentMonthPayments | number }} Fcfa</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres et actions -->
+    <div class="table-controls">
+      <div class="filters">
+        <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="filter-select">
+          <option value="">Tous les statuts</option>
+          <option value="paid">Payé</option>
+          <option value="pending">En attente</option>
+          <option value="overdue">En retard</option>
+        </select>
+
+        <select [(ngModel)]="periodFilter" (change)="applyFilters()" class="filter-select">
+          <option value="">Toutes les périodes</option>
+          <option value="current-month">Ce mois</option>
+          <option value="last-month">Mois dernier</option>
+          <option value="current-year">Cette année</option>
+        </select>
+
+        <button class="btn btn-outline-primary btn-sm" (click)="exportPayments()">
+          <i class="fas fa-download"></i> Exporter
+        </button>
+      </div>
+
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Rechercher un appartement..." />
+      </div>
+    </div>
+
+    <!-- Tableau des paiements -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Période</th>
+            <th>Montant</th>
+            <th>Date échéance</th>
+            <th>Date paiement</th>
+            <th>Mode</th>
+            <th>Statut</th>
+            <th>Appartement</th>
+            <th>Locataire</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let payment of filteredPayments" 
+              [class.overdue]="isPaymentOverdue(payment)" 
+              [class.paid]="payment.status === 'paid'">
+            <td>
+              <strong>{{ payment.period }}</strong>
+              <div class="payment-reference" *ngIf="payment.reference">Ref: {{ payment.reference }}</div>
+            </td>
+            <td class="amount-cell">
+              <span class="amount">{{ payment.amount | number }} Fcfa</span>
+            </td>
+            <td>
+              {{ payment.dueDate | date:'dd/MM/yyyy' }}
+              <div class="date-diff" *ngIf="getDaysUntilDue(payment) > 0">
+                {{ getDaysUntilDue(payment) }} jour(s)
+              </div>
+            </td>
+            <td>
+              <span *ngIf="payment.paymentDate">{{ payment.paymentDate | date:'dd/MM/yyyy' }}</span>
+              <span *ngIf="!payment.paymentDate" class="text-muted">-</span>
+            </td>
+            <td>
+              <span class="payment-method" [class]="payment.method?.toLowerCase()">
+                <i [class]="getMethodIcon(payment.method)"></i>
+                {{ payment.method }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [class]="getStatusClass(payment.status)">
+                <i [class]="getStatusIcon(payment.status)"></i>
+                {{ getStatusText(payment.status) }}
+              </span>
+            </td>
+            <td>
+              <div class="apartment-info">
+                <strong>{{ payment.apartment }}</strong>
+                <div class="apartment-details" *ngIf="payment.building">
+                  {{ payment.building }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="tenant-info">
+                {{ payment.tenant }}
+                <div class="tenant-contact" *ngIf="payment.tenantPhone">
+                  {{ payment.tenantPhone }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="action-buttons compact">
+                <button *ngIf="payment.status !== 'paid'" 
+                        class="btn-icon btn-success sm" 
+                        title="Marquer comme payé"
+                        (click)="markAsPaid(payment)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn-icon btn-primary sm" 
+                        title="Voir les détails"
+                        (click)="viewPaymentDetails(payment)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon btn-light sm" 
+                        title="Envoyer un rappel"
+                        (click)="sendReminder(payment)">
+                  <i class="fas fa-bell"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Message aucun paiement -->
+          <tr *ngIf="filteredPayments.length === 0">
+            <td colspan="9" class="no-data">
+              <div class="no-data-content">
+                <i class="fas fa-receipt"></i>
+                <h6>Aucun paiement trouvé</h6>
+                <p *ngIf="hasActiveFilters">Aucun paiement ne correspond à vos critères de recherche.</p>
+                <p *ngIf="!hasActiveFilters">Aucun paiement enregistré pour ce recouvreur.</p>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-pagination" *ngIf="filteredPayments.length > 0">
+      <div class="pagination-info">
+        Affichage de {{ getDisplayRange() }}
+      </div>
+      <div class="pagination-controls">
+        <button class="btn btn-light btn-sm" 
+                [disabled]="currentPage === 1"
+                (click)="previousPage()">
+          <i class="fas fa-chevron-left"></i> Précédent
+        </button>
+        <span class="page-numbers">
+          Page {{ currentPage }} sur {{ totalPages }}
+        </span>
+        <button class="btn btn-light btn-sm"
+                [disabled]="currentPage === totalPages"
+                (click)="nextPage()">
+          Suivant <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

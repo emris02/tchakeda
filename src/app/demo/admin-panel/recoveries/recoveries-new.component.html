@@ -1,0 +1,62 @@
+<div class="page-header">
+  <h4>Créer un recouvrement</h4>
+</div>
+<div class="content-container">
+  <form (ngSubmit)="create()" class="form-card">
+    <div class="form-group">
+      <select id="rentalId" [(ngModel)]="form.rentalId" name="rentalId" class="underline-input" required>
+        <option value="" disabled selected>Choisir une location</option>
+        <option *ngFor="let rental of rentals" [value]="rental.id">{{ rental.apartmentName }} - {{ rental.tenantName }}</option>
+      </select>
+      <label for="rentalId" class="label">
+        <i class="fas fa-home"></i>
+        Location
+      </label>
+      <div class="error" *ngIf="errors.rentalId">{{ errors.rentalId }}</div>
+    </div>
+    <div class="form-group">
+      <input type="number" id="amount" [(ngModel)]="form.amount" name="amount" class="underline-input" required min="1" placeholder="Montant" />
+      <label for="amount" class="label">
+        <i class="fas fa-money-bill-wave"></i>
+        Montant
+      </label>
+      <div class="error" *ngIf="errors.amount">{{ errors.amount }}</div>
+    </div>
+    <div class="form-group">
+      <input type="date" id="date" [(ngModel)]="form.date" name="date" class="underline-input" required placeholder="Date" />
+      <label for="date" class="label">
+        <i class="fas fa-calendar-alt"></i>
+        Date
+      </label>
+      <div class="error" *ngIf="errors.date">{{ errors.date }}</div>
+    </div>
+    <div class="form-group">
+      <select id="status" [(ngModel)]="form.status" name="status" class="underline-input" required>
+        <option value="" disabled selected>Choisir un statut</option>
+        <option value="En attente">En attente</option>
+        <option value="Payé">Payé</option>
+        <option value="Partiel">Partiel</option>
+      </select>
+      <label for="status" class="label">
+        <i class="fas fa-info-circle"></i>
+        Statut
+      </label>
+      <div class="error" *ngIf="errors.status">{{ errors.status }}</div>
+    </div>
+    <div class="form-group">
+      <select id="collectorId" [(ngModel)]="form.collectorId" name="collectorId" class="underline-input" required>
+        <option value="" disabled selected>Choisir un recouvreur</option>
+        <option *ngFor="let collector of collectors" [value]="collector.id">{{ collector.fullName }}</option>
+      </select>
+      <label for="collectorId" class="label">
+        <i class="fas fa-user-shield"></i>
+        Recouvreur
+      </label>
+      <div class="error" *ngIf="errors.collectorId">{{ errors.collectorId }}</div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+  </form>
+</div>

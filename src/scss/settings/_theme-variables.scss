@@ -1,0 +1,206 @@
+﻿@use 'sass:color';
+// =======================================
+//     List of variables for layout
+// =======================================
+$header-height: 56px;
+$Menu-width: 235px;
+$Menu-collapsed-width: 70px;
+$soft-bg-level: -80%;
+// color list for build layouts
+$primary-color: #4099ff;
+$warning-color: #ffb64d;
+$danger-color: #ff5370;
+$success-color: #2ed8b6;
+$purple-color: #7759de;
+$info-color: #00bcd4;
+$secondary-color: #748892;
+$default-color: #d6d6d6;
+$light-color: #eceff1;
+$dark-color: #263238;
+$inverse-color: $dark-color;
+$theme-border: #e2e5e8;
+
+$theme-colors: (
+  "primary": $primary-color,
+  "secondary": $secondary-color,
+  "success": $success-color,
+  "info": $info-color,
+  "warning": $warning-color,
+  "danger": $danger-color,
+  "light": $light-color,
+  "dark": $dark-color
+);
+
+$theme-colors-text: (
+  "primary": #fff,
+  "secondary": #fff,
+  "success": #fff,
+  "info": #fff,
+  "warning": #212529,
+  "danger": #fff,
+  "light": #212529,
+  "dark": #fff
+);
+$theme-colors-bg-subtle: (
+  "primary": #cfe2ff,
+  "secondary": #e2e3e5,
+  "success": #d1e7dd,
+  "info": #cff4fc,
+  "warning": #fff3cd,
+  "danger": #f8d7da,
+  "light": #f8f9fa,
+  "dark": #212529
+);
+$theme-colors-border-subtle: (
+  "primary": #9ec5fe,
+  "secondary": #cfd1d4,
+  "success": #a3cfbb,
+  "info": #9eeaf9,
+  "warning": #ffe69c,
+  "danger": #f1aeb5,
+  "light": #f8f9fa,
+  "dark": #343a40
+);
+$theme-colors-text-dark: (
+  "primary": #000,
+  "secondary": #000,
+  "success": #000,
+  "info": #000,
+  "warning": #000,
+  "danger": #000,
+  "light": #000,
+  "dark": #fff
+);
+$theme-colors-bg-subtle-dark: (
+
+  "primary": #031633,
+  "secondary": #2b2f32,
+  "success": #051b11,
+  "info": #032830,
+  "warning": #332701,
+  "danger": #2c0b0e,
+  "light": #343a40,
+  "dark": #000
+);
+
+$theme-colors-border-subtle-dark: (
+  "primary": #084298,
+  "secondary": #41464b,
+  "success": #0f5132,
+  "info": #055160,
+  "warning": #664d03,
+  "danger": #842029,
+  "light": #495057,
+  "dark": #495057
+);
+
+// Bootstrap utilities border colors
+$utilities-border-colors: $theme-colors-border-subtle;
+$utilities-border-subtle: $theme-colors-border-subtle;
+$negative-spacers: (
+  0: 0,
+  1: -0.25rem,
+  2: -0.5rem,
+  3: -1rem,
+  4: -1.5rem,
+  5: -3rem
+);
+
+$utilities-text-colors: $theme-colors-text;
+$utilities-text-emphasis-colors: $theme-colors-text-dark;
+$utilities-links-underline: (
+  "none": 0,
+  "hover": 1
+);
+
+$utilities-bg-colors: $theme-colors-bg-subtle;
+
+
+
+$theme-colors-rgb: (
+  "primary": (color.red($primary-color), color.green($primary-color), color.blue($primary-color)),
+  "secondary": (color.red($secondary-color), color.green($secondary-color), color.blue($secondary-color)),
+  "success": (color.red($success-color), color.green($success-color), color.blue($success-color)),
+  "info": (color.red($info-color), color.green($info-color), color.blue($info-color)),
+  "warning": (color.red($warning-color), color.green($warning-color), color.blue($warning-color)),
+  "danger": (color.red($danger-color), color.green($danger-color), color.blue($danger-color)),
+  "light": (color.red($light-color), color.green($light-color), color.blue($light-color)),
+  "dark": (color.red($dark-color), color.green($dark-color), color.blue($dark-color))
+);
+
+// header
+$header-dark-background: #3b4650;
+$header-dark-text-color: #fff;
+$header-light-background: #fff;
+$header-light-text-color: #3b4650;
+
+// Menu
+$menu-dark-background: #3b4650;
+$menu-dark-text-color: #b9c7d4;
+
+$menu-light-background: #fff;
+$menu-light-text-color: #666;
+$menu-active-color: $primary-color;
+
+$dark-layout: darken(#3b4650, 8%);
+$dark-layout-font: #adb7be;
+
+// Menu icon
+$menu-icon-color: #4099ff, #ff5370, #01a9ac, #7759de, #00bcd4, $warning-color;
+// Header background
+$color-header-name: blue, red, purple, info, dark, orange, green, yellow, orchidGreen, indigoGreen, darkGreen, darkblue;
+$color-header-color: #4099ff, #ff5370, #4099ff, #38a9f9, #3b4650, #ff784f, #11c788, #ff5858, #39adb5, #473b7b, #000000, #2d0102;
+$color-header-color2: #73b4ff, #f48fb1, #6e7ff3, #43e9b3, #647688, #ff5370, #54e2b7, #f09819, #7c4dff, #30d2be, #0fb3c2, #091991;
+
+// Menu background
+$color-menu-name: blue, red, purple, info, dark;
+$color-menu-color: #4099ff, #ff5370, #7759de, #00bcd4, #101b33;
+
+// Menu background gradient
+$color-menu-gradient-name: blue, red, purple, info, dark;
+$color-menu-gradient-color:
+  linear-gradient(to bottom, #7759de 0%, #4099ff 100%),
+  linear-gradient(to bottom, rgb(164, 69, 178) 0%, rgb(212, 24, 114) 52%, rgb(255, 0, 102) 100%),
+  linear-gradient(to top, rgb(178, 117, 240) 0%, rgb(117, 117, 240) 100%),
+  linear-gradient(to bottom, rgb(1, 169, 172) 0%, rgb(1, 219, 223) 100%),
+  linear-gradient(to bottom, rgb(36, 46, 62) 0%, rgb(58, 76, 103) 100%);
+
+// Active background color
+$color-active-name: blue, red, purple, info, dark;
+$color-active-color: #4099ff, #ff5370, #7759de, #00bcd4, $dark-color;
+// Menu title color
+$color-title-name: blue, red, purple, info, dark;
+$color-title-color: #4099ff, #ff5370, #7759de, #00bcd4, $dark-color;
+
+$theme-font-family: 'Poppins', sans-serif;
+$theme-font-size: 14px;
+$theme-background: #f6f7fb;
+$theme-font-color: #222;
+$theme-heading-color: #222;
+
+$color-name: c-blue, c-red, c-green, c-yellow, c-purple;
+$color-color: $primary-color, $danger-color, $success-color, $warning-color, $purple-color;
+$color-bt-name: primary, danger, success, warning, info, purple;
+$color-bt-color: $primary-color, $danger-color, $success-color, $warning-color, $info-color, $purple-color;
+
+// form-control variables
+$form-bg: #f0f3f6;
+
+// =====================================================================
+// ==================   Bootstrap Extra Variable  ======================
+// =====================================================================
+
+// Color contrast
+$yiq-contrasted-threshold: 200 !default;
+$yiq-dark-color: #37474f;
+$yiq-light-color: #fff;
+$theme-color-interval: 8%;
+$alert-bg-level: -10;
+$alert-border-level: -9;
+$alert-color-level: 6;
+
+// card block css
+$card-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
+$card-header-border: 0px solid #e2e5e8;
+
+

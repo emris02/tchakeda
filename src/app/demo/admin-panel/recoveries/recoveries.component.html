@@ -1,0 +1,28 @@
+<div class="page-header">
+  <h4>Recouvrements</h4>
+  <button class="btn btn-primary" (click)="goToNewCollector()"><i class="fas fa-plus"></i> Nouveau recouvreur</button>
+</div>
+<div class="content-container">
+  <table class="table recoveries-table">
+    <thead>
+      <tr>
+        <th>Location</th>
+        <th>Montant</th>
+        <th>Date</th>
+        <th>Statut</th>
+        <th>Date de création</th>
+        <th>Recouvreur</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let recovery of recoveries" (click)="goToDetail(recovery)" class="clickable-row">
+        <td>{{ recovery.rentalId }}</td>
+        <td>{{ recovery.amount | currency:'XOF' }}</td>
+        <td>{{ recovery.date }}</td>
+        <td>{{ recovery.status }}</td>
+        <td>{{ recovery.createdAt | date:'shortDate' }}</td>
+        <td>{{ recovery.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

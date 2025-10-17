@@ -1,0 +1,26 @@
+<div class="page-header">
+  <h4>Paiements des recouvrements</h4>
+  <button class="btn btn-primary" (click)="goToNew()">+ Nouveau paiement</button>
+</div>
+<div class="content-container">
+  <table class="table payments-table">
+    <thead>
+      <tr>
+        <th>Recouvrement</th>
+        <th>Montant</th>
+        <th>Date</th>
+        <th>Statut</th>
+        <th>Recouvreur/th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let payment of payments">
+        <td>{{ payment.recoveryName }}</td>
+        <td>{{ payment.amount | currency:'XOF' }}</td>
+        <td>{{ payment.date }}</td>
+        <td>{{ payment.status }}</td>
+        <td>{{ payment.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,127 @@
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center">
+  <h4 class="mb-2 mb-md-0">Appartements</h4>
+
+  <div class="header-actions d-flex flex-wrap align-items-center gap-2">
+
+    <!-- Menu Angular natif Filtres -->
+    <div class="menu-filter" style="position:relative;">
+  <button class="btn btn-outline-secondary" [class.active]="showStatusMenu" (click)="showStatusMenu = !showStatusMenu">
+        <i class="fas fa-filter"></i> Statut: {{ filterStatus | titlecase }}
+      </button>
+      <ul *ngIf="showStatusMenu" class="menu-list" style="position:absolute;z-index:10;min-width:160px;box-shadow:0 2px 8px #0001;background:#fff;border-radius:8px;padding:8px 0;margin:0;list-style:none;">
+        <li><a class="dropdown-item" [class.active]="filterStatus==='all'" (click)="filterStatus='all'; applyFilters(); showStatusMenu=false">Tous</a></li>
+        <li><a class="dropdown-item" [class.active]="filterStatus==='free'" (click)="filterStatus='free'; applyFilters(); showStatusMenu=false">Libre</a></li>
+        <li><a class="dropdown-item" [class.active]="filterStatus==='sale'" (click)="filterStatus='sale'; applyFilters(); showStatusMenu=false">En vente</a></li>
+        <li><a class="dropdown-item" [class.active]="filterStatus==='rent'" (click)="filterStatus='rent'; applyFilters(); showStatusMenu=false">En location</a></li>
+        <li><a class="dropdown-item" [class.active]="filterStatus==='construction'" (click)="filterStatus='construction'; applyFilters(); showStatusMenu=false">En construction</a></li>
+      </ul>
+    </div>
+
+    <!-- Menu Angular natif Tri -->
+    <div class="menu-sort" style="position:relative;">
+  <button class="btn btn-outline-secondary" [class.active]="showSortMenu" (click)="showSortMenu = !showSortMenu">
+        <i class="fas fa-sort"></i> Tri: {{ sortOrder === 'recent' ? 'Plus récent' : 'Plus ancien' }}
+      </button>
+      <ul *ngIf="showSortMenu" class="menu-list" style="position:absolute;z-index:10;min-width:160px;box-shadow:0 2px 8px #0001;background:#fff;border-radius:8px;padding:8px 0;margin:0;list-style:none;">
+        <li><a class="dropdown-item" [class.active]="sortOrder==='recent'" (click)="sortOrder='recent'; applyFilters(); showSortMenu=false">Plus récent</a></li>
+        <li><a class="dropdown-item" [class.active]="sortOrder==='oldest'" (click)="sortOrder='oldest'; applyFilters(); showSortMenu=false">Plus ancien</a></li>
+      </ul>
+    </div>
+
+    <!-- Boutons de vue -->
+    <button class="btn btn-outline-secondary view-btn"
+            [class.active]="viewMode === 'grid'"
+            (click)="viewMode = 'grid'">
+      <i class="fas fa-th-large"></i>
+    </button>
+
+    <button class="btn btn-outline-secondary view-btn"
+            [class.active]="viewMode === 'list'"
+            (click)="viewMode = 'list'">
+      <i class="fas fa-list"></i>
+    </button>
+
+    <!-- Bouton ajout -->
+    <button class="btn btn-primary add-btn" (click)="goToNew()">
+      <i class="fas fa-plus"></i> Nouvel appartement
+    </button>
+  </div>
+</div>
+
+
+<div class="content-container">
+
+  <!-- Vue liste -->
+  <table class="table apartments-table" *ngIf="viewMode === 'list'">
+    <thead>
+      <tr>
+        <th>Nom de l'appartement</th>
+        <th>Adresse</th>
+        <th>Ville</th>
+        <th>Région</th>
+        <th>Locataire</th>
+        <th>Mensualité</th>
+      </tr>
+    </thead>
+    <tbody>
+  <tr *ngFor="let apartment of filteredApartments" (click)="goToDetail(apartment)" class="clickable-row">
+        <td>{{ apartment.name }}</td>
+        <td>{{ apartment.address }}</td>
+        <td>{{ apartment.city }}</td>
+        <td>{{ apartment.region }}</td>
+  <td>{{ getTenantDisplay(apartment) }}</td>
+        <td>
+          <span *ngIf="apartment.mention">{{ apartment.mention | number }} FCFA</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+<!-- Vue carte -->
+<div *ngIf="viewMode === 'grid'">
+  <div class="apartments-grid">
+    <div class="apartment-card clickable-row" *ngFor="let apartment of filteredApartments" (click)="goToDetail(apartment)">
+      
+      <!-- Image / Carrousel -->
+      <div class="card-image card-image-square"
+           (mouseenter)="apartment._showOverlay = true"
+           (mouseleave)="apartment._showOverlay = false">
+        <!-- Nom de l'appartement affiché directement sur la carte -->
+        <div class="card-name-badge" title="{{ apartment.name }}">
+          {{ apartment.name || ('Appartement ' + (apartment.id || '')) }}
+        </div>
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-arrow left" 
+                  (click)="$event.stopPropagation(); apartment._carouselIndex = (apartment._carouselIndex > 0 ? apartment._carouselIndex - 1 : (apartment.rooms || 1) - 1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <img [src]="apartment.images && apartment.images[apartment._carouselIndex || 0] ? apartment.images[apartment._carouselIndex || 0] : 'assets/images/gallery-grid/img-grd-gal-1.jpg'"
+               [alt]="apartment.roomLabels && apartment.roomLabels[apartment._carouselIndex || 0] ? apartment.roomLabels[apartment._carouselIndex || 0] : 'Pièce ' + ((apartment._carouselIndex || 0)+1)"
+               class="card-img-cover" />
+          <button type="button" class="carousel-arrow right" 
+                  (click)="$event.stopPropagation(); apartment._carouselIndex = (apartment._carouselIndex < (apartment.rooms || 1) - 1 ? (apartment._carouselIndex || 0) + 1 : 0)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="carousel-indicator">{{ (apartment._carouselIndex || 0) + 1 }}/{{ apartment.rooms || (apartment.images?.length || 1) }}</div>
+          <!-- Overlay amélioré -->
+          <div class="card-overlay-info left" *ngIf="apartment._showOverlay">
+            <div class="overlay-room-label">
+              <div class="room-title" style="font-size:1.35rem;font-weight:700;text-shadow:0 2px 8px #000a;letter-spacing:0.5px;">
+                {{ getCurrentRoomLabel(apartment) }}
+              </div>
+              <div class="room-desc" style="font-size:1rem;font-weight:400;text-shadow:0 1px 6px #0007;">
+                {{ getCurrentRoomDescription(apartment) }}
+              </div>
+            </div>
+            <div class="overlay-details" style="margin-top:10px;">
+              <div><i class="fas fa-map-marker-alt"></i> {{ apartment.address }}, {{ apartment.city }}</div>
+              <div><i class="fas fa-door-open"></i> {{ apartment.rooms || (apartment.images ? apartment.images.length : 'N/A') }} pièces</div>
+              <div><i class="fas fa-building"></i> Type: {{ apartment.type === 'autre' ? apartment.customType : apartment.type }}</div>
+              <div><i class="fas fa-user"></i> Locataire: {{ getTenantDisplay(apartment) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="page-header">
+  <h4>Créer un bâtiment</h4>
+</div>
+
+<div class="content-container">
+  <form (ngSubmit)="create()" class="form-card building-grid">
+
+    <!-- Nom du bâtiment -->
+    <div class="form-group">
+      <input type="text" id="name" [(ngModel)]="form.name" name="name" class="underline-input" required placeholder="Nom du bâtiment" />
+      <label for="name" class="label">
+        <i class="fas fa-building"></i>
+        Nom du bâtiment
+      </label>
+      <div class="error" *ngIf="errors.name">{{ errors.name }}</div>
+    </div>
+
+    <!-- Type de bâtiment -->
+    <div class="form-group">
+      <select id="type" [(ngModel)]="form.type" name="type" class="underline-input" required (change)="onTypeChange($event)">
+        <option [ngValue]="null">Sélectionner...</option>
+        <option value="résidentiel">Résidentiel</option>
+        <option value="commercial">Commercial</option>
+        <option value="mixte">Mixte</option>
+        <option value="studio">Studio</option>
+        <option value="apartment">Appartement</option>
+        <option value="hotel">Hôtel</option>
+        <option value="villa">Villa</option>
+        <option value="autre">Autre...</option>
+      </select>
+      <label for="type" class="label">
+        <i class="fas fa-th-large"></i>
+        Type de bâtiment
+      </label>
+      <input *ngIf="isCustomType" type="text" id="customType" [(ngModel)]="form.customType" name="customType" class="underline-input" placeholder="Saisir le type" />
+      <div class="error" *ngIf="errors.type">{{ errors.type }}</div>
+      <div class="error" *ngIf="errors.customType">{{ errors.customType }}</div>
+    </div>
+
+    <!-- Nombre d'étages -->
+    <div class="form-group">
+      <input type="number" id="floors" [(ngModel)]="form.floors" name="floors" class="underline-input" required min="1" placeholder="Nombre d'étages" />
+      <label for="floors" class="label">
+        <i class="fas fa-layer-group"></i>
+        Nombre d'étages
+      </label>
+      <div class="error" *ngIf="errors.floors">{{ errors.floors }}</div>
+    </div>
+
+    <!-- Nombre d'appartements -->
+    <div class="form-group">
+      <input type="number" id="apartments" [(ngModel)]="form.apartments" name="apartments" class="underline-input" required min="1" placeholder="Nombre d'appartements" />
+      <label for="apartments" class="label">
+        <i class="fas fa-home"></i>
+        Nombre d'appartements
+      </label>
+      <div class="error" *ngIf="errors.apartments">{{ errors.apartments }}</div>
+    </div>
+
+    <!-- Adresse -->
+    <div class="form-group">
+      <input type="text" id="address" [(ngModel)]="form.address" name="address" class="underline-input" required placeholder="Adresse" />
+      <label for="address" class="label">
+        <i class="fas fa-map-marker-alt"></i>
+        Adresse
+      </label>
+      <div class="error" *ngIf="errors.address">{{ errors.address }}</div>
+    </div>
+
+    <!-- Ville -->
+    <div class="form-group">
+      <input type="text" id="city" [(ngModel)]="form.city" name="city" class="underline-input" required placeholder="Ville" />
+      <label for="city" class="label">
+        <i class="fas fa-city"></i>
+        Ville
+      </label>
+      <div class="error" *ngIf="errors.city">{{ errors.city }}</div>
+    </div>
+
+    <!-- Quartier / Région -->
+    <div class="form-group">
+      <input type="text" id="region" [(ngModel)]="form.region" name="region" class="underline-input" required placeholder="Quartier / Région" />
+      <label for="region" class="label">
+        <i class="fas fa-map-signs"></i>
+        Quartier / Région
+      </label>
+      <div class="error" *ngIf="errors.region">{{ errors.region }}</div>
+    </div>
+
+    <!-- Date de construction -->
+    <div class="form-group">
+      <input type="date" id="constructionDate" [(ngModel)]="form.constructionDate" name="constructionDate" class="underline-input" required placeholder="Date de construction" />
+      <label for="constructionDate" class="label">
+        <i class="fas fa-calendar-alt"></i>
+        Date de construction
+      </label>
+      <div class="error" *ngIf="errors.constructionDate">{{ errors.constructionDate }}</div>
+    </div>
+
+    <!-- Propriétaire avec possibilité de créer -->
+    <div class="form-group full-width" style="display: flex; align-items: center; gap: 10px;">
+      <div style="flex: 1; position: relative;">
+        <select id="ownerId" [(ngModel)]="form.ownerId" name="ownerId" class="underline-input" required>
+          <option [ngValue]="null">Sélectionner...</option>
+          <option *ngFor="let owner of owners" [ngValue]="owner.id">{{ owner.fullName }}</option>
+        </select>
+        <label for="ownerId" class="label">
+          <i class="fas fa-user-tie"></i>
+          Propriétaire
+        </label>
+        <div class="error" *ngIf="errors.ownerId">{{ errors.ownerId }}</div>
+      </div>
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="openOwnerDialog()">
+        <i class="fas fa-user-plus"></i> Nouveau propriétaire
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+
+  </form>
+</div>

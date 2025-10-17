@@ -1,0 +1,39 @@
+<div class="mat-dialog-container">
+  <button type="button" class="close-modal" (click)="onCancel()" aria-label="Fermer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card apartment-form">
+    <div class="form-grid grid-2x2">
+      <div class="form-group">
+        <input type="text" id="name" formControlName="name" class="underline-input" required placeholder="Saisis le nom" />
+        <label for="name" class="label">Nom de l'appartement <span class="label">*</span></label>
+        <div class="error" *ngIf="form.get('name')?.invalid && (form.get('name')?.touched || form.get('name')?.dirty)">Le nom est requis</div>
+      </div>
+      <div class="form-group">
+        <input type="text" id="type" formControlName="type" class="underline-input" required placeholder="Saisis le type" />
+        <label for="type" class="label">Type <span class="label">*</span></label>
+        <div class="error" *ngIf="form.get('type')?.invalid && (form.get('type')?.touched || form.get('type')?.dirty)">Le type est requis</div>
+      </div>
+      <div class="form-group">
+        <input type="number" id="rooms" formControlName="rooms" class="underline-input" required min="1" placeholder="Nombre de pièces" />
+        <label for="rooms" class="label">Nombre de pièces <span class="label">*</span></label>
+        <div class="error" *ngIf="form.get('rooms')?.invalid && (form.get('rooms')?.touched || form.get('rooms')?.dirty)">Le nombre de pièces doit être au moins 1</div>
+      </div>
+      <div class="form-group">
+        <div class="input-with-button">
+          <select id="buildingId" formControlName="buildingId" class="underline-input" required>
+            <option [ngValue]="null">Sélectionner...</option>
+            <option *ngFor="let building of buildings" [ngValue]="building.id">{{ building.name }}</option>
+          </select>
+          <label for="buildingId" class="label">Bâtiment <span class="label">*</span></label>
+          <button type="button" class="btn btn-light" (click)="openBuildingDialog()">Nouveau bâtiment</button>
+        </div>
+        <div class="error" *ngIf="form.get('buildingId')?.invalid && (form.get('buildingId')?.touched || form.get('buildingId')?.dirty)">Le bâtiment est requis</div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="onCancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enregistrer</button>
+    </div>
+  </form>
+</div>

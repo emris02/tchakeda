@@ -1,0 +1,30 @@
+<div class="page-header">
+  <h4>Propriétaires</h4>
+  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau propriétaire</button>
+</div>
+<div class="content-container">
+  <table class="table owners-table">
+    <thead>
+      <tr>
+        <th>Nom Complet</th>
+        <th>Pays</th>
+        <th>Téléphone</th>
+        <th>Adresse</th>
+        <th>Email</th>
+        <th>Profession</th>
+        <th>Batîment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let owner of owners" (click)="goToDetail(owner)" class="clickable-row">
+        <td>{{ owner.name }}</td>
+        <td>{{ owner.country }}</td>
+        <td>{{ owner.phone }}</td>
+        <td>{{ owner.adress }}</td>
+        <td>{{ owner.email }}</td>
+        <td>{{ owner.profession }}</td>
+  <td>{{ getBuildingCount(owner.id) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

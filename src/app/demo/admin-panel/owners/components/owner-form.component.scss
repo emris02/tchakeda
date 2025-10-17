@@ -1,0 +1,59 @@
+@use '/src/scss/form_imports';
+// Style popup centré et limité pour la modale
+form-card {
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	max-width: 600px;
+	width: 100%;
+	max-height: 90vh;
+	min-width: 320px;
+	border-radius: 12px;
+	box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+	overflow-y: auto;
+	padding: 24px 16px 16px 16px !important;
+}
+// Grille de formulaire 2x2
+.form-grid.grid-2x2 {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	margin: 25px 0;
+}
+
+// Bouton de fermeture en haut à droite
+.close-modal {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	background: transparent;
+	border: none;
+	font-size: 2rem;
+	color: #888;
+	cursor: pointer;
+	z-index: 10;
+	transition: color 0.2s;
+}
+.close-modal:hover {
+	color: #d32f2f;
+}
+.mat-dialog-container {
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	max-width: 95vw;
+}
+
+@media (max-width: 600px) {
+	.mat-dialog-container {
+		max-width: 98vw;
+		min-width: 0;
+		width: 100vw;
+		padding: 0.5rem 0.2rem 1rem 0.2rem !important;
+		border-radius: 8px !important;
+	}
+}

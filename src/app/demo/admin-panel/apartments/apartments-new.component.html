@@ -1,0 +1,212 @@
+<div class="page-container">
+  <div class="page-header">
+    <button class="btn btn-light back-btn" (click)="cancel()" title="Retour à la liste">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <h4 class="page-title">Créer un appartement</h4>
+  </div>
+
+  <div class="content-container">
+    <form (ngSubmit)="create()" class="form-card" #apartmentForm="ngForm">
+  <div class="form-grid">
+        <!-- Nom -->
+        <div class="form-group">
+          <input type="text" id="name" [(ngModel)]="form.name" name="name" class="underline-input" required 
+                 placeholder="Saisis le nom" #name="ngModel" />
+          <label for="name" class="label">
+            <i class="fas fa-tag"></i>
+            Nom <span class="required">*</span>
+          </label>
+          <div class="error" *ngIf="(name.invalid && name.touched) || errors.name">
+            {{ errors.name || 'Le nom est requis' }}
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="form-group">
+          <input list="apartmentTypes" id="type" [(ngModel)]="form.type" name="type" class="underline-input" required #type="ngModel" placeholder="Type d'appartement" />
+          <datalist id="apartmentTypes">
+            <option *ngFor="let t of apartmentTypes" [value]="t">{{ t }}</option>
+          </datalist>
+          <label for="type" class="label">
+            <i class="fas fa-list"></i>
+            Type <span class="required">*</span>
+          </label>
+          <!-- Suppression du type personnalisé -->
+          <div class="error" *ngIf="(type.invalid && type.touched) || errors.type">
+            {{ errors.type || 'Le type est requis' }}
+          </div>
+        </div>
+
+        <!-- Nombre de pièces -->
+        <div class="form-group">
+          <input type="number" id="rooms" [(ngModel)]="form.rooms" name="rooms" class="underline-input" 
+                 required min="1" placeholder="Nombre de pièces" #rooms="ngModel" />
+          <label for="rooms" class="label">
+            <i class="fas fa-door-open"></i>
+            Nombre de pièces <span class="required">*</span>
+          </label>
+          <div class="error" *ngIf="(rooms.invalid && rooms.touched) || errors.rooms">
+            {{ errors.rooms || 'Le nombre de pièces doit être au moins 1' }}
+          </div>
+        </div>
+
+        <!-- Location (montant) -->
+    <!-- Mensualité -->
+    <div class="form-group">
+      <div class="input-with-button">
+        <input type="number" id="rent" [(ngModel)]="form.rent" name="rent" class="underline-input" required min="1000" step="1000" placeholder="Loyer mensuel (CFA)" #rent="ngModel" />
+          <label for="rent" class="label">
+            <i class="fas fa-money-bill-wave"></i>
+            Loyer mensuel (CFA)
+          </label>
+      </div>
+      <div class="error" *ngIf="(rent.invalid && rent.touched) || errors.rent">
+            {{ errors.rent || 'Le loyer est requis' }}
+      </div>
+    </div>
+
+        <!-- Statut -->
+        <div class="form-group">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <select id="tenantId" class="underline-input tenant-select" (change)="onTenantSelected($event)" [value]="form.tenantId || ''">
+              <option value="">Libre</option>
+              <option *ngFor="let tenant of tenants" [value]="tenant.id">{{ tenant.fullName }}</option>
+            </select>
+            <label for="tenantId" class="label">
+              <i class="fas fa-user-check"></i>
+              Statut
+            </label>
+            <div class="input-with-button">
+              <button *ngIf="form.status === 'Libre'" type="button" class="btn btn-outline-primary btn-sm" (click)="openTenantDialog()">
+                <i class="fas fa-user-plus"></i> Nouveau locataire
+              </button>
+            </div>
+            <button *ngIf="form.status === 'Occupé'" type="button" class="btn btn-outline-danger btn-sm" (click)="removeTenant()">
+              <i class="fas fa-user-times"></i> Retirer le locataire
+            </button>
+          </div>
+        </div>
+
+        <!-- Bâtiment -->
+        <div class="form-group full-width">
+          <div class="building-selector">
+            <select id="buildingId" [(ngModel)]="form.buildingId" name="buildingId" class="underline-input" 
+                    required #buildingId="ngModel">
+              <option [ngValue]="null">Sélectionner un bâtiment...</option>
+              <option *ngFor="let building of buildings" [ngValue]="building.id">
+                {{ building.name }} - {{ building.city }}
+              </option>
+            </select>
+            <label for="buildingId" class="label">
+              <i class="fas fa-building"></i>
+              Bâtiment <span class="required">*</span>
+            </label>
+            <div class="input-with-button">
+              <button type="button" class="btn btn-outline-primary btn-sm new-building-btn" (click)="openBuildingDialog()">
+                <i class="fas fa-plus"></i> Nouveau bâtiment
+              </button>
+            </div>
+          </div>
+          <div class="error" *ngIf="(buildingId.invalid && buildingId.touched) || errors.buildingId">
+            {{ errors.buildingId || 'Le bâtiment est requis' }}
+          </div>
+        </div>
+<!-- Images des pièces -->
+<div class="form-group full-width image-section">
+  <div class="section-header">
+    <h5>Photos des pièces</h5>
+  <span class="image-counter">{{ images.length }}/{{ form.rooms }} pièce{{ form.rooms > 1 ? 's' : '' }}</span>
+  </div>
+  <p class="input-description">Ajoutez jusqu'à 6 pièces avec une photo, un nom obligatoire et une description facultative.</p>
+  
+  <div class="apartment-images-grid">
+    <!-- Pièces existantes -->
+    <div *ngFor="let img of images; let i = index" class="image-grid-item">
+      <div class="image-container">
+        <img [src]="getDisplayImage(img, roomLabels[i] || '')" 
+             [alt]="roomLabels[i] || 'Pièce ' + (i+1)" 
+             class="apartment-img" />
+        <div class="image-overlay">
+          <button type="button" class="btn-change-image" (click)="changeRoomImage(i)" title="Changer l'image">
+            <i class="fas fa-camera"></i>
+          </button>
+          <button type="button" class="btn-remove-image" (click)="removeImage(i)" title="Supprimer">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="room-info">
+        <div class="form-group">
+          <input type="text" id="roomLabel-{{i}}" class="underline-input" 
+                 [(ngModel)]="roomLabels[i]" name="roomLabels[{{i}}]" 
+                 placeholder="Ex: Salon, Chambre, Cuisine..." required />
+          <label for="roomLabel-{{i}}" class="label">Nom de la pièce <span class="required">*</span></label>
+        </div>
+        <div class="form-group">
+          <textarea id="roomDesc-{{i}}" class="underline-input" 
+                    [(ngModel)]="roomDescriptions[i]" name="roomDescriptions[{{i}}]" 
+                    placeholder="Ex: Dimensions, équipements, orientation..."
+                    maxlength="200"></textarea>
+          <label for="roomDesc-{{i}}" class="label">Description (facultatif)</label>
+          <div class="char-count">{{ (roomDescriptions[i] || '').length }}/200</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images en attente -->
+    <div *ngFor="let img of pendingImages; let idx = index" class="image-grid-item">
+      <div class="image-container">
+        <img [src]="img.dataUrl" class="apartment-img" alt="Aperçu pièce" />
+        <button type="button" class="btn-remove-preview" (click)="removePendingImage(idx)" title="Annuler l'image">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="room-info">
+        <div class="form-group">
+          <input type="text" id="pendingLabel-{{idx}}" [(ngModel)]="img.label" class="underline-input" placeholder="Nom de la pièce (obligatoire)" required />
+          <label class="label" for="pendingLabel-{{idx}}">Nom de la pièce <span class="required">*</span></label>
+        </div>
+        <div class="form-group">
+          <textarea id="pendingDesc-{{idx}}" [(ngModel)]="img.description" class="underline-input" placeholder="Description (facultatif)" maxlength="200"></textarea>
+          <label class="label" for="pendingDesc-{{idx}}">Description (facultatif)</label>
+            <button type="button" class="btn btn-success btn-sm" [disabled]="!img.label || !img.dataUrl" (click)="confirmPendingImage(idx)"><i class="fas fa-check"></i> Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ajouter une nouvelle pièce -->
+    <div class="image-grid-item add-image" *ngIf="images.length + pendingImages.length < form.rooms">
+      <div class="add-image-content add-image-flex">
+        <input #newImageInput type="file" (change)="onNewImagesSelected($event)" 
+          accept="image/jpeg,image/png,image/webp" multiple style="display: none;" />
+        <button type="button" class="btn btn-outline-primary" (click)="newImageInput.click()">
+          <i class="fas fa-plus-circle"></i> Ajouter une pièce
+        </button>
+        <div class="file-requirements">
+          <small>Formats: JPG, PNG, WebP • Max: 2MB</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message limite -->
+  <div *ngIf="images.length >= form.rooms" class="limit-message">
+      <i class="fas fa-check-circle"></i>
+      <p>Maximum de 6 pièces atteint</p>
+    </div>
+  </div>
+
+  <!-- Erreur -->
+  <div class="error" *ngIf="errors.roomImages">{{ errors.roomImages }}</div>
+  </div>
+
+  <!-- Boutons d'action -->
+    <div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save"></i> Enregistrer
+    </button>
+    <button type="button" class="btn btn-light" (click)="cancel()">
+      <i class="fas fa-times"></i> Annuler
+    </button>
+  </div>
+</div>

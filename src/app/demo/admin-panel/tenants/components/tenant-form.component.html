@@ -1,0 +1,33 @@
+<div class="mat-dialog-container">
+  <button type="button" class="close-modal" (click)="onCancel()" aria-label="Fermer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card tenant-form">
+    <div class="form-grid grid-2x2">
+      <div class="form-group">
+        <input type="text" id="fullName" formControlName="fullName" class="underline-input" required placeholder="Nom complet" />
+        <label for="fullName" class="label">Nom complet <span class="required">*</span></label>
+        <div class="error" *ngIf="form.get('fullName')?.invalid && (form.get('fullName')?.touched || form.get('fullName')?.dirty)">Le nom complet est requis</div>
+      </div>
+      <div class="form-group">
+        <input type="email" id="email" formControlName="email" class="underline-input" required placeholder="Email" />
+        <label for="email" class="label">Email <span class="required">*</span></label>
+        <div class="error" *ngIf="form.get('email')?.invalid && (form.get('email')?.touched || form.get('email')?.dirty)">L'email est requis</div>
+      </div>
+      <div class="form-group">
+        <input type="text" id="phone" formControlName="phone" class="underline-input" required placeholder="Téléphone" />
+        <label for="phone" class="label">Téléphone <span class="required">*</span></label>
+        <div class="error" *ngIf="form.get('phone')?.invalid && (form.get('phone')?.touched || form.get('phone')?.dirty)">Le téléphone est requis</div>
+      </div>
+      <div class="form-group">
+        <input type="text" id="address" formControlName="address" class="underline-input" required placeholder="Adresse" />
+        <label for="address" class="label">Adresse <span class="required">*</span></label>
+        <div class="error" *ngIf="form.get('address')?.invalid && (form.get('address')?.touched || form.get('address')?.dirty)">L'adresse est requise</div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="onCancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enregistrer</button>
+    </div>
+  </form>
+</div>

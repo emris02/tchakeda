@@ -1,0 +1,94 @@
+@use '/src/scss/form_imports.scss';
+.page-header { 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.content-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 24px;
+}
+
+/* Formulaire en grille 2x2 */
+.rental-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); // 2 colonnes égales
+  gap: 24px;
+}
+
+/* Form card */
+.form-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 24px;
+  max-width: auto;
+  margin: 0 auto;
+}
+
+/* Champs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .underline-input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #e0e0e0;
+    outline: none;
+    padding: 8px 0;
+    font-size: 16px;
+    background: transparent;
+    transition: border-color 0.2s;
+    &:focus {
+      border-bottom-color: #1976d2;
+    }
+  }
+
+  .error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* Champs avec bouton ou input + bouton */
+  > div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+}
+
+/* Champs qui prennent 2 colonnes */
+.form-group.full-width,
+.form-actions {
+  grid-column: span 2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tenant-grid {
+    grid-template-columns: 1fr; // 1 colonne sur mobile
+  }
+  .form-group.full-width,
+  .form-actions {
+    grid-column: span 1;
+  }
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}

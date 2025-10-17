@@ -1,0 +1,24 @@
+<div class="page-header">
+  <h4>Paiements des propriétaires</h4>
+  <button class="btn btn-primary" (click)="goToNew()">+ Nouveau paiement</button>
+</div>
+<div class="content-container">
+  <table class="table payments-table">
+    <thead>
+      <tr>
+        <th>Propriétaire</th>
+        <th>Montant</th>
+        <th>Date</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let payment of payments">
+        <td>{{ payment.ownerName }}</td>
+          <td>{{ payment.amount | currency:'XOF' }}</td>
+        <td>{{ payment.date }}</td>
+        <td>{{ payment.status }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

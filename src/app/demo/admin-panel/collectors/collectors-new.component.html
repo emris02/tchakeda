@@ -1,0 +1,406 @@
+<div class="page-container">
+  <!-- En-tête avec navigation -->
+  <div class="page-header">
+    <button class="btn btn-light back-btn" (click)="cancel()">
+      <i class="fas fa-arrow-left"></i> Recouvreurs
+    </button>
+    <h4 class="page-title">Nouveau recouvreur</h4>
+  </div>
+
+  <!-- Formulaire de création -->
+  <div class="content-container">
+    <form (ngSubmit)="create()" class="form-card collector-form">
+      
+      <!-- Section informations personnelles -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-user-tie"></i>
+          <h5>Informations personnelles</h5>
+        </div>
+        
+        <div class="collector-grid">
+          <!-- Nom complet -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="fullName" [(ngModel)]="form.fullName" name="fullName" 
+                     class="underline-input" required placeholder=" " />
+              <label for="fullName" class="label">
+                <i class="fas fa-user"></i>
+                Nom complet <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.fullName">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.fullName }}
+            </div>
+          </div>
+
+          <!-- Pays -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="country" [(ngModel)]="form.country" name="country" 
+                     class="underline-input" required placeholder=" " />
+              <label for="country" class="label">
+                <i class="fas fa-globe"></i>
+                Pays <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.country">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.country }}
+            </div>
+          </div>
+
+          <!-- Adresse -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="address" [(ngModel)]="form.address" name="address" 
+                     class="underline-input" required placeholder=" " />
+              <label for="address" class="label">
+                <i class="fas fa-map-marker-alt"></i>
+                Adresse <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.address">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.address }}
+            </div>
+          </div>
+
+          <!-- Téléphone -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="phone" [(ngModel)]="form.phone" name="phone" 
+                     class="underline-input" required placeholder=" " />
+              <label for="phone" class="label">
+                <i class="fas fa-phone"></i>
+                Téléphone <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.phone">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.phone }}
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="email" id="email" [(ngModel)]="form.email" name="email" 
+                     class="underline-input" required placeholder=" " />
+              <label for="email" class="label">
+                <i class="fas fa-envelope"></i>
+                Email <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.email">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.email }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section zone d'action -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-map-marked-alt"></i>
+          <h5>Zone d'action</h5>
+        </div>
+        
+        <div class="action-zone-grid">
+          <!-- Sélection du bâtiment -->
+          <div class="form-group">
+            <div class="input-container">
+              <select id="buildingId" [(ngModel)]="form.buildingId" name="buildingId" 
+                      class="underline-input" required (change)="onBuildingChange()">
+                <option value="">Sélectionner un bâtiment...</option>
+                <option *ngFor="let building of buildings" [value]="building.id">
+                  {{ building.name }} - {{ building.city }}
+                </option>
+              </select>
+              <label for="buildingId" class="label">
+                <i class="fas fa-building"></i>
+                Bâtiment <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.buildingId">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}
+            </div>
+          </div>
+
+          <!-- Sélection des appartements -->
+          <div class="form-group full-width" *ngIf="form.buildingId">
+            <div class="input-container">
+              <select multiple id="apartmentIds" [(ngModel)]="form.apartmentIds" name="apartmentIds" 
+                      class="underline-input apartments-select" required>
+                <option *ngFor="let apartment of filteredApartments" [value]="apartment.id">
+                  {{ apartment.name }} - {{ apartment.type }} - {{ apartment.mention ? (apartment.mention | number) + ' FCFA' : '-' }}
+                </option>
+              </select>
+              <label for="apartmentIds" class="label">
+                <i class="fas fa-home"></i>
+                Appartements à recouvrer <span class="required">*</span>
+              </label>
+            </div>
+            
+            <!-- Résumé de la sélection -->
+            <div class="selection-summary" *ngIf="form.apartmentIds && form.apartmentIds.length > 0">
+              <div class="summary-header">
+                <strong>{{ form.apartmentIds.length }} appartement(s) sélectionné(s)</strong>
+                <span class="total-rent">
+                  Loyer total: {{ getTotalRent() | number }} FCFA/mois
+                </span>
+              </div>
+              <div class="apartments-list">
+                <div *ngFor="let apartmentId of form.apartmentIds" class="apartment-item">
+                  <span>{{ getApartmentName(apartmentId) }}</span>
+                  <button type="button" class="btn-remove" (click)="removeApartment(apartmentId)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="error" *ngIf="errors.apartmentIds">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.apartmentIds }}
+            </div>
+          </div>
+
+          <!-- Message si aucun bâtiment sélectionné -->
+          <div class="info-message" *ngIf="!form.buildingId">
+            <i class="fas fa-info-circle"></i>
+            <p>
+              Sélectionnez d'abord un bâtiment pour voir la liste des appartements disponibles.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section pièce d'identité -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-id-card"></i>
+          <h5>Pièce d'identité</h5>
+        </div>
+        
+        <div class="identity-section">
+          <!-- Upload de photo -->
+          <div class="identity-upload-section">
+            <label class="upload-label">
+              <i class="fas fa-camera"></i>
+              Photo / Pièce d'identité
+            </label>
+            
+            <div class="upload-container">
+              <div *ngIf="form.identityImage" class="identity-preview">
+                <div class="preview-image">
+                  <img [src]="form.identityImage" alt="Photo d'identité" />
+                  <div class="preview-overlay">
+                    <button type="button" class="btn-icon btn-danger" (click)="form.identityImage = ''">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                    <label class="btn-icon btn-primary">
+                      <i class="fas fa-sync"></i>
+                      <input type="file" accept="image/*" (change)="onIdentitySelected($event)" hidden />
+                    </label>
+                  </div>
+                </div>
+                <div class="preview-info">
+                  <span class="file-size">Image téléversée</span>
+                  <button type="button" class="btn-link" (click)="form.identityImage = ''">
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+              
+              <div *ngIf="!form.identityImage" class="identity-upload-placeholder">
+                <label class="upload-area">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <span class="upload-text">Cliquez pour téléverser</span>
+                  <span class="upload-subtext">ou glissez-déposez une image</span>
+                  <input type="file" accept="image/*" (change)="onIdentitySelected($event)" hidden />
+                </label>
+                <div class="upload-requirements">
+                  <i class="fas fa-info-circle"></i>
+                  Formats: JPG, PNG, WebP • Max: 3Mo
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations de la pièce d'identité -->
+          <div class="identity-fields-grid">
+            <div class="form-group">
+              <div class="input-container">
+                <select id="identityType" [(ngModel)]="form.identityType" name="identityType" 
+                        class="underline-input">
+                  <option value="">Type de pièce</option>
+                  <option value="CNI">Carte Nationale d'Identité</option>
+                  <option value="Passport">Passeport</option>
+                  <option value="Permis">Permis de conduire</option>
+                  <option value="CarteSejour">Carte de séjour</option>
+                  <option value="Autre">Autre</option>
+                </select>
+                <label for="identityType" class="label">
+                  <i class="fas fa-id-badge"></i>
+                  Type de pièce
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-container">
+                <input type="text" id="identityNumber" [(ngModel)]="form.identityNumber" name="identityNumber" 
+                       class="underline-input" placeholder=" " />
+                <label for="identityNumber" class="label">
+                  <i class="fas fa-hashtag"></i>
+                  Numéro de la pièce
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aperçu de la carte d'identité -->
+          <div class="identity-card-preview" *ngIf="form.identityImage || form.identityType || form.identityNumber">
+            <div class="preview-header">
+              <h6>Aperçu de la carte</h6>
+              <span class="preview-badge">Aperçu</span>
+            </div>
+            <div class="identity-card">
+              <div class="card-left">
+                <div class="card-photo">
+                  <img *ngIf="form.identityImage" [src]="form.identityImage" alt="Photo" />
+                  <div *ngIf="!form.identityImage" class="card-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                </div>
+                <div class="card-type" *ngIf="form.identityType">
+                  {{ form.identityType }}
+                </div>
+              </div>
+              <div class="card-right">
+                <div class="card-name">{{ form.fullName || 'Nom complet' }}</div>
+                <div class="card-number" *ngIf="form.identityNumber">
+                  N° {{ form.identityNumber }}
+                </div>
+                <div class="card-address" *ngIf="form.address">
+                  {{ form.address }}
+                </div>
+                <div class="card-country" *ngIf="form.country">
+                  {{ form.country }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section contact affilié -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-users"></i>
+          <h5>Contact d'urgence</h5>
+        </div>
+        
+        <div class="affiliation-section">
+          <!-- Toggle d'activation -->
+          <div class="affiliation-toggle">
+            <label class="toggle-label">
+              <span class="toggle-text">Ajouter un contact affilié</span>
+              <span class="toggle-description">Personne à contacter en cas d'urgence</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="showAffiliated" name="showAffiliated" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <!-- Formulaire du contact affilié -->
+          <div *ngIf="showAffiliated" class="affiliated-form">
+            <div class="affiliated-grid">
+              <div class="form-group">
+                <div class="input-container">
+                  <input type="text" id="aff_fullName" [(ngModel)]="form.affiliatedPerson.fullName" 
+                         name="aff_fullName" class="underline-input" placeholder=" " />
+                  <label for="aff_fullName" class="label">
+                    <i class="fas fa-user"></i>
+                    Nom complet
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-container">
+                  <input type="text" id="aff_relation" [(ngModel)]="form.affiliatedPerson.relation" 
+                         name="aff_relation" class="underline-input" placeholder=" " />
+                  <label for="aff_relation" class="label">
+                    <i class="fas fa-link"></i>
+                    Relation
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-container">
+                  <input type="text" id="aff_phone" [(ngModel)]="form.affiliatedPerson.phone" 
+                         name="aff_phone" class="underline-input" placeholder=" " />
+                  <label for="aff_phone" class="label">
+                    <i class="fas fa-phone"></i>
+                    Téléphone
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-container">
+                  <input type="email" id="aff_email" [(ngModel)]="form.affiliatedPerson.email" 
+                         name="aff_email" class="underline-input" placeholder=" " />
+                  <label for="aff_email" class="label">
+                    <i class="fas fa-envelope"></i>
+                    Email
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions du formulaire -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">
+          <i class="fas fa-times"></i>
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary btn-submit" [disabled]="isSubmitting">
+          <i class="fas fa-plus-circle" *ngIf="!isSubmitting"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+          {{ isSubmitting ? 'Création en cours...' : 'Créer le recouvreur' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal de succès -->
+  <div *ngIf="showSuccessModal" class="modal-overlay">
+    <div class="modal-card success-modal">
+      <div class="modal-icon success">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h5>Recouvreur créé avec succès !</h5>
+      <p>Le recouvreur a été ajouté et peut maintenant gérer les paiements.</p>
+      <div class="collector-summary" *ngIf="newCollector">
+        <div class="summary-item">
+          <strong>{{ newCollector.fullName }}</strong>
+          <span>{{ newCollector.apartmentIds?.length || 0 }} appartement(s)</span>
+        </div>
+      </div>
+      <div class="form-actions center">
+        <button type="button" class="btn btn-primary" (click)="goToCollectorsList()">
+          <i class="fas fa-list"></i>
+          Voir la liste
+        </button>
+        <button type="button" class="btn btn-outline-primary" (click)="createAnother()">
+          <i class="fas fa-plus"></i>
+          Ajouter un autre
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

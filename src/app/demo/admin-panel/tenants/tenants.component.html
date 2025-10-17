@@ -1,0 +1,40 @@
+<div class="page-header">
+  <h4>Locataires</h4>
+  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau locataire</button>
+</div>
+<div class="content-container">
+  <table class="table tenants-table">
+    <thead>
+      <tr>
+        <th>Profil</th>
+        <th>Nom complet</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>Situation matrimoniale</th>
+        <th>Contact urgence</th>
+        <th>Type logement</th>
+        <th>Loyer</th>
+        <th>Date de rentrer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tenant of tenants" (click)="goToDetail(tenant)" class="clickable-row">
+        <td>
+          <img *ngIf="tenant.identityImage" [src]="tenant.identityImage" alt="Photo" class="tenant-photo" />
+          <img *ngIf="!tenant.identityImage && tenant.profileImage" [src]="tenant.profileImage" alt="Photo" class="tenant-photo" />
+          <span *ngIf="!tenant.identityImage && !tenant.profileImage" class="tenant-avatar">
+            <i class="feather icon-user"></i>
+          </span>
+        </td>
+        <td>{{ tenant.fullName }}</td>
+        <td>{{ tenant.email }}</td>
+        <td>{{ tenant.phone }}</td>
+        <td>{{ tenant.maritalStatus || 'Non renseignée' }}</td>
+        <td>{{ tenant.emergencyContact || 'Non renseignée' }}</td>
+        <td>{{ tenant.rentalType || 'Non renseigné' }}</td>
+          <td>{{ getTenantRent(tenant) }}</td>
+          <td>{{ getTenantStartDate(tenant) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

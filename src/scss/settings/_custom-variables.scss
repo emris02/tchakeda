@@ -1,0 +1,66 @@
+@use 'sass:color';
+@use 'sass:map';
+
+// ----------------------------
+// Variables couleurs
+// ----------------------------
+$primary-color: #ff9800;
+$secondary-color: #4caf50;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+
+// Exemple : remplacer lighten/darken par color.adjust
+$input-focus-border-color: color.adjust($primary-color, $lightness: 25%);
+$custom-control-indicator-active-bg: color.adjust($primary-color, $lightness: 35%);
+$custom-range-thumb-active-bg: color.adjust($primary-color, $lightness: 35%);
+
+// ----------------------------
+// Variables Bootstrap
+// ----------------------------
+$component-active-bg: $primary-color;
+
+// Form validation states
+$form-validation-states: (
+  'valid': (
+    'color': $success-color,
+    'icon': 'check'
+  ),
+  'invalid': (
+    'color': $danger-color,
+    'icon': 'exclamation'
+  )
+);
+
+// ----------------------------
+// Embed responsive aspect ratios
+// ----------------------------
+// Correctement défini sans fonction couleur
+$embed-responsive-aspect-ratios: (21 9, 16 9, 4 3, 1 1);
+
+// ----------------------------
+// Exemples de maps custom
+// ----------------------------
+$custom-maps: map.merge(
+  (
+    'header': (
+      'bg': $primary-color,
+      'color': $light-color
+    ),
+    'footer': (
+      'bg': $dark-color,
+      'color': $light-color
+    )
+  ),
+  ()
+);
+
+// --------------------------
+// Variables typographie
+// ----------------------------
+$font-family-base: 'Roboto', sans-serif;
+$font-size-base: 1rem;
+$line-height-base: 1.5;

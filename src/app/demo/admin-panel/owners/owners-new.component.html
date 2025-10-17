@@ -1,0 +1,219 @@
+<div class="page-container">
+  <!-- En-tête avec navigation -->
+  <div class="page-header">
+    <button class="btn btn-light back-btn" (click)="cancel()">
+      <i class="fas fa-arrow-left"></i> Propriétaires
+    </button>
+    <h4 class="page-title">Nouveau propriétaire</h4>
+  </div>
+
+  <!-- Formulaire de création -->
+  <div class="content-container">
+    <form (ngSubmit)="create()" class="form-card owner-form">
+      
+      <!-- Section informations personnelles -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-user-circle"></i>
+          <h5>Informations personnelles</h5>
+        </div>
+        
+        <div class="owner-grid">
+          <!-- Nom complet -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="fullName" [(ngModel)]="form.fullName" name="fullName" 
+                     class="underline-input" required placeholder=" " />
+              <label for="fullName" class="label">
+                <i class="fas fa-user"></i>
+                Nom complet <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.fullName">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.fullName }}
+            </div>
+          </div>
+
+          <!-- Pays -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="country" [(ngModel)]="form.country" name="country" 
+                     class="underline-input" required placeholder=" " />
+              <label for="country" class="label">
+                <i class="fas fa-globe"></i>
+                Pays <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.country">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.country }}
+            </div>
+          </div>
+
+          <!-- Téléphone -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="phone" [(ngModel)]="form.phone" name="phone" 
+                     class="underline-input" required placeholder=" " />
+              <label for="phone" class="label">
+                <i class="fas fa-phone"></i>
+                Téléphone <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.phone">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.phone }}
+            </div>
+          </div>
+
+          <!-- Adresse -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="address" [(ngModel)]="form.address" name="address" 
+                     class="underline-input" required placeholder=" " />
+              <label for="address" class="label">
+                <i class="fas fa-map-marker-alt"></i>
+                Adresse <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.address">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.address }}
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <div class="input-container">
+              <input type="email" id="email" [(ngModel)]="form.email" name="email" 
+                     class="underline-input" required placeholder=" " />
+              <label for="email" class="label">
+                <i class="fas fa-envelope"></i>
+                Email <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.email">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.email }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section affiliation bâtiment -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-building"></i>
+          <h5>Affiliation au bâtiment</h5>
+        </div>
+        
+        <div class="building-affiliation">
+          <!-- Sélection du bâtiment -->
+          <div class="form-group full-width">
+            <div class="select-with-action">
+              <div class="input-container">
+                <select id="buildingId" [(ngModel)]="form.buildingId" name="buildingId" 
+                        class="underline-input">
+                  <option value="">Sélectionner un bâtiment...</option>
+                  <option *ngFor="let building of buildings" [ngValue]="building.id">
+                    {{ building.name }} - {{ building.city }}
+                  </option>
+                </select>
+                <label for="buildingId" class="label">
+                  <i class="fas fa-home"></i>
+                  Bâtiment affilié
+                </label>
+              </div>
+              
+              <button type="button" class="btn btn-outline-primary btn-add" 
+                      (click)="goToNewBuilding()">
+                <i class="fas fa-plus"></i>
+                Nouveau bâtiment
+              </button>
+            </div>
+            
+            <!-- Info bâtiment sélectionné -->
+            <div *ngIf="selectedBuilding" class="building-preview">
+              <div class="building-info">
+                <strong>{{ selectedBuilding.name }}</strong>
+                <div class="building-details">
+                  <span><i class="fas fa-map-pin"></i> {{ selectedBuilding.address }}</span>
+                  <span><i class="fas fa-city"></i> {{ selectedBuilding.city }}</span>
+                  <span><i class="fas fa-building"></i> {{ selectedBuilding.type }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="error" *ngIf="errors.buildingId">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}
+            </div>
+          </div>
+
+          <!-- Message d'information -->
+          <div class="info-message" *ngIf="!form.buildingId">
+            <i class="fas fa-info-circle"></i>
+            <p>
+              L'affiliation à un bâtiment est optionnelle. Vous pourrez l'ajouter plus tard 
+              depuis la fiche du propriétaire.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section informations complémentaires -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-info-circle"></i>
+          <h5>Informations complémentaires</h5>
+        </div>
+        
+        <div class="additional-info">
+          <div class="form-group full-width">
+            <div class="input-container">
+              <textarea id="notes" [(ngModel)]="form.notes" name="notes" 
+                        class="underline-input textarea" placeholder=" "
+                        maxlength="500"></textarea>
+              <label for="notes" class="label">
+                <i class="fas fa-sticky-note"></i>
+                Notes supplémentaires
+              </label>
+            </div>
+            <div class="char-count">
+              {{ (form.notes || '').length }}/500 caractères
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions du formulaire -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">
+          <i class="fas fa-times"></i>
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary btn-submit">
+          <i class="fas fa-plus-circle"></i>
+          Créer le propriétaire
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Modal de confirmation -->
+  <div *ngIf="showSuccessModal" class="modal-overlay">
+    <div class="modal-card success-modal">
+      <div class="modal-icon success">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h5>Propriétaire créé avec succès !</h5>
+      <p>Le propriétaire a été ajouté à la base de données.</p>
+      <div class="form-actions center">
+        <button type="button" class="btn btn-primary" (click)="goToOwnersList()">
+          <i class="fas fa-list"></i>
+          Voir la liste
+        </button>
+        <button type="button" class="btn btn-outline-primary" (click)="createAnother()">
+          <i class="fas fa-plus"></i>
+          Ajouter un autre
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

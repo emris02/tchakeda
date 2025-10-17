@@ -1,0 +1,189 @@
+<div class="page-header">
+  <h4>Créer un locataire</h4>
+</div>
+
+<div class="content-container">
+  <form (ngSubmit)="create()" class="form-card">
+    <section>
+      <h5>Informations personnelles</h5>
+      <div class="tenant-grid">
+        <div class="form-group">
+          <input type="file" id="identityImage" accept="image/*" name="identityImage" class="tenant-photo-container" />
+          <label for="identityImage" class="label">
+            <i class="fas fa-camera"></i>
+            Photo d'identité <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.identityImage">{{ errors.identityImage }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="fullName" [(ngModel)]="form.fullName" name="fullName" class="underline-input" required placeholder="Nom complet" />
+          <label for="fullName" class="label">
+            <i class="fas fa-user"></i>
+            Nom complet <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.fullName">{{ errors.fullName }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="country" [(ngModel)]="form.country" name="country" class="underline-input" required placeholder="Pays" autocomplete="off" />
+          <label for="country" class="label">
+            <i class="fas fa-globe"></i>
+            Pays <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.country">{{ errors.country }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="address" [(ngModel)]="form.address" name="address" class="underline-input" required placeholder="Adresse" />
+          <label for="address" class="label">
+            <i class="fas fa-map-marker-alt"></i>
+            Adresse <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.address">{{ errors.address }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="phone" [(ngModel)]="form.phone" name="phone" class="underline-input" required placeholder="Téléphone" />
+          <label for="phone" class="label">
+            <i class="fas fa-phone"></i>
+            Téléphone <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.phone">{{ errors.phone }}</div>
+        </div>
+        <div class="form-group">
+          <input type="email" id="email" [(ngModel)]="form.email" name="email" class="underline-input" required placeholder="Email" />
+          <label for="email" class="label">
+            <i class="fas fa-envelope"></i>
+            Email <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.email">{{ errors.email }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="profession" [(ngModel)]="form.profession" name="profession" class="underline-input" placeholder="Profession" autocomplete="off" />
+          <label for="profession" class="label">
+            <i class="fas fa-briefcase"></i>
+            Profession
+          </label>
+        </div>
+      </div>
+      <div class="tenant-grid">
+        <div class="form-group">
+          <select id="identityType" [(ngModel)]="form.identityType" name="identityType" class="underline-input" required>
+            <option value="">-- Sélectionner --</option>
+            <option value="CNI">Carte Nationale d'Identité</option>
+            <option value="Passeport">Passeport</option>
+            <option value="Permis">Permis de conduire</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <label for="identityType" class="label">
+            <i class="fas fa-id-badge"></i>
+            Type de pièce d'identité <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.identityType">{{ errors.identityType }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="identityNumber" [(ngModel)]="form.identityNumber" name="identityNumber" class="underline-input" required placeholder="Numéro de pièce d'identité" />
+          <label for="identityNumber" class="label">
+            <i class="fas fa-hashtag"></i>
+            Numéro de pièce d'identité <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.identityNumber">{{ errors.identityNumber }}</div>
+        </div>
+        <div class="form-group">
+          <select id="maritalStatus" [(ngModel)]="form.maritalStatus" name="maritalStatus" class="underline-input">
+            <option value="">-- Sélectionner --</option>
+            <option value="Célibataire">Célibataire</option>
+            <option value="Marié(e)">Marié(e)</option>
+            <option value="Divorcé(e)">Divorcé(e)</option>
+            <option value="Veuf(ve)">Veuf(ve)</option>
+          </select>
+          <label for="maritalStatus" class="label">
+            <i class="fas fa-heart"></i>
+            Situation matrimoniale <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.maritalStatus">{{ errors.maritalStatus }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="emergencyContact" [(ngModel)]="form.emergencyContact" name="emergencyContact" class="underline-input" placeholder="Contact d'urgence" />
+          <label for="emergencyContact" class="label">
+            <i class="fas fa-phone"></i>
+            Contact d'urgence <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.emergencyContact">{{ errors.emergencyContact }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="rentalType" [(ngModel)]="form.rentalType" name="rentalType" class="underline-input" placeholder="Type de logement loué" />
+          <label for="rentalType" class="label">
+            <i class="fas fa-home"></i>
+            Type de logement loué <span style="color:red">*</span>
+          </label>
+          <div class="error" *ngIf="errors.rentalType">{{ errors.rentalType }}</div>
+        </div>
+      </div>
+    </section>
+
+<section>
+    <!-- Toggle Personne affiliée -->
+    <div class="affiliation-toggle-section" style="margin: 24px 0; display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-weight: 500;">Personne affiliée</span>
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="showAffiliated" name="showAffiliated" />
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <!-- Personne affiliée -->
+    <div class="form-card affiliation-section" *ngIf="showAffiliated">
+      <div class="tenant-grid">
+        <div class="form-group">
+          <input type="text" id="affiliatedPersonRelation" [(ngModel)]="form.affiliatedPerson.relation" name="affiliatedPersonRelation" class="underline-input" placeholder="Type de relation" />
+          <label for="affiliatedPersonRelation" class="label">Type de relation <span style="color:red">*</span></label>
+          <div class="error" *ngIf="errors.affiliatedPersonRelation">{{ errors.affiliatedPersonRelation }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="affiliatedPersonFullName" [(ngModel)]="form.affiliatedPerson.fullName" name="affiliatedPersonFullName" class="underline-input" placeholder="Prénom et nom" />
+          <label for="affiliatedPersonFullName" class="label">Prénom et nom <span style="color:red">*</span></label>
+          <div class="error" *ngIf="errors.affiliatedPersonFullName">{{ errors.affiliatedPersonFullName }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="affiliatedPersonPhone" [(ngModel)]="form.affiliatedPerson.phone" name="affiliatedPersonPhone" class="underline-input" placeholder="Téléphone" />
+          <label for="affiliatedPersonPhone" class="label">Téléphone <span style="color:red">*</span></label>
+          <div class="error" *ngIf="errors.affiliatedPersonPhone">{{ errors.affiliatedPersonPhone }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="affiliatedPersonAddress" [(ngModel)]="form.affiliatedPerson.address" name="affiliatedPersonAddress" class="underline-input" placeholder="Adresse" />
+          <label for="affiliatedPersonAddress" class="label">Adresse <span style="color:red">*</span></label>
+          <div class="error" *ngIf="errors.affiliatedPersonAddress">{{ errors.affiliatedPersonAddress }}</div>
+        </div>
+        <div class="form-group">
+          <input type="email" id="affiliatedPersonEmail" [(ngModel)]="form.affiliatedPerson.email" name="affiliatedPersonEmail" class="underline-input" placeholder="E-mail" />
+          <label for="affiliatedPersonEmail" class="label">E-mail</label>
+          <div class="error" *ngIf="errors.affiliatedPersonEmail">{{ errors.affiliatedPersonEmail }}</div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="affiliatedPersonProfession" [(ngModel)]="form.affiliatedPerson.profession" name="affiliatedPersonProfession" class="underline-input" placeholder="Profession" />
+          <label for="affiliatedPersonProfession"class="label">Profession</label>
+          <div class="error" *ngIf="errors.affiliatedPersonProfession">{{ errors.affiliatedPersonProfession }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- Sélection du bâtiment puis des appartements à louer -->
+    <div class="form-group">
+      <label for="buildingId" class="label">Bâtiment</label>
+      <select id="buildingId" [(ngModel)]="form.buildingId" name="buildingId" class="underline-input" (change)="onBuildingChange()">
+        <option value="" disabled selected>Choisir un bâtiment</option>
+        <option *ngFor="let b of buildings" [value]="b.id">{{ b.name }}</option>
+      </select>
+    </div>
+    <div class="form-group" *ngIf="form.buildingId">
+      <label for="apartments" class="label">Appartements à louer (optionnel)</label>
+      <select id="apartments" [(ngModel)]="form.apartments" name="apartments" class="underline-input" multiple>
+        <option *ngFor="let apt of filteredApartments" [value]="apt.id">{{ apt.name }} - {{ apt.address }}</option>
+      </select>
+    </div>
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+  </form>
+</div>
+

@@ -1,0 +1,399 @@
+<div class="page-container">
+  <!-- En-tête avec bouton retour et titre -->
+  <div class="page-header">
+    <button class="btn btn-light back-btn" (click)="back()">
+      <i class="fas fa-arrow-left"></i> Locataires
+    </button>
+    <h4 class="page-title">Détails du locataire</h4>
+  </div>
+
+  <!-- Modale de suppression -->
+  <div *ngIf="showDeleteConfirm" class="modal-overlay">
+    <div class="modal-card">
+      <h5>Confirmer la suppression</h5>
+      <p>Voulez-vous vraiment supprimer ce locataire ? Cette action est irréversible.</p>
+      <div class="form-actions center">
+        <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="deleteTenant()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire d'édition du locataire -->
+  <form *ngIf="editMode" (ngSubmit)="save()" class="form-card">
+    <!-- Section infos principales -->
+    <div class="card-header">
+      <h5>Informations du locataire</h5>
+      <div class="action-buttons">
+        <button class="action-btn save" type="submit" title="Enregistrer les modifications">
+          <i class="fas fa-check"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="tenant-form-content">
+      <!-- Photo et informations personnelles -->
+      <div class="tenant-profile-section">
+        <div class="tenant-photo-upload">
+          <div class="tenant-photo-container">
+            <img *ngIf="form.identityImage" [src]="form.identityImage" alt="Photo d'identité" class="tenant-photo" />
+            <div *ngIf="!form.identityImage" class="tenant-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="image-upload-controls">
+            <input type="file" id="identityImage" accept="image/*" (change)="onIdentityImageSelected($event)" class="file-input" />
+            <label for="identityImage" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-camera"></i> Changer la photo
+            </label>
+            <div class="error" *ngIf="errors.identityImage">{{ errors.identityImage }}</div>
+          </div>
+        </div>
+
+        <div class="tenant-info-grid">
+              <div class="form-group">
+                <div class="input-container">
+                  <input type="text" id="fullName" [(ngModel)]="form.fullName" name="fullName" class="underline-input" required placeholder=" " />
+                  <label for="fullName" class="label">
+                    <i class="fas fa-user"></i>
+                    Nom complet <span class="required">*</span>
+                  </label>
+                </div>
+                <div class="error" *ngIf="errors.fullName">
+                  <i class="fas fa-exclamation-circle"></i> {{ errors.fullName }}
+                </div>
+              </div>
+
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="country" [(ngModel)]="form.country" name="country" class="underline-input" required placeholder=" " />
+              <label for="country" class="label">
+                <i class="fas fa-globe"></i>
+                Pays <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.country">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.country }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="address" [(ngModel)]="form.address" name="address" class="underline-input" required placeholder=" " />
+              <label for="address" class="label">
+                <i class="fas fa-map-marker-alt"></i>
+                Adresse <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.address">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.address }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="phone" [(ngModel)]="form.phone" name="phone" class="underline-input" required placeholder=" " />
+              <label for="phone" class="label">
+                <i class="fas fa-phone"></i>
+                Téléphone <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.phone">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.phone }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="emergencyContact" [(ngModel)]="form.emergencyContact" name="emergencyContact" class="underline-input" required placeholder=" " />
+              <label for="emergencyContact" class="label">
+                <i class="fas fa-phone"></i>
+                Contact d'urgence <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.emergencyContact">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.emergencyContact }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-container">
+              <input type="email" id="email" [(ngModel)]="form.email" name="email" class="underline-input" placeholder=" " />
+              <label for="email" class="label">
+                <i class="fas fa-envelope"></i>
+                Email
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.email">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.email }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-container">
+              <input type="text" id="profession" [(ngModel)]="form.profession" name="profession" class="underline-input" placeholder=" " />
+              <label for="profession" class="label">
+                <i class="fas fa-briefcase"></i>
+                Profession
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.profession">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.profession }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sélection du bâtiment et appartement -->
+      <div class="location-section">
+        <h6>Localisation</h6>
+        <div class="location-grid">
+          <div class="form-group">
+            <div class="input-container">
+              <select id="buildingId" [(ngModel)]="form.buildingId" name="buildingId" class="underline-input" (change)="onBuildingChange()" required>
+                <option value="">Choisir un bâtiment</option>
+                <option *ngFor="let b of buildings" [value]="b.id">{{ b.name }} - {{ b.city }}</option>
+              </select>
+              <label for="buildingId" class="label">
+                <i class="fas fa-home"></i>
+                Bâtiment <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.buildingId">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="form.buildingId">
+            <div class="input-container">
+              <select id="apartmentId" [(ngModel)]="form.apartmentId" name="apartmentId" class="underline-input" required>
+                <option value="">Choisir un appartement</option>
+                <option *ngFor="let apt of filteredApartments" [value]="apt.id">
+                  {{ apt.name }} - {{ apt.type }} - {{ apt.mention ? (apt.mention | number) + ' FCFA' : '-' }}
+                </option>
+              </select>
+              <label for="apartmentId" class="label">
+                <i class="fas fa-door-open"></i>
+                Appartement <span class="required">*</span>
+              </label>
+            </div>
+            <div class="error" *ngIf="errors.apartmentId">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.apartmentId }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section personne affiliée -->
+      <!-- Toggle Personne affiliée -->
+      <div class="affiliation-toggle-section" style="margin: 24px 0; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-weight: 500;">Personne affiliée</span>
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="showAffiliated" name="showAffiliated" (change)="onShowAffiliatedChange()" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="affiliation-section" *ngIf="showAffiliated">
+        <h6>Personne à contacter en cas d'urgence</h6>
+        <div class="affiliation-grid">
+          <div class="form-group">
+            <input type="text" id="affiliatedPersonRelation" [(ngModel)]="form.affiliatedPerson.relation" name="affiliatedPersonRelation" class="underline-input" placeholder=" " required />
+            <label for="affiliatedPersonRelation" class="label">Type de relation <span class="required">*</span></label>
+            <div class="error" *ngIf="errors.affiliatedPersonRelation">{{ errors.affiliatedPersonRelation }}</div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="affiliatedPersonFullName" [(ngModel)]="form.affiliatedPerson.fullName" name="affiliatedPersonFullName" class="underline-input" placeholder=" " required />
+            <label for="affiliatedPersonFullName" class="label">Nom complet <span class="required">*</span></label>
+            <div class="error" *ngIf="errors.affiliatedPersonFullName">{{ errors.affiliatedPersonFullName }}</div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="affiliatedPersonPhone" [(ngModel)]="form.affiliatedPerson.phone" name="affiliatedPersonPhone" class="underline-input" placeholder=" " required />
+            <label for="affiliatedPersonPhone" class="label">Téléphone <span class="required">*</span></label>
+            <div class="error" *ngIf="errors.affiliatedPersonPhone">{{ errors.affiliatedPersonPhone }}</div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="affiliatedPersonAddress" [(ngModel)]="form.affiliatedPerson.address" name="affiliatedPersonAddress" class="underline-input" placeholder=" " required />
+            <label for="affiliatedPersonAddress" class="label">Adresse <span class="required">*</span></label>
+            <div class="error" *ngIf="errors.affiliatedPersonAddress">{{ errors.affiliatedPersonAddress }}</div>
+          </div>
+
+          <div class="form-group">
+            <input type="email" id="affiliatedPersonEmail" [(ngModel)]="form.affiliatedPerson.email" name="affiliatedPersonEmail" class="underline-input" placeholder=" " />
+            <label for="affiliatedPersonEmail" class="label">Email</label>
+            <div class="error" *ngIf="errors.affiliatedPersonEmail">{{ errors.affiliatedPersonEmail }}</div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="affiliatedPersonProfession" [(ngModel)]="form.affiliatedPerson.profession" name="affiliatedPersonProfession" class="underline-input" placeholder=" " />
+            <label for="affiliatedPersonProfession" class="label">Profession</label>
+            <div class="error" *ngIf="errors.affiliatedPersonProfession">{{ errors.affiliatedPersonProfession }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Affichage lecture du locataire -->
+  <div *ngIf="!editMode" class="form-card">
+    <div class="card-header">
+      <h5>Informations du locataire</h5>
+      <div class="action-buttons">
+        <button class="action-btn edit" (click)="enableEdit()" title="Modifier les informations">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="action-btn delete" title="Supprimer le locataire" (click)="showDeleteConfirm = true">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="tenant-view-content">
+      <!-- Photo et informations personnelles -->
+      <div class="tenant-profile-section">
+        <div class="tenant-photo-display">
+          <div class="tenant-photo-container">
+            <img *ngIf="tenant?.identityImage" [src]="tenant?.identityImage" alt="Photo d'identité" class="tenant-photo" />
+            <div *ngIf="!tenant?.identityImage" class="tenant-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+            <div class="tenant-status">
+            <span class="status-badge status-active" *ngIf="getCurrentApartmentId(tenant)">Locataire actif</span>
+            <span class="status-badge status-completed" *ngIf="!getCurrentApartmentId(tenant)">Ancien locataire</span>
+          </div>
+        </div>
+
+        <div class="tenant-info-display">
+          <div class="info-item">
+            <label><i class="fas fa-user"></i> Nom complet</label>
+            <p class="info-value">{{ tenant?.fullName || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label><i class="fas fa-globe"></i> Pays</label>
+            <p class="info-value">{{ tenant?.country || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label><i class="fas fa-phone"></i> Téléphone</label>
+            <p class="info-value">{{ tenant?.phone || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label><i class="fas fa-exclamation-circle"></i> Contact urgence</label>
+            <p class="info-value">{{ tenant?.emergencyContact || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <p class="info-value">{{ tenant?.email || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label><i class="fas fa-briefcase"></i> Profession</label>
+            <p class="info-value">{{ tenant?.profession || '-' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localisation actuelle -->
+      <div class="location-section" *ngIf="getCurrentApartmentId(tenant)">
+        <h6>Localisation actuelle</h6>
+        <div class="location-info">
+          <div class="info-item">
+            <label>Bâtiment</label>
+            <p class="info-value">{{ getBuildingName(getCurrentBuildingId(tenant)) || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Appartement</label>
+            <p class="info-value">{{ getApartmentName(getCurrentApartmentId(tenant)) || '-' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section personne affiliée -->
+  <div class="affiliation-section" *ngIf="tenant?.affiliatedPerson?.fullName">
+        <h6>Personne à contacter en cas d'urgence</h6>
+        <div class="affiliation-info">
+          <div class="info-item">
+            <label>Nom complet</label>
+            <p class="info-value">{{ tenant?.affiliatedPerson?.fullName || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Type de relation</label>
+            <p class="info-value">{{ tenant?.affiliatedPerson?.relation || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Téléphone</label>
+            <p class="info-value">{{ tenant?.affiliatedPerson?.phone || '-' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Adresse</label>
+            <p class="info-value">{{ tenant?.affiliatedPerson?.address || '-' }}</p>
+          </div>
+          <div class="info-item" *ngIf="tenant?.affiliatedPerson?.email">
+            <label>Email</label>
+            <p class="info-value">{{ tenant?.affiliatedPerson?.email || '-' }}</p>
+          </div>
+          <div class="info-item" *ngIf="tenant?.affiliatedPerson?.profession">
+            <label>Profession</label>
+            <p class="info-value">{{ tenant?.affiliatedPerson?.profession || '-' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historique des locations -->
+  <div class="form-card">
+    <div class="card-header">
+      <h5>Historique des locations</h5>
+    </div>
+    
+    <div class="table-container" *ngIf="rentalDetails.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Appartement</th>
+            <th>Propriétaire</th>
+            <th>Date début</th>
+            <th>Loyer</th>
+            <th>Date fin</th>
+            <th>Montant recouvré</th>
+            <th>Quartier</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let detail of rentalDetails">
+            <td>
+              <strong>{{ detail.apartment?.name || '-' }}</strong>
+              <div class="apartment-type">{{ detail.apartment?.type || '-' }}</div>
+            </td>
+            <td>{{ detail.owner?.name || '-' }}</td>
+            <td>{{ detail.rental?.startDate ? (detail.rental?.startDate | date:'dd/MM/yyyy') : '-' }}</td>
+            <td class="rent-amount">{{ detail.rental?.price ? (detail.rental?.price | number) + ' FCFA' : '-' }}</td>
+            <td>{{ detail.rental?.endDate ? (detail.rental?.endDate | date:'dd/MM/yyyy') : '-' }}</td>
+            <td class="recovered-amount">{{ detail.recoveredAmount ? (detail.recoveredAmount | number) + ' FCFA' : '-' }}</td>
+            <td>{{ detail.apartment?.region || '-' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                'status-active': isRentalActive(detail.rental),
+                'status-completed': !isRentalActive(detail.rental)
+              }">
+                {{ isRentalActive(detail.rental) ? 'Active' : 'Terminée' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="rentalDetails.length === 0" class="no-data">
+      <div class="no-data-content">
+        <i class="fas fa-home"></i>
+        <h6>Aucun historique de location</h6>
+        <p>Ce locataire n'a pas encore d'historique de location.</p>
+      </div>
+    </div>
+  </div>
+</div>

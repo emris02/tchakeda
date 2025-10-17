@@ -1,0 +1,24 @@
+.page-container {
+  padding: 0px;
+}
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th, .table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e1e4e8;
+}
+.table th {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+.btn {
+  margin-right: 6px;
+}

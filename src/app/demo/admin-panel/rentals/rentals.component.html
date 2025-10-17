@@ -1,0 +1,28 @@
+<div class="page-header">
+  <h4>Locations</h4>
+  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i>Nouvelle location</button>
+</div>
+<div class="content-container">
+  <table class="table rentals-table">
+    <thead>
+      <tr>
+        <th>Appartement</th>
+        <th>Locataire</th>
+        <th>Date début</th>
+        <th>Date fin</th>
+        <th>Prix</th>
+        <th>Date de création</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let rental of rentals" (click)="goToDetail(rental)" class="clickable-row">
+        <td>{{ rental.apartmentName }}</td>
+        <td>{{ rental.tenantName }}</td>
+        <td>{{ rental.startDate }}</td>
+        <td>{{ rental.endDate }}</td>
+        <td>{{ rental.price | currency:'X0F' }}</td>
+        <td>{{ rental.createdAt | date:'shortDate' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

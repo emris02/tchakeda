@@ -1,0 +1,37 @@
+<div class="page-header">
+  <h4>Bâtiments</h4>
+  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau bâtiment</button>
+</div>
+
+<div class="content-container">
+  <table class="table buildings-table">
+    <thead>
+      <tr>
+        <th>Nom du batîment</th>
+        <th>Type</th>
+        <th>Étages</th>
+        <th>Appartements</th>
+        <th>Adresse</th>
+        <th>Ville</th>
+        <th>Région</th>
+        <th>Date de construction</th>
+        <th>Propriétaire</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let building of buildings" class="clickable-row" (click)="goToDetail(building)">
+        <td>{{ building.name }}</td>
+        <td>{{ building.type === 'autre' ? building.customType : building.type }}</td>
+        <td>{{ building.floors }}</td>
+        <td>{{ building.apartments }}</td>
+        <td>{{ building.address }}</td>
+        <td>{{ building.city }}</td>
+        <td>{{ building.region }}</td>
+        <td>{{ building.constructionDate | date:'dd/MM/yyyy' }}</td>
+        <td>
+          {{ getOwnerName(building.ownerId) || 'Non attribué' }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

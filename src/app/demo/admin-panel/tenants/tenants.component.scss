@@ -1,0 +1,54 @@
+@use '/src/scss/form_imports';
+
+.tenant-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+.tenant-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #888;
+  font-size: 24px;
+  border: 2px solid #e0e0e0;
+}
+.tenants-table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td {
+    padding: 18px 10px;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    background: #f8f9fa;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .clickable-row {
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover {
+      background: #f2f2f2;
+    }
+  }
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.content-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 24px;
+}
