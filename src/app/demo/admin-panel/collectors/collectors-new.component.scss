@@ -15,8 +15,8 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 
 // Styles généraux
 .page-container {
-  padding: 20px;
-  max-width: 1000px;
+  padding: 0px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -90,7 +90,7 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 50px;
   
   i {
     font-size: 20px;

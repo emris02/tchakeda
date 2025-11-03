@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BuildingsService, Building } from './buildings.service';
+// Keep header navigation for building creation
 import { OwnersService, Owner } from '../owners/owners.service';
 
 import { CommonModule } from '@angular/common';

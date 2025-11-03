@@ -12,7 +12,7 @@
     <div class="modal-card">
       <h5>Confirmer la suppression</h5>
       <p>Voulez-vous vraiment supprimer ce locataire ? Cette action est irréversible.</p>
-      <div class="form-actions center">
+      <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteTenant()">Supprimer</button>
       </div>
@@ -309,7 +309,10 @@
           </div>
         </div>
       </div>
-
+      <div class="info-item">
+      <label>Adresse</label>
+      <p class="info-value">{{ getBuildingAdress(getCurrentBuildingId(tenant)) || '-' }}</p>
+    </div>
       <!-- Section personne affiliée -->
   <div class="affiliation-section" *ngIf="tenant?.affiliatedPerson?.fullName">
         <h6>Personne à contacter en cas d'urgence</h6>

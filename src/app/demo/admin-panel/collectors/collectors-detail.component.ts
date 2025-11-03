@@ -1,65 +1,57 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CollectorsService, Collector } from './collectors.service';
+import { PaymentsService, Payment } from '../payments/payments.service';
 import { RecoveriesService, Recovery } from '../recoveries/recoveries.service';
 import { RentalsService, Rental } from '../rentals/rentals.service';
+import { BuildingsService } from '../buildings/buildings.service';
+import { ApartmentsService } from '../apartments/apartments.service';
 
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-collectors-detail',
   templateUrl: './collectors-detail.component.html',
   styleUrls: ['./collectors-detail.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, HttpClientModule, FormsModule]
 })
 export class CollectorsDetailComponent implements OnInit {
+  // Payments (from API)
+  payments: Payment[] = [];
+  loadingPayments = false;
+  paymentsError: string | null = null;
+  totalCollected: number = 0; // somme status=paid
+  totalPending: number = 0; // somme status=pending
+  currentMonthPayments: number = 0; // somme paiements du mois courant
+
+  // Collector entity
   collector: Collector | undefined;
   id: number | undefined;
+  form: any = {};
   editMode = false;
   showDeleteConfirm = false;
-  form: any = {};
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private collectorsService: CollectorsService
-    , private recoveriesService: RecoveriesService
-    , private rentalsService: RentalsService
-  ) {}
-
-  ngOnInit() {
-    this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.collector = this.collectorsService.getCollectors().find(c => c.id === this.id);
-    if (!this.collector) {
-      this.router.navigate(['/demo/admin-panel/collectors']);
-    } else {
-      this.form = { ...this.collector };
-      // load payments related to this collector
-      this.loadCollectorPayments();
-    }
-  }
-
+  // Legacy / derived lists from recoveries
   collectorPayments: any[] = [];
-  totalCollected: number = 0;
-  totalPending: number = 0;
-  // UI / filters / pagination
-  statusFilter: string = '';
-  periodFilter: string = '';
-  searchTerm: string = '';
   filteredPayments: any[] = [];
-  hasActiveFilters: boolean = false;
-  // pagination
-  currentPage: number = 1;
-  pageSize: number = 10;
-  totalPages: number = 1;
-  // summary values used in template
-  currentMonthPayments: number = 0;
   completedPayments: number = 0;
   pendingPayments: number = 0;
   successRate: number = 0;
   currentMonthCollection: number = 0;
   averageCollectionTime: number = 0;
+
+  // UI / filters / pagination
+  statusFilter: string = '';
+  periodFilter: string = '';
+  searchTerm: string = '';
+  hasActiveFilters: boolean = false;
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalPages: number = 1;
+
   errors: any = {};
   assignedZones: any[] = [];
 
@@ -71,34 +63,87 @@ export class CollectorsDetailComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = () => {
       this.form = this.form || {};
-      // store as data URL for preview; in real app you'd upload and save a path or blob
       this.form.identityImage = reader.result as string;
     };
     reader.readAsDataURL(file);
   }
 
-  private formatDateShort(dateStr: string | undefined): string {
-    if (!dateStr) return '-';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString();
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private collectorsService: CollectorsService,
+    private paymentsService: PaymentsService,
+    private recoveriesService: RecoveriesService,
+    private rentalsService: RentalsService,
+    private buildingsService: BuildingsService,
+    private apartmentsService: ApartmentsService
+  ) {}
+
+  ngOnInit() {
+    this.id = Number(this.route.snapshot.paramMap.get('id'));
+    this.collector = this.collectorsService.getCollectors().find(c => c.id === this.id);
+    if (!this.collector) {
+      this.router.navigate(['/demo/admin-panel/collectors']);
+      return;
+    }
+    this.form = { ...this.collector };
+    // load both sources: recoveries (legacy) and API payments (preferred)
+    this.loadCollectorPayments();
+    this.fetchPayments();
   }
 
-  private formatPeriodFromRental(r?: Rental): string {
-    if (!r) return '-';
-    const s = r.startDate ? this.formatDateShort(r.startDate) : '';
-    const e = r.endDate ? this.formatDateShort(r.endDate) : '';
-    return s && e ? `${s} → ${e}` : (s || e || '-');
+  /** Calcul dynamique du nombre de maisons/locations assignées */
+  get assignedHouseCount(): number {
+    if (!this.collector) return 0;
+    const rentals = typeof this.rentalsService.getRentals === 'function' ? this.rentalsService.getRentals() : [];
+    return rentals.filter((r: any) => Number(r.collectorId) === Number(this.collector?.id)).length;
   }
 
+  /* -------------------- Payments API integration -------------------- */
+  fetchPayments(): void {
+    if (!this.collector) return;
+    this.loadingPayments = true;
+    this.paymentsError = null;
+    this.paymentsService.getCollectorPayments(this.collector.id).subscribe({
+      next: (payments: Payment[]) => {
+        this.payments = payments || [];
+        this.calculatePaymentStats();
+        this.loadingPayments = false;
+      },
+      error: (err: any) => {
+        console.error('Erreur fetching payments', err);
+        this.paymentsError = 'Erreur lors du chargement des paiements.';
+        this.loadingPayments = false;
+      }
+    });
+  }
+
+  calculatePaymentStats(): void {
+    const now = new Date();
+    this.totalCollected = this.payments
+      .filter(p => p && (p.status || '').toString().toLowerCase() === 'paid')
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
+    this.totalPending = this.payments
+      .filter(p => p && (p.status || '').toString().toLowerCase() === 'pending')
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
+    this.currentMonthPayments = this.payments
+      .filter(p => {
+        if (!p || !p.paymentDate) return false;
+        const d = new Date(p.paymentDate);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      })
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
+  }
+
+  /* -------------------- Legacy recoveries-based logic (kept) -------------------- */
   private loadCollectorPayments() {
     this.collectorPayments = [];
     this.totalCollected = 0;
     this.totalPending = 0;
     if (!this.collector) return;
+    // helper: formatPeriodFromRental depends on formatDateShort
     const all = this.recoveriesService.getRecoveries();
-    const related = all.filter(r => {
-      // prefer matching collectorId when available, otherwise fallback to name
+    const related = all.filter((r: any) => {
       const collId = (r as any).collectorId;
       if (collId !== undefined && collId !== null) return Number(collId) === Number(this.collector?.id);
       return (r.name || '').toString() === this.collector?.fullName;
@@ -108,13 +153,11 @@ export class CollectorsDetailComponent implements OnInit {
       const entry = {
         period: this.formatPeriodFromRental(rental),
         amount: rec.amount,
-        // dueDate: optionally provided on recovery, otherwise fallback to rental endDate
         dueDate: (rec as any).dueDate || (rental ? rental.endDate : undefined) || undefined,
-        // paymentDate is the recorded date of the recovery when available
         paymentDate: rec.date || undefined,
         method: (rec as any).paymentMethod || '-',
         status: (rec.status || '-').toString(),
-        collector: rec.name || this.collector.fullName,
+        collector: rec.name || this.collector!.fullName,
         apartment: rental ? rental.apartmentName : (rec as any).apartmentName || '-',
         tenant: rental ? rental.tenantName : (rec as any).tenantName || '-',
         tenantPhone: (rec as any).tenantPhone || undefined,
@@ -133,39 +176,34 @@ export class CollectorsDetailComponent implements OnInit {
     // compute additional summaries
     const now = new Date();
     this.currentMonthCollection = this.collectorPayments
-      .filter(p => p.paymentDate && (new Date(p.paymentDate)).getMonth() === now.getMonth() && (new Date(p.paymentDate)).getFullYear() === now.getFullYear())
-      .reduce((s, p) => s + Number(p.amount || 0), 0);
+      .filter((p: any) => p.paymentDate && (new Date(p.paymentDate)).getMonth() === now.getMonth() && (new Date(p.paymentDate)).getFullYear() === now.getFullYear())
+      .reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
     this.currentMonthPayments = this.collectorPayments
-      .filter(p => p.paymentDate && (new Date(p.paymentDate)).getMonth() === now.getMonth() && (new Date(p.paymentDate)).getFullYear() === now.getFullYear())
+      .filter((p: any) => p.paymentDate && (new Date(p.paymentDate)).getMonth() === now.getMonth() && (new Date(p.paymentDate)).getFullYear() === now.getFullYear())
       .length;
     this.successRate = this.collectorPayments.length ? Math.round((this.completedPayments / this.collectorPayments.length) * 100) : 0;
-    // average collection time: days between rental start and paymentDate when both available
+    // average collection time
     const durations: number[] = [];
     for (const p of this.collectorPayments) {
-      const rental = this.rentalsService.getRentals().find(r => r.apartmentName === p.apartment) as Rental | undefined;
+      const rental = this.rentalsService.getRentals().find((r: any) => r.apartmentName === p.apartment) as Rental | undefined;
       if (rental && p.paymentDate && rental.startDate) {
         const d = Math.round((new Date(p.paymentDate).getTime() - new Date(rental.startDate).getTime()) / (1000 * 60 * 60 * 24));
         if (!isNaN(d)) durations.push(d);
       }
     }
     this.averageCollectionTime = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
-
-    // init filtered list and pagination
     this.applyFilters();
   }
 
   applyFilters() {
-    // compute filteredPayments from collectorPayments
     let list = this.collectorPayments.slice();
     this.hasActiveFilters = !!(this.statusFilter || this.periodFilter || (this.searchTerm && this.searchTerm.trim()));
-    // status filter
     if (this.statusFilter) {
       const sf = this.statusFilter.toLowerCase();
       if (sf === 'paid') list = list.filter(p => p.status && p.status.toLowerCase().includes('pay'));
       if (sf === 'pending') list = list.filter(p => !(p.status && p.status.toLowerCase().includes('pay')));
       if (sf === 'overdue') list = list.filter(p => this.isPaymentOverdue(p));
     }
-    // period filter
     const now = new Date();
     if (this.periodFilter) {
       if (this.periodFilter === 'current-month') {
@@ -177,29 +215,40 @@ export class CollectorsDetailComponent implements OnInit {
         list = list.filter(p => p.paymentDate && (new Date(p.paymentDate)).getFullYear() === now.getFullYear());
       }
     }
-    // search
     if (this.searchTerm && this.searchTerm.trim()) {
       const q = this.searchTerm.trim().toLowerCase();
       list = list.filter(p => (p.apartment && p.apartment.toLowerCase().includes(q)) || (p.tenant && p.tenant.toLowerCase().includes(q)));
     }
-
-    // pagination
     this.totalPages = Math.max(1, Math.ceil(list.length / this.pageSize));
     if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
     const start = (this.currentPage - 1) * this.pageSize;
     this.filteredPayments = list.slice(start, start + this.pageSize);
   }
 
+  private formatDateShort(dateStr: string | undefined): string {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString();
+  }
+
+  private formatPeriodFromRental(r?: Rental): string {
+    if (!r) return '-';
+    const s = r.startDate ? this.formatDateShort(r.startDate) : '';
+    const e = r.endDate ? this.formatDateShort(r.endDate) : '';
+    return s && e ? `${s} → ${e}` : (s || e || '-');
+  }
+
   // helpers
   isPaymentOverdue(payment: any): boolean {
-    if (!payment.dueDate) return false;
+    if (!payment || !payment.dueDate) return false;
     const due = new Date(payment.dueDate);
     const today = new Date();
     return due < today && !(payment.status && payment.status.toLowerCase().includes('pay'));
   }
 
   getDaysUntilDue(payment: any): number {
-    if (!payment.dueDate) return 0;
+    if (!payment || !payment.dueDate) return 0;
     const due = new Date(payment.dueDate);
     const diff = Math.ceil((due.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
     return isNaN(diff) ? 0 : diff;
@@ -236,15 +285,13 @@ export class CollectorsDetailComponent implements OnInit {
     return status || '-';
   }
 
-  /** Retourne true si le recouvreur est considéré comme actif (maisons assignées) */
   isCollectorActive(): boolean {
     if (!this.collector) return false;
-    return !!(this.collector.houseCount && Number(this.collector.houseCount) > 0);
+    return !!(this.assignedHouseCount && Number(this.assignedHouseCount) > 0);
   }
 
   // Actions
   markAsPaid(payment: any) {
-    // try to find underlying recovery and update it
     const all = this.recoveriesService.getRecoveries();
     const match = all.find(r => Number(r.amount) === Number(payment.amount) && (r.date === payment.paymentDate || r.date === payment.dueDate || r.name === payment.collector));
     if (match) {
@@ -309,4 +356,20 @@ export class CollectorsDetailComponent implements OnInit {
   back() {
     this.router.navigate(['/demo/admin-panel/collectors']);
   }
+
+  // helpers to resolve names
+  getBuildingName(buildingId: number | undefined): string {
+    if (!buildingId) return '-';
+    const building = this.buildingsService.getBuildingById(buildingId);
+    return building ? building.name : '-';
+  }
+
+  getApartmentName(apartmentId: number | undefined): string {
+    if (!apartmentId) return '-';
+    const apartment = this.apartmentsService.getApartmentById(apartmentId);
+    if (!apartment) return `ID: ${apartmentId}`;
+    return apartment.name || `ID: ${apartmentId}`;
+  }
+
 }
+

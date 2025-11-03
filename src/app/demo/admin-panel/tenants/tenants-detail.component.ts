@@ -60,6 +60,7 @@ export class TenantsDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     // Load apartments and tenants first so lookups and selects are ready
+    this.loadBuildings();
     this.loadApartments();
     this.loadTenants();
     this.loadTenantData(id);
@@ -90,6 +91,10 @@ export class TenantsDetailComponent implements OnInit {
       }
       this.loadRentalDetails();
     }
+  }
+    // Charger les locataires
+  private loadBuildings(): void {
+    this.buildings = this.buildingsService.getBuildings();
   }
 
   // Charger les appartements
@@ -289,6 +294,12 @@ export class TenantsDetailComponent implements OnInit {
     if (!buildingId) return '-';
     const building = this.buildings.find(b => b.id === buildingId);
     return building ? building.name : '-';
+  }
+    // Obtenir le nom d'un bâtiment
+  getBuildingAdress(buildingId: number | undefined): string {
+    if (!buildingId) return '-';
+    const building = this.buildings.find(b => b.id === buildingId);
+    return building ? building.address : '-';
   }
 
   // Obtenir le nom d'un locataire

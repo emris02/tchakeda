@@ -75,6 +75,23 @@
 .form-actions {
   grid-column: span 2;
 }
+// Sélection avec action
+.select-with-action {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .btn-add {
+    white-space: nowrap;
+    height: fit-content;
+  }
+}
 
 /* Responsive */
 @media (max-width: 768px) {

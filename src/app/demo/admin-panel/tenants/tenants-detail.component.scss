@@ -19,11 +19,13 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin: 0 auto;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
+.page-header{
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
   
   @media (max-width: 768px) {
     flex-direction: column;

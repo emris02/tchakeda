@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BuildingsService, Building } from './buildings.service';
 import { ApartmentsService } from '../apartments/apartments.service';
 import { OwnersService, Owner } from '../owners/owners.service';
+import { MatDialog } from '@angular/material/dialog';
+import { OwnerFormComponent } from '../owners/components/owner-form.component';
 
 @Component({
   selector: 'app-buildings-detail',
@@ -56,6 +58,7 @@ export class BuildingsDetailComponent implements OnInit {
     private buildingsService: BuildingsService,
     private ownersService: OwnersService,
     private apartmentsService: ApartmentsService
+    , private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -82,7 +85,14 @@ export class BuildingsDetailComponent implements OnInit {
   }
 
   goToNewOwner() {
-    this.router.navigate(['demo/admin-panel/owners/new']);
+    const dialogRef = this.dialog.open(OwnerFormComponent, { width: '500px', data: {} });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        // refresh owners and select new owner
+        this.owners = this.ownersService.getOwners();
+        this.form.ownerId = result.id;
+      }
+    });
   }
 
   enableEdit() {

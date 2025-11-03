@@ -270,3 +270,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .apartment-card { animation: fadeIn 0.5s ease-out; }
+.btn-primary
+ {
+    --bs-btn-color: #fff;
+}

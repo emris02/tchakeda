@@ -11,7 +11,7 @@
     <div class="modal-card">
       <h5>Confirmer la suppression</h5>
       <p>Voulez-vous vraiment supprimer cette location ? Cette action est irréversible.</p>
-      <div class="form-actions center">
+      <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteRental()">Supprimer</button>
       </div>
@@ -29,30 +29,62 @@
           </button>
         </div>
       </div>
-      <div class="form-grid">
-        <!-- Appartement -->
+      <div class="form-grid two-columns">
+        <!-- Row 1: Bâtiment + Appartement -->
         <div class="form-group">
-          <div class="input-container">
+          <div class="select-with-action">
+            <select [(ngModel)]="form.buildingId" name="buildingId" class="underline-input" (change)="onBuildingChange()" required>
+              <option [ngValue]="null">Sélectionner...</option>
+              <option *ngFor="let b of buildings" [ngValue]="b.id">{{ b.name || ('Bâtiment ' + b.id) }}</option>
+            </select>
+            <label class="label">
+              <i class="fas fa-building"></i>
+              Bâtiment
+            </label>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewBuilding()" title="Ajouter un bâtiment">
+                <i class="fas fa-plus"></i> Nouveau bâtiment
+            </button>
+          </div>
+          <div class="error" *ngIf="errors.buildingId"><i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}</div>
+        </div>
+
+        <div class="form-group">
+          <div class="select-with-action">
             <select [(ngModel)]="form.apartmentId" name="apartmentId" class="underline-input" required>
               <option [ngValue]="null">Sélectionner...</option>
-              <option *ngFor="let apt of apartments" [ngValue]="apt.id">{{ apt.name }}</option>
+              <option *ngFor="let apt of (filteredApartments.length ? filteredApartments : apartments)" [ngValue]="apt.id">{{ apt.name }}</option>
             </select>
             <label class="label">
               <i class="fas fa-door-open"></i>
               Appartement
             </label>
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top:8px;">
-            <button type="button" class="btn btn-link" (click)="goToNewApartment()" title="Ajouter un appartement">
-              <i class="fas fa-plus"></i>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewApartment()" title="Ajouter un appartement">
+              <i class="fas fa-plus"></i> Nouvel appartement
             </button>
           </div>
           <div class="error" *ngIf="errors.apartmentId"><i class="fas fa-exclamation-circle"></i> {{ errors.apartmentId }}</div>
         </div>
 
-        <!-- Locataire -->
+        <!-- Row 2: Locataire + Recouvreur + Loyer -->
         <div class="form-group">
-          <div class="input-container">
+          <div class="select-with-action">
+            <select [(ngModel)]="form.collectorId" name="collectorId" class="underline-input" required>
+              <option [ngValue]="null">Sélectionner...</option>
+              <option *ngFor="let c of collectors" [ngValue]="c.id">{{ c.fullName }}</option>
+            </select>
+            <label class="label">
+              <i class="fas fa-user-tie"></i>
+              Recouvreur
+            </label>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewCollector()" title="Ajouter un recouvreur">
+              <i class="fas fa-plus"></i> Nouveau recouvreur
+            </button>
+          </div>
+          <div class="error" *ngIf="errors['collectorId']"><i class="fas fa-exclamation-circle"></i> {{ errors['collectorId'] }}</div>
+        </div>
+
+        <div class="form-group">
+          <div class="select-with-action">
             <select [(ngModel)]="form.tenantId" name="tenantId" class="underline-input" required>
               <option [ngValue]="null">Sélectionner...</option>
               <option *ngFor="let t of tenants" [ngValue]="t.id">{{ t.fullName }}</option>
@@ -61,40 +93,13 @@
               <i class="fas fa-user"></i>
               Locataire
             </label>
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top:8px;">
-            <button type="button" class="btn btn-link" (click)="goToNewTenant()" title="Ajouter un locataire">
-              <i class="fas fa-plus"></i>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewTenant()" title="Ajouter un locataire">
+              <i class="fas fa-plus"></i> Nouveau locataire
             </button>
-          </div>
+            </div>
           <div class="error" *ngIf="errors.tenantId"><i class="fas fa-exclamation-circle"></i> {{ errors.tenantId }}</div>
         </div>
 
-        <!-- Date début -->
-        <div class="form-group">
-          <div class="input-container">
-            <input type="date" [(ngModel)]="form.startDate" name="startDate" class="underline-input" required />
-            <label class="label">
-              <i class="fas fa-calendar-alt"></i>
-              Date début
-            </label>
-          </div>
-          <div class="error" *ngIf="errors.startDate"><i class="fas fa-exclamation-circle"></i> {{ errors.startDate }}</div>
-        </div>
-
-        <!-- Date fin -->
-        <div class="form-group">
-          <div class="input-container">
-            <input type="date" [(ngModel)]="form.endDate" name="endDate" class="underline-input" />
-            <label class="label">
-              <i class="fas fa-calendar-alt"></i>
-              Date fin
-            </label>
-          </div>
-          <div class="error" *ngIf="errors.endDate"><i class="fas fa-exclamation-circle"></i> {{ errors.endDate }}</div>
-        </div>
-
-        <!-- Prix -->
         <div class="form-group full-width">
           <div class="input-container">
             <div class="input-with-button">
@@ -107,6 +112,29 @@
             <div class="error" *ngIf="errors['price']">{{ errors['price'] }}</div>
           </div>
           <div class="error" *ngIf="errors.price"><i class="fas fa-exclamation-circle"></i> {{ errors.price }}</div>
+        </div>
+
+        <!-- Row 3: Date début + Date fin -->
+        <div class="form-group">
+          <div class="select-with-action">
+            <input type="date" [(ngModel)]="form.startDate" name="startDate" class="underline-input" required />
+            <label class="label">
+              <i class="fas fa-calendar-alt"></i>
+              Date début
+            </label>
+          </div>
+          <div class="error" *ngIf="errors.startDate"><i class="fas fa-exclamation-circle"></i> {{ errors.startDate }}</div>
+        </div>
+
+        <div class="form-group">
+          <div class="select-with-action">
+            <input type="date" [(ngModel)]="form.endDate" name="endDate" class="underline-input" />
+            <label class="label">
+              <i class="fas fa-calendar-alt"></i>
+              Date fin
+            </label>
+          </div>
+          <div class="error" *ngIf="errors.endDate"><i class="fas fa-exclamation-circle"></i> {{ errors.endDate }}</div>
         </div>
       </div>
     </form>
@@ -137,6 +165,10 @@
         <div class="info-card">
           <label><i class="fas fa-user"></i> Locataire</label>
           <p>{{ getTenantName(rental?.tenantId) }}</p>
+        </div>
+        <div class="info-card">
+          <label><i class="fas fa-user-tie"></i> Recouvreur</label>
+          <p>{{ getCollectorName(rental?.collectorId) }}</p>
         </div>
         <div class="info-card">
           <label><i class="fas fa-money-bill-wave"></i> Mensualité</label>

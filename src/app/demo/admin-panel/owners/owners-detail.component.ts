@@ -4,6 +4,9 @@ import { OwnersService, Owner } from './owners.service';
 import { BuildingsService, Building } from '../buildings/buildings.service';
 import { ApartmentsService, Apartment } from '../apartments/apartments.service';
 import { RentalsService, Rental } from '../rentals/rentals.service';
+import { TenantsService, Tenant } from '../tenants/tenants.service';
+import { CollectorsService, Collector } from '../collectors/collectors.service';
+import { RecoveriesService, Recovery } from '../recoveries/recoveries.service';
 
 @Component({
   selector: 'app-owners-detail',
@@ -12,12 +15,36 @@ import { RentalsService, Rental } from '../rentals/rentals.service';
   standalone: false
 })
 export class OwnersDetailComponent implements OnInit {
-  // Récupère le nom du locataire pour un appartement
-  getTenantName(apt: Apartment): string {
-    // Si apt.tenant est un string (nom), retourne directement
-    if (typeof apt.tenant === 'string') return apt.tenant;
-    // Si apt.tenant est un objet, retourne la propriété name
-    if (apt.tenant && typeof apt.tenant === 'object' && 'name' in apt.tenant) return (apt.tenant as any).name;
+  tenants: Tenant[] = [];
+  collectors: Collector[] = [];
+  recoveries: Recovery[] = [];
+
+  // Récupère le nom complet du locataire pour un appartement
+  getTenantFullName(apt: Apartment): string {
+    // If apartment already stores a string name, return it
+    if (typeof apt.tenant === 'string' && apt.tenant.trim()) return apt.tenant;
+
+    // If apt.tenant is an object with a fullName or name field
+    if (apt.tenant && typeof apt.tenant === 'object') {
+      const t = apt.tenant as any;
+      if (t.fullName) return t.fullName;
+      if (t.name) return t.name;
+      if (t.nom || t.prenom) return `${t.nom || ''} ${t.prenom || ''}`.trim();
+    }
+
+    // Otherwise try to resolve by tenant id stored in related rentals
+    try {
+      // Find a rental that references this apartment to get tenantId
+      const rental = this.rentalsService.getRentals().find((r: Rental) => r.apartmentId === apt.id);
+      const tenantId = rental ? (rental.tenantId as number | undefined) : undefined;
+      if (tenantId !== undefined && tenantId !== null) {
+        const tenant = this.tenants.find(t => t.id === Number(tenantId));
+        if (tenant) return tenant.fullName || `${(tenant as any).nom || ''} ${(tenant as any).prenom || ''}`.trim() || String(tenantId);
+      }
+    } catch (e) {
+      // ignore and fallback
+    }
+
     return 'Non attribué';
   }
 
@@ -26,13 +53,37 @@ export class OwnersDetailComponent implements OnInit {
     return apt.mention ? Number(apt.mention) : null;
   }
 
-  // Récupère la date de paiement (champ non présent dans Apartment)
+  // Récupère la date de paiement pour un appartement via recoveries ou rental
   getPaymentDate(apt: Apartment): string | null {
+    try {
+      // find rental for apartment
+      const rental = this.rentalsService.getRentals().find((r: Rental) => r.apartmentId === apt.id);
+      if (rental) {
+        // try recoveries first
+        const rec = this.recoveries.find(r => Number(r.rentalId) === Number(rental.id));
+        if (rec && rec.date) return (new Date(rec.date)).toLocaleDateString();
+        // fallback to rental endDate or paymentDate fields if present
+        if ((rental as any).paymentDate) return (new Date((rental as any).paymentDate)).toLocaleDateString();
+        if (rental.endDate) return (new Date(rental.endDate)).toLocaleDateString();
+      }
+    } catch {
+      // ignore
+    }
     return '-';
   }
 
-  // Récupère le nom du collecteur (champ non présent dans Apartment)
+  // Récupère le nom du collecteur assigné à l'appartement via la location
   getCollector(apt: Apartment): string {
+    try {
+      const rental = this.rentalsService.getRentals().find((r: Rental) => r.apartmentId === apt.id);
+      if (rental && rental.collectorId) {
+        const col = this.collectors.find(c => Number(c.id) === Number(rental.collectorId));
+        if (col) return col.fullName || (col as any).name || '-';
+        return String(rental.collectorId);
+      }
+    } catch {
+      // ignore
+    }
     return '-';
   }
 
@@ -67,12 +118,32 @@ export class OwnersDetailComponent implements OnInit {
     private ownersService: OwnersService,
     private buildingsService: BuildingsService,
     private apartmentsService: ApartmentsService,
-    private rentalsService: RentalsService
+    private rentalsService: RentalsService,
+    private tenantsService: TenantsService,
+    private collectorsService: CollectorsService,
+    private recoveriesService: RecoveriesService
   ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.owner = this.ownersService.getOwnerById(id);
+    // Charger les locataires en cache local pour résolution des noms
+    try {
+      this.tenants = this.tenantsService.getTenants();
+    } catch {
+      this.tenants = [];
+    }
+    // Charger les collecteurs et recoveries en cache local
+    try {
+      this.collectors = (this.collectorsService && typeof this.collectorsService.getCollectors === 'function') ? this.collectorsService.getCollectors() : [];
+    } catch {
+      this.collectors = [];
+    }
+    try {
+      this.recoveries = (this.recoveriesService && typeof this.recoveriesService.getRecoveries === 'function') ? this.recoveriesService.getRecoveries() : [];
+    } catch {
+      this.recoveries = [];
+    }
     if (this.owner) {
       this.form = { ...this.owner };
       this.buildings = this.buildingsService.getBuildings().filter((b: Building) => b.ownerId === this.owner?.id);
@@ -105,11 +176,15 @@ export class OwnersDetailComponent implements OnInit {
         observations = 'Retard de paiement';
       }
       try {
-        const tenants = (window as any).tenantsService ? (window as any).tenantsService.getTenants() : [];
-        const tenant = tenants.find((t: any) => t.id === r.tenantId);
-        tenantName = tenant ? tenant.fullName : String(r.tenantId);
+        const tenantsList = this.tenants && this.tenants.length ? this.tenants : this.tenantsService.getTenants();
+        const tenant = tenantsList.find((t: any) => t.id === r.tenantId);
+        if (tenant) {
+          tenantName = tenant.fullName || `${(tenant as any).nom || ''} ${(tenant as any).prenom || ''}`.trim();
+        } else {
+          tenantName = r.tenantId ? String(r.tenantId) : 'Non attribué';
+        }
       } catch {
-        tenantName = String(r.tenantId);
+        tenantName = r.tenantId ? String(r.tenantId) : 'Non attribué';
       }
       // Génère un numéro de facture unique (ex: ANNEE-MOIS-BATIMENT-ID)
       const invoiceNumber = `F-${r.startDate?.slice(0,7).replace('-','')}-${building.id}-${r.id}`;

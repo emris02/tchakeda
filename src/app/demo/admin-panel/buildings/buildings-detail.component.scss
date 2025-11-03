@@ -20,15 +20,18 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 .page-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
-  margin: 0;
-  font-size: 24px;
+  margin: 0 auto;
+  text-align: center;
   font-weight: 600;
   color: $text-color;
+  font-size: 24px;
 }
 
 .back-btn {

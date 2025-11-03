@@ -7,8 +7,10 @@ export interface Rental {
   id: number;
   apartmentId: number;
   buildingId: number;
+  collectorId: number;
   apartmentName: string;
   buildingName: string;
+  collectorName: string;
   tenantId: number;
   tenantName: string;
   startDate: string;

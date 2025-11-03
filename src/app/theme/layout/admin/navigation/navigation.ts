@@ -41,13 +41,6 @@ export const NavigationItems: NavigationItem[] = [
     icon: 'icon-group',
     children: [
       {
-        id: 'buildings',
-        title: 'Bâtiments',
-        type: 'item',
-        icon: 'feather icon-layers',
-  url: '/demo/admin-panel/buildings'
-      },
-      {
         id: 'owners',
         title: 'Propriétaires',
         type: 'collapse',
@@ -71,12 +64,12 @@ export const NavigationItems: NavigationItem[] = [
           }
         ]
       },
-      {
-        id: 'tenants',
-        title: 'Locataires',
+            {
+        id: 'buildings',
+        title: 'Bâtiments',
         type: 'item',
-        icon: 'feather icon-users',
-  url: '/demo/admin-panel/tenants'
+        icon: 'feather icon-layers',
+  url: '/demo/admin-panel/buildings'
       },
       {
         id: 'apartments',
@@ -84,6 +77,13 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         icon: 'feather icon-grid',
   url: '/demo/admin-panel/apartments'
+      },      
+      {
+        id: 'tenants',
+        title: 'Locataires',
+        type: 'item',
+        icon: 'feather icon-users',
+  url: '/demo/admin-panel/tenants'
       },
       {
         id: 'rentals',

@@ -1,0 +1,40 @@
+<div class="mat-dialog-container">
+  <button type="button" class="close-modal" (click)="cancel()" aria-label="Fermer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+
+  <form (ngSubmit)="save()" [class.submitting]="isSubmitting" class="form-card collector-form">
+    <div class="form-grid grid-2x2">
+    <div class="form-group">
+      <input type="text" [(ngModel)]="form.fullName" name="fullName" class="underline-input" required />     
+      <label class="label">Nom complet</label>
+      <div class="error" *ngIf="errors['fullName']">{{ errors['fullName'] }}</div>
+    </div>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="form.phone" name="phone" class="underline-input" required />
+      <label class="label">Téléphone</label>
+      <div class="error" *ngIf="errors['phone']">{{ errors['phone'] }}</div>
+    </div>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="form.address" name="address" class="underline-input" />
+      <label class="label">Adresse</label>
+    </div>
+    <div class="form-group">
+      <input type="email" [(ngModel)]="form.email" name="email" class="underline-input" />
+      <label class="label">Email</label>
+    </div>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="form.identityType" name="identityType" class="underline-input" />
+      <label class="label">Type de pièce</label>
+    </div>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="form.identityNumber" name="identityNumber" class="underline-input" />
+      <label class="label">Numéro de pièce</label>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-light" (click)="cancel()" [disabled]="isSubmitting">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">Enregistrer</button>
+    </div>
+    </div>
+  </form> 
+</div>

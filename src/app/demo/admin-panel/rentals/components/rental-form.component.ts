@@ -61,8 +61,20 @@ export class RentalFormComponent {
       price: [data?.price || 1000, [Validators.required, Validators.min(1000)]],
       deposit: [data?.deposit || 0, [Validators.min(0)]]
     });
-    this.filteredBuildings = this.buildings;
-    this.filteredApartments = this.apartments;
+
+    // Filtrer les bâtiments selon le propriétaire sélectionné (utile si édition)
+    if (this.form.value.ownerId && this.form.value.ownerId !== 0) {
+      this.filteredBuildings = this.buildings.filter(b => b.ownerId === this.form.value.ownerId);
+    } else {
+      this.filteredBuildings = this.buildings;
+    }
+
+    // Filtrer les appartements selon le bâtiment sélectionné (utile si édition)
+    if (this.form.value.buildingId && this.form.value.buildingId !== 0) {
+      this.filteredApartments = this.apartments.filter(a => a.buildingId === this.form.value.buildingId);
+    } else {
+      this.filteredApartments = [];
+    }
   }
 
   onOwnerChange() {

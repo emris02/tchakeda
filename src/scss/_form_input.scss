@@ -132,6 +132,7 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   background: $primary-color;
   border-color: $primary-color;
   color: #fff;
+  --bs-btn-color: #fff;
 
   &:hover {
     background: darken($primary-color, 8%);

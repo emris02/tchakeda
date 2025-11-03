@@ -8,6 +8,7 @@
   th {
     background: #f8f9fa;
     font-weight: 600;
+    font-size: 13px;
   }
   .clickable-row {
     cursor: pointer;
@@ -28,4 +29,9 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   padding: 24px;
+}
+
+.btn-primary
+ {
+    --bs-btn-color: #fff;
 }

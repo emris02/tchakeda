@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CollectorsService, Collector } from './collectors.service'; // force refresh
 
 import { CommonModule } from '@angular/common';
+// Keep header navigation for collectors creation
 @Component({
   selector: 'app-collectors',
   templateUrl: './collectors.component.html',
@@ -18,7 +19,6 @@ export class CollectorsComponent {
   constructor(private collectorsService: CollectorsService, private router: Router) {
     this.collectors = this.collectorsService.getCollectors();
   }
-
 
   goToNewCollector() {
     this.router.navigate(['demo/admin-panel/collectors/new']);

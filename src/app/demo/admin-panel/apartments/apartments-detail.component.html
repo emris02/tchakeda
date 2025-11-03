@@ -11,7 +11,7 @@
     <div class="modal-card">
       <h5>Confirmer la suppression</h5>
       <p>Voulez-vous vraiment supprimer cet appartement ? Cette action est irréversible.</p>
-      <div class="form-actions center">
+      <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteApartment()">Supprimer</button>
       </div>
@@ -101,8 +101,8 @@
               </label>
             </div>
             <div class="error" *ngIf="errors.buildingId"><i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}</div>
-            <button type="button" class="btn btn-link" (click)="openBuildingDialog()" title="Ajouter un bâtiment">
-              <i class="fas fa-plus"></i>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="openBuildingDialog()" title="Ajouter un bâtiment">
+              <i class="fas fa-plus"></i> Nouveau bâtiment
             </button>
           </div>
         </div>
@@ -120,8 +120,8 @@
               </label>
             </div>
             <div class="error" *ngIf="errors.tenantId"><i class="fas fa-exclamation-circle"></i> {{ errors.tenantId }}</div>
-            <button type="button" class="btn btn-link" (click)="openTenantDialog()" title="Ajouter un locataire">
-              <i class="fas fa-plus"></i>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="openTenantDialog()" title="Ajouter un locataire">
+              <i class="fas fa-plus"></i> Nouveau locataire
             </button>
           </div>
         </div>

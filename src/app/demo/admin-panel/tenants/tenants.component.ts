@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TenantsService, Tenant } from './tenants.service';
+// Keep navigation for header-level New button
 import { RentalsService, Rental } from '../rentals/rentals.service';
 
 @Component({

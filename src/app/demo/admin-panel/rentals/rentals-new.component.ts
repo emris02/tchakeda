@@ -10,6 +10,8 @@ import { ApartmentsService } from '../apartments/apartments.service';
 import { TenantsService } from '../tenants/tenants.service';
 import { OwnersService } from '../owners/owners.service';
 import { BuildingsService } from '../buildings/buildings.service';
+import { CollectorsService } from '../collectors/collectors.service';
+import { CollectorsFormComponent } from '../collectors/components/collectors-form.component';
 
 @Component({
   selector: 'app-rentals-new',
@@ -24,10 +26,12 @@ export class RentalsNewComponent implements OnInit {
     ownerId: 0,
     buildingId: 0,
     apartmentId: 0,
+    collectorId: 0,
     tenantId: 0,
     startDate: '',
     owenerName: '',
     tenantName: '',
+    collectorName: '',
     apartmentName: '',
     buildingName: '',
     endDate: '',
@@ -43,6 +47,7 @@ export class RentalsNewComponent implements OnInit {
   buildings: any[] = [];
   apartments: any[] = [];
   tenants: any[] = [];
+  collectors: any[] = [];
 
   // --- Collections filtrées (en fonction des choix précédents) ---
   filteredBuildings: any[] = [];
@@ -55,6 +60,7 @@ export class RentalsNewComponent implements OnInit {
     private tenantsService: TenantsService,
     private ownersService: OwnersService,
     private buildingsService: BuildingsService,
+    private collectorsService: CollectorsService,
     private dialog: MatDialog
   ) {}
 
@@ -63,6 +69,7 @@ export class RentalsNewComponent implements OnInit {
     this.buildings = this.buildingsService.getBuildings();
     this.apartments = this.apartmentsService.getApartments();
     this.tenants = this.tenantsService.getTenants();
+    this.collectors = this.collectorsService.getCollectors();
   }
 
   // --- Navigation création ---
@@ -122,6 +129,23 @@ export class RentalsNewComponent implements OnInit {
     });
   }
 
+  openTenantDialog() {
+    this.goToNewTenant();
+  }
+
+  openNewCollectorDialog() {
+  const dialogRef = this.dialog.open(CollectorsFormComponent, {
+      width: '700px',
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.collectors = this.collectorsService.getCollectors();
+        this.form.collectorId = result.id;
+      }
+    });
+  }
+
   // --- Hiérarchie ---
   onOwnerChange() {
     this.filteredBuildings = this.buildings.filter(b => b.ownerId === this.form.ownerId);
@@ -151,6 +175,7 @@ export class RentalsNewComponent implements OnInit {
   this.errors = {};
 
   if (!this.form.ownerId) this.errors['ownerId'] = 'Propriétaire requis';
+  if (!this.form.collectorId) this.errors['collectorId'] = 'Recouvreur requis';
   if (!this.form.buildingId) this.errors['buildingId'] = 'Bâtiment requis';
   if (!this.form.apartmentId) this.errors['apartmentId'] = 'Appartement requis';
   if (!this.form.tenantId) this.errors['tenantId'] = 'Locataire requis';

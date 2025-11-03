@@ -73,9 +73,34 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 // Grilles
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
   margin: 25px 0;
+}
+
+.form-grid.two-columns {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-group {
+  position: relative;
+}
+
+/* Use select-with-action pattern (matching buildings-detail) */
+.select-with-action {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  select, input {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-grid.two-columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 .details-grid {

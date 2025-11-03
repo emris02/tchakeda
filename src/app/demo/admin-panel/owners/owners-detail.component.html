@@ -11,7 +11,7 @@
     <div class="modal-card">
       <h5>Confirmer la suppression</h5>
       <p>Voulez-vous vraiment supprimer ce propriétaire ? Cette action est irréversible.</p>
-      <div class="form-actions center">
+      <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteOwner()">Supprimer</button>
       </div>
@@ -172,48 +172,47 @@
 
         <div class="tab-content" *ngIf="activeTab === 'appartements'">
           <div class="table-container">
-<table class="data-table">
-  <thead>
-    <tr>
-      <th>Appartement</th>
-      <th>Locataire</th>
-      <th>Mensualité</th>
-      <th>Date de paiement</th>
-      <th>Recouvreur</th>
-      <th>Statut</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let apt of selectedBuildingApartments">
-      <!-- Nom de l'appart -->
-      <td>{{ apt.name || '-' }}</td>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Appartement</th>
+                <th>Locataire</th>
+                <th>Mensualité</th>
+                <th>Date de paiement</th>
+                <th>Recouvreur</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let apt of selectedBuildingApartments">
+                <!-- Nom de l'appart -->
+                <td>{{ apt.name || '-' }}</td>
 
-      <!-- Locataire -->
-  <td>{{ getTenantName(apt) }}</td>
+              <!-- Locataire -->
+            <td>{{ getTenantFullName(apt) }}</td>
 
-      <!-- Mensualité -->
-  <td>{{ getMonthlyRent(apt) ? (getMonthlyRent(apt) | currency:'XOF':'symbol':'1.0') : '-' }}</td>
+                <!-- Mensualité -->
+            <td>{{ getMonthlyRent(apt) ? (getMonthlyRent(apt) | currency:'XOF':'symbol':'1.0') : '-' }}</td>
 
-      <!-- Date de paiement -->
-  <td>-</td>
+                <!-- Date de paiement -->
+            <td>-</td>
 
-      <!-- Recouvreur -->
-  <td>{{ getCollector(apt) }}</td>
+                <!-- Recouvreur -->
+            <td>{{ getCollector(apt) }}</td>
 
-      <!-- Statut -->
-      <td>
-        <span class="status-badge">{{ getStatus(apt) }}</span>
-      </td>
-    </tr>
-
-    <!-- Message si aucun appartement -->
-    <tr *ngIf="selectedBuildingApartments.length === 0">
-      <td colspan="6" class="no-data">
-        Aucun appartement pour ce bâtiment
-      </td>
-    </tr>
-  </tbody>
-</table>
+                <!-- Statut -->
+                <td>
+                  <span class="status-badge">{{ getStatus(apt) }}</span>
+                </td>
+              </tr>
+              <!-- Message si aucun appartement -->
+              <tr *ngIf="selectedBuildingApartments.length === 0">
+                <td colspan="6" class="no-data">
+                  Aucun appartement pour ce bâtiment
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
           </div>
         </div>

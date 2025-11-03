@@ -5,6 +5,11 @@ import { ApartmentsService, Apartment } from '../apartments/apartments.service';
 import { BuildingsService, Building } from '../buildings/buildings.service';
 import { TenantsService, Tenant } from '../tenants/tenants.service';
 import { RecoveriesService, Recovery } from '../recoveries/recoveries.service';
+import { MatDialog } from '@angular/material/dialog';
+import { BuildingFormComponent } from '../buildings/components/building-form.component';
+import { ApartmentFormComponent } from '../apartments/components/apartment-form.component';
+import { TenantFormComponent } from '../tenants/components/tenant-form.component';
+import { CollectorsFormComponent } from '../collectors/components/collectors-form.component';
 
 @Component({
   selector: 'app-rentals-detail',
@@ -14,6 +19,11 @@ import { RecoveriesService, Recovery } from '../recoveries/recoveries.service';
 })
 export class RentalsDetailComponent implements OnInit {
   // ...existing code...
+  getCollectorName(id: number | undefined): string {
+    if (!id) return '';
+    const c = this.collectors?.find((c: any) => c.id === id);
+    return c ? c.fullName : '';
+  }
   showAddApartmentModal = false;
   showAddTenantModal = false;
   newApartmentName = '';
@@ -65,7 +75,9 @@ export class RentalsDetailComponent implements OnInit {
   errors: any = {};
   apartments: Apartment[] = [];
   buildings: Building[] = [];
+  filteredApartments: Apartment[] = [];
   tenants: Tenant[] = [];
+  collectors: any[] = [];
   showDeleteConfirm = false;
   filterApartmentId: number | null = null;
   filterTenantId: number | null = null;
@@ -82,21 +94,73 @@ export class RentalsDetailComponent implements OnInit {
     private router: Router,
     private rentalsService: RentalsService,
     private apartmentsService: ApartmentsService,
+    private buildingsService: BuildingsService,
     private tenantsService: TenantsService
-    , private recoveriesService: RecoveriesService
-    , private buildingsService: BuildingsService
+    , private recoveriesService: RecoveriesService,
+    private dialog: MatDialog
   ) {
     this.apartments = this.apartmentsService.getApartments();
     this.buildings = this.buildingsService.getBuildings();
     this.tenants = this.tenantsService.getTenants();
+    // Load collectors
+    if ((window as any).CollectorsService) {
+      this.collectors = (window as any).CollectorsService.getCollectors();
+    } else {
+      // fallback: try to get from localStorage
+      const data = localStorage.getItem('collectors');
+      this.collectors = data ? JSON.parse(data) : [];
+    }
+  }
+
+  goToNewCollector() {
+    const dialogRef = this.dialog.open(CollectorsFormComponent, {
+      width: '500px',
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        // Refresh collectors list
+        if ((window as any).CollectorsService) {
+          this.collectors = (window as any).CollectorsService.getCollectors();
+        } else {
+          const data = localStorage.getItem('collectors');
+          this.collectors = data ? JSON.parse(data) : [];
+        }
+        this.form.collectorId = result.id;
+      }
+    });
   }
 
   goToNewApartment() {
-   this.router.navigate(['demo/admin-panel/apartments/new']);
+   const dialogRef = this.dialog.open(ApartmentFormComponent, { width: '700px', data: { buildingId: this.form?.buildingId } });
+   dialogRef.afterClosed().subscribe((result: any) => {
+     if (result) {
+       this.apartments = this.apartmentsService.getApartments();
+       this.filteredApartments = this.apartments.filter(a => a.buildingId === (this.form?.buildingId || result.buildingId));
+       this.form.apartmentId = result.id;
+     }
+   });
+  }
+
+  goToNewBuilding() {
+   const dialogRef = this.dialog.open(BuildingFormComponent, { width: '700px', data: {} });
+   dialogRef.afterClosed().subscribe((result: any) => {
+     if (result) {
+       this.buildings = this.buildingsService.getBuildings();
+       this.form.buildingId = result.id;
+       this.filteredApartments = this.apartments.filter(a => a.buildingId === result.id);
+     }
+   });
   }
 
   goToNewTenant() {
-   this.router.navigate(['demo/admin-panel/tenants/new']);
+   const dialogRef = this.dialog.open(TenantFormComponent, { width: '600px', data: {} });
+   dialogRef.afterClosed().subscribe((result: any) => {
+     if (result) {
+       this.tenants = this.tenantsService.getTenants();
+       this.form.tenantId = result.id;
+     }
+   });
   }
   // Handle contract upload
   onContractSelected(event: any) {
@@ -124,6 +188,10 @@ export class RentalsDetailComponent implements OnInit {
     this.rental = this.rentalsService.getRentalById(id);
     if (this.rental) {
       this.form = { ...this.rental };
+    }
+    // If editing/viewing an existing rental, prepare filtered apartments if building is known
+    if (this.form && this.form.buildingId) {
+      this.filteredApartments = this.apartments.filter(a => a.buildingId === this.form.buildingId);
     }
     this.applyFilters();
       // Load payment history for this rental from recoveries (if any)
@@ -175,6 +243,20 @@ export class RentalsDetailComponent implements OnInit {
   }
 
   enableEdit() {
+    // Prepare edit form: set building from apartment if needed and filter apartments
+    if (this.form && this.form.apartmentId) {
+      const apt = this.apartments.find(a => a.id === this.form.apartmentId);
+      if (apt && apt.buildingId) {
+        this.form.buildingId = apt.buildingId;
+        this.filteredApartments = this.apartments.filter(a => a.buildingId === apt.buildingId);
+      } else {
+        this.form.buildingId = null;
+        this.filteredApartments = [];
+      }
+    } else {
+      // ensure filteredApartments is empty until building selected
+      this.filteredApartments = [];
+    }
     this.editMode = true;
   }
 
@@ -186,11 +268,22 @@ export class RentalsDetailComponent implements OnInit {
 
   validate() {
     this.errors = {};
+    if (!this.form.buildingId) this.errors.buildingId = 'Bâtiment requis';
     if (!this.form.apartmentId) this.errors.apartmentId = 'Appartement requis';
     if (!this.form.tenantId) this.errors.tenantId = 'Locataire requis';
     if (!this.form.startDate) this.errors.startDate = 'Date début requise';
     if (!this.form.price || this.form.price < 1) this.errors.price = 'Prix requis';
     return Object.keys(this.errors).length === 0;
+  }
+
+  onBuildingChange() {
+    if (this.form && this.form.buildingId) {
+      this.filteredApartments = this.apartments.filter(a => a.buildingId === this.form.buildingId);
+    } else {
+      this.filteredApartments = [];
+    }
+    // reset apartment selection when building changes
+    this.form.apartmentId = null;
   }
 
   save() {
@@ -219,6 +312,14 @@ export class RentalsDetailComponent implements OnInit {
       return matchApt && matchTenant;
     });
   }
+  getBuildingName(id: number | undefined): string {
+    if (!id) return '';
+    const building = this.buildings.find(b => b.id === id);
+    if (building) {
+      return building.name || 'Bâtiment inconnu';
+    }
+    return '';
+    }
 
   getApartmentName(id: number | undefined): string {
     if (!id) return '';
@@ -236,16 +337,7 @@ export class RentalsDetailComponent implements OnInit {
     if (!this.rental) return [];
     return this.apartments.filter(a => a.id === this.rental?.apartmentId);
   }
-    getBuildingName(buildingId: number | undefined): string {
-      if (!buildingId) return '';
-      // Prefer direct lookup from buildings list
-      const b = this.buildings.find(x => x.id === buildingId);
-      if (b) return b.name || ('Bâtiment ' + buildingId);
-      // Fallback: try to find via apartments owning this building id
-      const apt = this.apartments.find(a => a.buildingId === buildingId);
-      if (apt && apt.buildingId) return 'Bâtiment ' + apt.buildingId;
-      return '';
-    }
+    
    // Download contract image
    downloadContract() {
      if (this.contractImage) {

@@ -13,37 +13,7 @@ $background-light: #f8f9fa;
 $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
-// =============================================================================
-// MIXINS UTILITAIRES
-// =============================================================================
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-@mixin grid-responsive($min-width: 280px) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
-  gap: 20px;
-}
-
-@mixin mobile-stack {
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-}
-
-// =============================================================================
-// STYLES GÉNÉRAUX
-// =============================================================================
+// Styles généraux
 .page-container {
   padding: 0px;
   max-width: 1400px;
@@ -90,344 +60,13 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 // =============================================================================
-// COMPOSANTS CARTES
-// =============================================================================
-.form-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: $card-shadow;
-  padding: 24px;
-  margin-bottom: 24px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    box-shadow: $card-hover-shadow;
-  }
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid $border-color;
-
-  h5 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: $text-color;
-  }
-
-  h6 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: $text-color;
-  }
-
-  @include mobile-stack;
-}
-
-// =============================================================================
-// SECTIONS SPÉCIFIQUES RECOUVREUR - AMÉLIORÉ
-// =============================================================================
-
-.collector-form-content,
-.collector-view-content {
-  .collector-profile-section {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 20px;
-    margin-bottom: 30px;
-    align-items: start;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 25px;
-      text-align: center;
-    }
-  }
-}
-
-// Photo et upload - Structure améliorée
-.collector-photo-upload,
-.collector-photo-display {
-  @include flex-column;
-  align-items: center;
-  gap: 20px;
-  min-width: 200px;
-}
-
-.collector-photo-container {
-  position: relative;
-
-  .collector-photo {
-    width: 160px;
-    height: 160px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 3px solid white;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    transition: all 0.3s ease;
-    
-    &:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
-    }
-  }
-
-  .collector-avatar {
-    width: 160px;
-    height: 160px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #088ad5 0%, #147aff 100%);
-    @include flex-center;
-    font-size: 52px;
-    color: white;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  }
-}
-
-.collector-status {
-  .status-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    
-    &.status-active {
-      background: rgba($success-color, 0.12);
-      color: $success-color;
-      border: 1px solid rgba($success-color, 0.3);
-    }
-    
-    &.status-completed {
-      background: rgba($text-muted, 0.12);
-      color: $text-muted;
-      border: 1px solid rgba($text-muted, 0.3);
-    }
-  }
-}
-
-.image-upload-controls {
-  text-align: center;
-  
-  .file-input {
-    display: none;
-  }
-  
-  .btn {
-    margin-top: 8px;
-  }
-}
-
-// =============================================================================
-// GRILLES D'INFORMATIONS - AMÉLIORÉES
-// =============================================================================
-
-.collector-info-grid,
-.affiliation-grid,
-.location-grid {
-  @include grid-responsive(280px);
-}
-
-.collector-info-display,
-.affiliation-info,
-.location-info {
-  @include grid-responsive(250px);
-}
-
-// Style amélioré pour les items d'information
-.info-item {
-  // background: white;
-  // padding: 20px;
-  // border-radius: 10px;
-  // border: 1px solid #f0f0f0;
-  // transition: all 0.3s ease;
-  // position: relative;
-  // overflow: hidden;
-  
-  // &:hover {
-  //   transform: translateY(-2px);
-  //   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  //   border-color: $primary-color;
-  // }
-  
-  // Container pour icône et label séparés
-  .info-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #f5f5f5;
-    
-    .info-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      @include flex-center;
-      background: rgba($primary-color, 0.08);
-      color: $primary-color;
-      font-size: 16px;
-      flex-shrink: 0;
-        i {
-          margin-right: 8px; /* small gap between icon and label text */
-        }
-      
-      // Couleurs spécifiques selon l'icône
-      &.icon-user { background: rgba(#4CAF50, 0.08); color: #4CAF50; }
-      &.icon-globe { background: rgba(#2196F3, 0.08); color: #2196F3; }
-      &.icon-map { background: rgba(#FF9800, 0.08); color: #FF9800; }
-      &.icon-home { background: rgba(#9C27B0, 0.08); color: #9C27B0; }
-      &.icon-phone { background: rgba(#009688, 0.08); color: #009688; }
-      &.icon-envelope { background: rgba(#E91E63, 0.08); color: #E91E63; }
-    }
-    
-    .info-label {
-      font-weight: 600;
-      font-size: 13px;
-      color: $text-muted;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      flex: 1;
-    }
-  }
-  
-  .info-value {
-    margin: 0;
-    font-size: 16px;
-    color: $text-color;
-    font-weight: 500;
-    line-height: 1.5;
-    word-break: break-word;
-    
-    // Style spécial pour les liens
-    .phone-link,
-    .email-link {
-      color: $primary-color;
-      text-decoration: none;
-      transition: color 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      
-      &:hover {
-        color: darken($primary-color, 15%);
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-// =============================================================================
-// FORMULAIRES - STYLE AMÉLIORÉ
-// =============================================================================
-
-.collector-form,
-.collector-details {
-  .form-grid,
-  .details-grid {
-    @include grid-responsive(280px);
-  }
-}
-
-.form-group {
-  margin-bottom: 24px;
-  position: relative;
-
-  // Container d'input avec icône
-  .input-container {
-    position: relative;
-    
-    .input-icon {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 40px;
-      height: 40px;
-      @include flex-center;
-      color: $text-muted;
-      font-size: 16px;
-      z-index: 2;
-      transition: color 0.3s ease;
-    }
-    
-    .underline-input {
-      width: 100%;
-      border: none;
-      border-bottom: 2px solid #e0e0e0;
-      outline: none;
-      padding: 12px 0 12px 40px;
-      font-size: 15px;
-      background: transparent;
-      transition: all 0.3s ease;
-      
-      &:focus {
-        border-bottom-color: $primary-color;
-        
-        & + .label {
-          color: $primary-color;
-        }
-        
-        ~ .input-icon {
-          color: $primary-color;
-        }
-      }
-      
-      &:not(:placeholder-shown) + .label {
-        transform: translateY(-22px) scale(0.85);
-        color: $text-muted;
-      }
-    }
-    
-    .label {
-      position: absolute;
-      top: 12px;
-      left: 40px;
-      font-size: 15px;
-      color: $text-muted;
-      transition: all 0.3s ease;
-      pointer-events: none;
-      background: white;
-      padding: 0 4px;
-      
-      .required {
-        color: $danger-color;
-        font-weight: 600;
-        margin-left: 2px;
-      }
-    }
-  }
-
-  .error {
-    color: $danger-color;
-    font-size: 13px;
-    margin-top: 6px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    
-    &::before {
-      content: '⚠';
-      font-size: 12px;
-    }
-  }
-}
-
-// =============================================================================
 // CARTES DE STATISTIQUES
 // =============================================================================
 
 .stats-grid {
-  @include grid-responsive(240px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
   margin-bottom: 24px;
   
   @media (max-width: 768px) {
@@ -461,7 +100,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   width: 60px;
   height: 60px;
   border-radius: 12px;
-  @include flex-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 24px;
   color: white;
   
@@ -501,251 +142,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 // =============================================================================
-// PERFORMANCE - STYLE AMÉLIORÉ
-// =============================================================================
-
-.performance-section {
-  margin-top: 30px;
-  padding-top: 25px;
-  border-top: 1px solid $border-color;
-  
-  h6 {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 600;
-    color: $text-color;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    
-    &::before {
-      content: '';
-      width: 4px;
-      height: 18px;
-      background: $primary-color;
-      border-radius: 2px;
-    }
-  }
-}
-
-.performance-stats {
-  @include grid-responsive(160px);
-}
-
-.performance-item {
-  text-align: center;
-  padding: 24px 20px;
-  background: white;
-  border-radius: 12px;
-  border: 1px solid $border-color;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, $primary-color, lighten($primary-color, 20%));
-  }
-  
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: $card-hover-shadow;
-  }
-  
-  .performance-value {
-    font-size: 26px;
-    font-weight: 700;
-    color: $primary-color;
-    margin-bottom: 6px;
-  }
-  
-  .performance-label {
-    font-size: 14px;
-    color: $text-muted;
-    font-weight: 500;
-    line-height: 1.4;
-  }
-}
-
-// =============================================================================
-// ZONES ASSIGNÉES - STYLE AMÉLIORÉ
-// =============================================================================
-
-.zones-section {
-  margin-top: 30px;
-  padding-top: 25px;
-  border-top: 1px solid $border-color;
-  
-  h6 {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 600;
-    color: $text-color;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    
-    &::before {
-      content: '';
-      width: 4px;
-      height: 18px;
-      background: $primary-color;
-      border-radius: 2px;
-    }
-  }
-}
-
-.zones-grid {
-  @include grid-responsive(200px);
-}
-
-.zone-card {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid $border-color;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, $primary-color, lighten($primary-color, 20%));
-  }
-  
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: $card-hover-shadow;
-    border-color: $primary-color;
-  }
-  
-  .zone-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
-    
-    h6 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 600;
-      color: $text-color;
-      line-height: 1.3;
-    }
-    
-    .apartments-count {
-      font-size: 11px;
-      color: white;
-      background: $primary-color;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-  }
-  
-  .zone-stats {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    
-    .stat {
-      font-size: 11px;
-      color: white;
-      background: $success-color;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-weight: 600;
-      
-      &:last-child {
-        background: $warning-color;
-      }
-    }
-  }
-}
-
-// =============================================================================
-// BOUTONS ET ACTIONS - STYLE AMÉLIORÉ
-// =============================================================================
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  
-  &.compact {
-    gap: 6px;
-    
-    .btn-icon.sm {
-      width: 32px;
-      height: 32px;
-      font-size: 13px;
-      border-radius: 8px;
-      
-      &:hover {
-        transform: scale(1.08);
-      }
-    }
-  }
-}
-
-.action-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  @include flex-center;
-  background: #f8f9fa;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 10px;
-    background: currentColor;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  i {
-    position: relative;
-    z-index: 1;
-  }
-  
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    
-    &::before {
-      opacity: 0.1;
-    }
-  }
-}
-
-.action-btn.edit:hover { color: $primary-color; border-color: $primary-color; }
-.action-btn.delete:hover { color: $danger-color; border-color: $danger-color; }
-.action-btn.save:hover { color: $success-color; border-color: $success-color; }
-.action-btn.cancel:hover { color: $danger-color; border-color: $danger-color; }
-
-// =============================================================================
-// RESTE DU CODE (identique mais conservé pour complétude)
+// CARTE PRINCIPALE DES PAIEMENTS
 // =============================================================================
 
 .payments-card {
@@ -780,11 +177,23 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     font-size: 16px;
     font-weight: 600;
     
-    &.success { color: $success-color; }
-    &.warning { color: $warning-color; }
-    &.info { color: $info-color; }
+    &.success {
+      color: $success-color;
+    }
+    
+    &.warning {
+      color: $warning-color;
+    }
+    
+    &.info {
+      color: $info-color;
+    }
   }
 }
+
+// =============================================================================
+// CONTROLES DE TABLEAU
+// =============================================================================
 
 .table-controls {
   display: flex;
@@ -794,7 +203,10 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   gap: 16px;
   flex-wrap: wrap;
   
-  @include mobile-stack;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .filters {
@@ -848,6 +260,10 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
   }
 }
+
+// =============================================================================
+// TABLEAU DES PAIEMENTS
+// =============================================================================
 
 .table-container {
   overflow-x: auto;
@@ -922,10 +338,12 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
           margin-top: 2px;
         }
         
-        .amount-cell .amount {
-          font-weight: 600;
-          font-family: 'Courier New', monospace;
-          color: $text-color;
+        .amount-cell {
+          .amount {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: $text-color;
+          }
         }
         
         .payment-method {
@@ -935,10 +353,21 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
           font-size: 13px;
           font-weight: 500;
           
-          &.cash { color: $success-color; }
-          &.transfer { color: $primary-color; }
-          &.check { color: $warning-color; }
-          &.mobile { color: $info-color; }
+          &.cash {
+            color: $success-color;
+          }
+          
+          &.transfer {
+            color: $primary-color;
+          }
+          
+          &.check {
+            color: $warning-color;
+          }
+          
+          &.mobile {
+            color: $info-color;
+          }
         }
         
         .apartment-info,
@@ -954,6 +383,10 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
   }
 }
+
+// =============================================================================
+// BADGES DE STATUT
+// =============================================================================
 
 .status-badge {
   display: inline-flex;
@@ -989,6 +422,577 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     color: $text-muted;
     border: 1px solid rgba($text-muted, 0.3);
   }
+}
+
+// =============================================================================
+// SECTIONS SPÉCIFIQUES LOCATAIRE
+// =============================================================================
+
+.collector-form-content,
+.collector-view-content {
+  .collector-profile-section {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 36px; /* slightly larger for moderate spacing */
+    margin-bottom: 32px;
+    align-items: start;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      text-align: center;
+    }
+  }
+}
+
+// Photo et upload
+.collector-photo-upload,
+.collector-photo-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.collector-photo-container {
+  position: relative;
+
+  .collector-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .collector-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #088ad5 0%, #147aff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.collector-status {
+  .status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &.status-active {
+      background: rgba($success-color, 0.1);
+      color: $success-color;
+      border: 1px solid rgba($success-color, 0.3);
+    }
+    
+    &.status-completed {
+      background: rgba($text-muted, 0.1);
+      color: $text-muted;
+      border: 1px solid rgba($text-muted, 0.3);
+    }
+  }
+}
+
+.image-upload-controls {
+  text-align: center;
+  
+  .file-input {
+    display: none;
+  }
+  
+  .btn {
+    margin-top: 8px;
+  }
+}
+
+// Grilles d'informations
+  .collector-info-grid,
+  .affiliation-grid,
+  .location-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px; /* moderate gap between personal info items */
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+.collector-info-display,
+.affiliation-info,
+.location-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+.info-item {
+  label {
+    display: block;
+    margin-bottom: 8px; /* slightly larger label spacing */
+    font-weight: 600;
+    font-size: 14px;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .info-value {
+    margin: 0;
+    padding: 12px 0; /* increased vertical padding for breathing room */
+    font-size: 16px;
+    color: $text-color;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+}
+
+
+// =============================================================================
+// BOUTONS D'ACTION COMPACTS
+// =============================================================================
+
+.action-buttons.compact {
+  display: flex;
+  gap: 4px;
+  
+  .btn-icon.sm {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// =============================================================================
+// PAGINATION
+// =============================================================================
+
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid $border-color;
+  flex-wrap: wrap;
+  gap: 12px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: $text-muted;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .page-numbers {
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-color;
+  }
+}
+
+// =============================================================================
+// ÉTAT VIDE
+// =============================================================================
+
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  
+  .no-data-content {
+    i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: #ddd;
+      display: block;
+    }
+    
+    h6 {
+      margin: 0 0 8px 0;
+      color: $text-muted;
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: $text-muted;
+    }
+  }
+}
+
+// =============================================================================
+// FORMULAIRES ET INFORMATIONS
+// =============================================================================
+
+.form-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: $card-hover-shadow;
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $border-color;
+
+  h5 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-color;
+  }
+
+  h6 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-color;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.collector-form,
+.collector-details {
+  .form-grid,
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+}
+
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+
+  .label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    color: $text-color;
+    transition: all 0.3s ease;
+  }
+
+  .required {
+    color: $danger-color;
+    font-weight: 600;
+  }
+}
+
+.underline-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #e0e0e0;
+  outline: none;
+  padding: 10px 0;
+  font-size: 15px;
+  background: transparent;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-bottom-color: $primary-color;
+    
+    & + .label {
+      color: $primary-color;
+      transform: translateY(-5px);
+      font-size: 12px;
+    }
+  }
+  
+  &:not(:placeholder-shown) + .label {
+    transform: translateY(-5px);
+    font-size: 12px;
+    color: $text-muted;
+  }
+}
+
+.error {
+  color: $danger-color;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  &::before {
+    content: '⚠';
+    font-size: 12px;
+  }
+}
+
+// =============================================================================
+// ZONES ASSIGNÉES
+// =============================================================================
+
+.zones-section {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid $border-color;
+  
+  h6 {
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-color;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    &::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: $primary-color;
+      border-radius: 2px;
+    }
+  }
+}
+
+.zones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.zone-card {
+  background: $background-light;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid $border-color;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $card-shadow;
+  }
+  
+  .zone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    
+    h6 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-color;
+    }
+    
+    .apartments-count {
+      font-size: 12px;
+      color: $text-muted;
+      background: white;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+  }
+  
+  .zone-stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    
+    .stat {
+      font-size: 11px;
+      color: $text-muted;
+      background: white;
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+  }
+}
+
+// =============================================================================
+// INFORMATIONS DU RECOUVREUR
+// =============================================================================
+
+.info-item {
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .info-value {
+    margin: 0;
+    padding: 8px 0;
+    font-size: 16px;
+    color: $text-color;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  
+  .phone-link,
+  .email-link {
+    color: $primary-color;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: darken($primary-color, 10%);
+    }
+  }
+}
+
+// =============================================================================
+// PERFORMANCE
+// =============================================================================
+
+.performance-section {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid $border-color;
+  
+  h6 {
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-color;
+  }
+}
+
+.performance-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.performance-item {
+  text-align: center;
+  padding: 20px;
+  background: $background-light;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+  
+  .performance-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 4px;
+  }
+  
+  .performance-label {
+    font-size: 14px;
+    color: $text-muted;
+    font-weight: 500;
+  }
+}
+
+// =============================================================================
+// BOUTONS ET ACTIONS
+// =============================================================================
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #edf2f7;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.action-btn.edit:hover {
+  color: $primary-color;
+  border-color: $primary-color;
+}
+
+.action-btn.delete:hover {
+  color: $danger-color;
+  border-color: $danger-color;
+}
+
+.action-btn.save:hover {
+  color: $success-color;
+  border-color: $success-color;
+}
+
+.action-btn.cancel:hover {
+  color: $danger-color;
+  border-color: $danger-color;
 }
 
 .btn {
@@ -1055,6 +1059,10 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
 }
 
+// =============================================================================
+// MODALS
+// =============================================================================
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1062,7 +1070,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  @include flex-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1000;
   padding: 20px;
   backdrop-filter: blur(4px);
@@ -1099,65 +1109,6 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   
   &.center {
     justify-content: center;
-  }
-}
-
-.table-pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid $border-color;
-  flex-wrap: wrap;
-  gap: 12px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-.pagination-info {
-  font-size: 14px;
-  color: $text-muted;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  
-  .page-numbers {
-    font-size: 14px;
-    font-weight: 500;
-    color: $text-color;
-  }
-}
-
-.no-data {
-  text-align: center;
-  padding: 60px 20px;
-  
-  .no-data-content {
-    i {
-      font-size: 48px;
-      margin-bottom: 16px;
-      color: #ddd;
-      display: block;
-    }
-    
-    h6 {
-      margin: 0 0 8px 0;
-      color: $text-muted;
-      font-weight: 600;
-    }
-    
-    p {
-      margin: 0;
-      font-size: 14px;
-      color: $text-muted;
-    }
   }
 }
 
@@ -1205,6 +1156,14 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     margin-bottom: 20px;
   }
   
+  .card-header {
+    margin-bottom: 16px;
+    
+    .action-buttons {
+      align-self: flex-end;
+    }
+  }
+  
   .data-table {
     font-size: 12px;
     
@@ -1234,16 +1193,31 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
       padding: 10px 6px;
     }
   }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
 }
 
 // Support tactile
 @media (hover: none) {
-  .action-btn:hover,
-  .btn:hover,
-  .stat-card:hover,
-  .zone-card:hover,
-  .performance-item:hover,
-  .info-item:hover {
+  .action-btn:hover {
+    transform: none;
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+  
+  .stat-card:hover {
+    transform: none;
+  }
+  
+  .zone-card:hover {
     transform: none;
   }
 }

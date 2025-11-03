@@ -13,7 +13,7 @@
     <div class="modal-card">
       <h5>Confirmer la suppression</h5>
       <p>Voulez-vous vraiment supprimer ce recouvreur ? Cette action est irréversible.</p>
-      <div class="form-actions center">
+      <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="delete()">Supprimer</button>
       </div>
@@ -106,13 +106,13 @@
 
             <div class="form-group">
               <div class="input-container">
-                <input type="number" id="houseCount" [(ngModel)]="form.houseCount" name="houseCount" class="underline-input" required min="0" placeholder=" " />
+                <input type="number" id="houseCount" [value]="assignedHouseCount" name="houseCount" class="underline-input" readonly placeholder=" " />
                 <label for="houseCount" class="label">
                   <i class="fas fa-home"></i> Nombre de maisons <span class="required">*</span>
                 </label>
               </div>
-              <div class="error" *ngIf="errors.houseCount">
-                <i class="fas fa-exclamation-circle"></i> {{ errors.houseCount }}
+              <div class="error" *ngIf="errors.assignedHouseCount">
+                <i class="fas fa-exclamation-circle"></i> {{ errors.assignedHouseCount }}
               </div>
             </div>
 
@@ -165,13 +165,10 @@
     <!-- ===================== MODE VISUALISATION ===================== -->
     <div *ngIf="!editMode" class="collector-details">
       <div class="collector-view-content">
-
-        <!-- Section profil -->
         <div class="collector-profile-section">
-          <!-- Photo du recouvreur à gauche -->
           <div class="collector-photo-display">
             <div class="collector-photo-container">
-              <img *ngIf="collector?.identityImage" [src]="collector?.identityImage" alt="Photo du recouvreur" class="collector-photo" />
+              <img *ngIf="collector?.identityImage" [src]="collector?.identityImage" alt="Photo d'identité" class="collector-photo" />
               <div *ngIf="!collector?.identityImage" class="collector-avatar">
                 <i class="fas fa-user"></i>
               </div>
@@ -181,41 +178,34 @@
               <span class="status-badge status-completed" *ngIf="!isCollectorActive()">Ancien recouvreur</span>
             </div>
           </div>
-
-          <!-- Informations du recouvreur à droite -->
           <div class="collector-info-display">
             <div class="details-grid">
               <div class="info-item">
-                <label><i class="fas fa-user me-2"></i> Nom complet</label>
+                <label><i class="fas fa-user"></i> Nom complet</label>
                 <p class="info-value">{{ collector?.fullName || '-' }}</p>
               </div>
-
               <div class="info-item">
-                <label><i class="fas fa-flag me-2"></i> Pays</label>
+                <label><i class="fas fa-globe"></i> Pays</label>
                 <p class="info-value">{{ collector?.country || '-' }}</p>
               </div>
-
               <div class="info-item">
-                <label><i class="fas fa-map-marker-alt me-2"></i> Adresse</label>
+                <label><i class="fas fa-map-marker-alt"></i> Adresse</label>
                 <p class="info-value">{{ collector?.address || '-' }}</p>
               </div>
-
               <div class="info-item">
-                <label><i class="fas fa-home me-2"></i> Nombre de maisons</label>
-                <p class="info-value">{{ collector?.houseCount || '0' }}</p>
+                <label><i class="fas fa-home"></i> Nombre de maisons</label>
+                <p class="info-value">{{ assignedHouseCount || '0' }}</p>
               </div>
-
               <div class="info-item">
-                <label><i class="fas fa-phone me-2"></i> Téléphone</label>
+                <label><i class="fas fa-phone"></i> Téléphone</label>
                 <p class="info-value">
                   <a [href]="'tel:' + collector?.phone" class="phone-link">
                     {{ collector?.phone || '-' }}
                   </a>
                 </p>
               </div>
-
               <div class="info-item">
-                <label><i class="fas fa-envelope me-2"></i> Email</label>
+                <label><i class="fas fa-envelope"></i> Email</label>
                 <p class="info-value">
                   <a [href]="'mailto:' + collector?.email" class="email-link">
                     {{ collector?.email || '-' }}
@@ -225,7 +215,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -264,7 +253,7 @@
           <i class="fas fa-home"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ collector?.houseCount || 0 }}</h3>
+          <h3>{{ assignedHouseCount || 0 }}</h3>
           <p>Maisons assignées</p>
         </div>
       </div>

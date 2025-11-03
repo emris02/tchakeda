@@ -8,20 +8,20 @@
       <tr>
         <th>Appartement</th>
         <th>Locataire</th>
-        <th>Date début</th>
-        <th>Date fin</th>
-        <th>Prix</th>
-        <th>Date de création</th>
+        <th>Mensualité</th>
+        <th>Recouvreur</th>
+        <th>Date de début</th>
+        <th>Date de fin</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let rental of rentals" (click)="goToDetail(rental)" class="clickable-row">
         <td>{{ rental.apartmentName }}</td>
         <td>{{ rental.tenantName }}</td>
-        <td>{{ rental.startDate }}</td>
-        <td>{{ rental.endDate }}</td>
         <td>{{ rental.price | currency:'X0F' }}</td>
-        <td>{{ rental.createdAt | date:'shortDate' }}</td>
+        <td>{{ rental.collectorName }}</td>
+        <td>{{ rental.startDate | date:'shortDate' }}</td>
+        <td>{{ rental.endDate | date:'shortDate' }}</td>
       </tr>
     </tbody>
   </table>

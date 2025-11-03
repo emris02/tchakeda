@@ -15,6 +15,17 @@ export class TenantsNewComponent {
   availableApartments: Apartment[] = [];
   filteredApartments: Apartment[] = [];
   showAffiliated = false;
+  imagePreview: string | null = null;
+  isSubmitting = false;
+
+  // template compatibility aliases
+  get previewImage(): string | null {
+    return this.imagePreview;
+  }
+
+  onImageSelect(event: Event) {
+    this.onFileSelected(event);
+  }
   form: {
     buildingId?: number;
     fullName: string;
@@ -120,11 +131,35 @@ export class TenantsNewComponent {
 
   create() {
     if (!this.validate()) return;
-    this.tenantsService.createTenant(this.form);
-    this.router.navigate(['demo/admin-panel/tenants']);
+    this.isSubmitting = true;
+    try {
+      this.tenantsService.createTenant(this.form);
+      this.router.navigate(['demo/admin-panel/tenants']);
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   cancel() {
     this.router.navigate(['demo/admin-panel/tenants']);
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+      this.form.identityImage = this.imagePreview;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage() {
+    this.imagePreview = null;
+    this.form.identityImage = '';
+    const fileInput = document.getElementById('identityImage') as HTMLInputElement | null;
+    if (fileInput) fileInput.value = '';
   }
 }

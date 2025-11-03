@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApartmentsService, Apartment } from './apartments.service';
+// Keep header navigation for apartment creation
 
 interface ApartmentWithCarousel extends Apartment {
   _carouselIndex: number;

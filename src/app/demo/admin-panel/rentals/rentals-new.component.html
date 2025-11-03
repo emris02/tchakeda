@@ -16,7 +16,9 @@
           <i class="fas fa-user-tie"></i>
           Propriétaire
         </label>
-        <button type="button" class="btn btn-light" (click)="goToNewOwner()">Nouveau propriétaire</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewOwner()" title="Ajouter un propriétaire">
+          <i class="fas fa-user-plus"></i> Nouveau propriétaire
+        </button>
       </div>
       <div class="error" *ngIf="errors['ownerId']">{{ errors['ownerId'] }}</div>
     </div>
@@ -32,7 +34,9 @@
           <i class="fas fa-building"></i>
           Bâtiment
         </label>
-        <button type="button" class="btn btn-light" (click)="goToNewBuilding()">Nouveau bâtiment</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewBuilding()" title="Ajouter un bâtiment">
+          <i class="fas fa-plus"></i> Nouveau bâtiment
+        </button>
       </div>
       <div class="error" *ngIf="errors['buildingId']">{{ errors['buildingId'] }}</div>
     </div>
@@ -48,29 +52,35 @@
           <i class="fas fa-home"></i>
           Appartement
         </label>
-        <button type="button" class="btn btn-light" (click)="goToNewApartment()">Nouvel appartement</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewApartment()" title="Ajouter un appartement">
+          <i class="fas fa-plus"></i> Nouvel appartement
+        </button>
       </div>
       <div class="error" *ngIf="errors['apartmentId']">{{ errors['apartmentId'] }}</div>
     </div>
 
     <!-- Locataire -->
-    <div class="form-group">
-      <div class="input-with-button">
-        <select id="tenantId" [(ngModel)]="form.tenantId" name="tenantId" class="underline-input" required>
-          <option [ngValue]="0">Sélectionner...</option>
-          <option *ngFor="let tenant of tenants" [ngValue]="tenant.id">{{ tenant.fullName }}</option>
-        </select>
-        <label for="tenantId" class="label">
-          <i class="fas fa-user"></i>
-          Locataire
-        </label>
-        <button type="button" class="btn btn-light" (click)="goToNewTenant()">Nouveau locataire</button>
-      </div>
-      <div class="error" *ngIf="errors['tenantId']">{{ errors['tenantId'] }}</div>
-    </div>
+        <div class="form-group">
+          <div class="select-with-action">
+            <div class="input-container">
+              <select id="tenantId" [(ngModel)]="form.tenantId" name="tenantId" class="underline-input">
+                <option [ngValue]="null">Sélectionner un locataire...</option>
+                <option *ngFor="let tenant of tenants" [ngValue]="tenant.id">{{ tenant.fullName }}</option>
+              </select>
+              <label for="tenantId" class="label">
+                <i class="fas fa-user"></i>
+                Locataire
+              </label>
+            </div>
+            <div class="error" *ngIf="errors['tenantId']"><i class="fas fa-exclamation-circle"></i> {{ errors['tenantId'] }}</div>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="openTenantDialog()" title="Ajouter un locataire">
+              <i class="fas fa-user-plus"></i> Nouveau locataire
+            </button>
+          </div>
+        </div>
 
     <!-- Mensualité -->
-    <div class="form-group full-width">
+    <div class="form-group">
       <div class="input-with-button">
         <input type="number" id="price" [(ngModel)]="form.price" name="price" class="underline-input" required min="1000" step="1000" placeholder="Loyer mensuel (CFA)" />
         <label for="price" class="label">
@@ -82,13 +92,30 @@
     </div>
 
     <!-- Caution -->
-    <div class="form-group full-width">
+    <div class="form-group">
       <input type="number" id="deposit" [(ngModel)]="form.deposit" name="deposit" class="underline-input" required min="0" step="1000" placeholder="Caution (CFA)" />
       <label for="deposit" class="label">
         <i class="fas fa-hand-holding-dollar"></i>
         Caution (CFA)
       </label>
       <div class="error" *ngIf="errors['deposit']">{{ errors['deposit'] }}</div>
+    </div>
+    <!-- Recouvreur -->
+    <div class="form-group full-width">
+      <div class="input-with-button">
+        <select id="collectorId" [(ngModel)]="form.collectorId" name="collectorId" class="underline-input" required>
+          <option [ngValue]="0">Sélectionner...</option>
+          <option *ngFor="let collector of collectors" [ngValue]="collector.id">{{ collector.name }}</option>
+        </select>
+        <label for="collectorId" class="label">
+          <i class="fas fa-user-shield"></i>
+          Recouvreur
+        </label>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="openNewCollectorDialog()" title="Ajouter un recouvreur">
+          <i class="fas fa-user-plus"></i> Nouveau recouvreur
+        </button>
+      </div>
+      <div class="error" *ngIf="errors['collectorId']">{{ errors['collectorId'] }}</div>
     </div>
 
     <!-- Date début -->
