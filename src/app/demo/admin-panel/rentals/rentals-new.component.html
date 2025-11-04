@@ -1,6 +1,10 @@
-<div class="page-header">
-  <h4>Créer une location</h4>
-</div>
+<div class="page-container">
+  <div class="page-header">
+    <button class="btn btn-light back-btn" (click)="cancel()">
+      <i class="fas fa-arrow-left"></i> Location
+    </button>
+    <h4 class="page-title">Ajouter une location</h4>
+  </div>
 
 <div class="content-container">
   <form (ngSubmit)="create()" class="form-card rental-grid">
@@ -137,11 +141,12 @@
       </label>
       <div class="error" *ngIf="errors['endDate']">{{ errors['endDate'] }}</div>
     </div>
-
-    <!-- Actions -->
-    <div class="form-actions full-width">
-      <button type="button" class="btn btn-light" (click)="cancel()">Annuler</button>
-      <button type="submit" class="btn btn-primary">Créer</button>
-    </div>
-  </form>
+    </form>
 </div>
+<!-- Actions -->
+      <div class="action-bar">
+        <div class="form-actions">
+          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+          <button type="submit" class="btn btn-primary btn-save">Créer</button>
+        </div>
+      </div>

@@ -25,9 +25,11 @@
         <div class="error" *ngIf="form.get('address')?.invalid && (form.get('address')?.touched || form.get('address')?.dirty)">L'adresse est requise</div>
       </div>
     </div>
-    <div class="form-actions">
-      <button type="button" class="btn btn-light" (click)="onCancel()">Annuler</button>
-      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enregistrer</button>
+    <div class="action-bar">
+      <div class="form-actions">
+        <button type="button" class="btn btn-light btn-cancel" (click)="onCancel()">Annuler</button>
+        <button type="submit" class="btn btn-primary btn-save" [disabled]="form.invalid">Enregistrer</button>
+      </div>
     </div>
   </form>
 </div>

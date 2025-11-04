@@ -13,6 +13,7 @@ $background-light: #f8f9fa;
 $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 
+
 // Styles généraux
 .page-container {
   padding: 0px;
@@ -23,57 +24,82 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 .page-header {
   display: flex;
   align-items: center;
-  margin-bottom: 32px;
-  gap: 16px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
-  margin: 0;
-  font-size: 24px;
+  margin: 0 auto;
+  text-align: center;
   font-weight: 600;
   color: $text-color;
-  text-align: center;
-  flex: 1;
+  font-size: 24px;
 }
 
 .back-btn {
-  background: #f8f9fa;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  padding: 8px 15px;
   transition: all 0.3s ease;
   
   &:hover {
-    background: #e9ecef;
-    transform: translateX(-2px);
+    background-color: #f8f9fa;
+    transform: translateX(-3px);
   }
 }
 
-// Formulaire principal
-.content-container {
-  .form-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: $card-shadow;
-    padding: 0;
-    overflow: hidden;
-    margin: 0 auto;
-    transition: all 0.3s ease;
-    
-    &:hover {
-      box-shadow: $card-hover-shadow;
-    }
-  }
+// Cartes et formulaires
+.form-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  padding: 25px;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+/* Action bar (footer-like container for form actions) */
+.action-bar {
+  background: #ffffff; // light distinct block under the white form
+  border-radius: 10px;
+  border: 1px solid lighten($border-color, 6%);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  padding: 14px 20px;
+  margin: 18px 0 32px;
+}
+
+.action-bar .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+  margin: 0;
+}
+
+.action-bar .btn-cancel {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.action-bar .btn-cancel:hover {
+  background: darken(#e74c3c, 6%);
+}
+
+.action-bar .btn-save {
+  background: $primary-color;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.action-bar .btn-save:hover {
+  background: darken($primary-color, 6%);
 }
 
 .owner-form {
@@ -314,70 +340,6 @@ select.underline-input {
     font-size: 12px;
   }
 }
-
-// Actions du formulaire
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  padding: 32px;
-  background: $background-light;
-  border-top: 1px solid $border-color;
-  grid-column: 1 / -1;
-  
-  &.center {
-    justify-content: center;
-  }
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    padding: 24px;
-  }
-  
-  .btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    
-    &.btn-cancel {
-      background: #f8f9fa;
-      border-color: #ddd;
-      color: $text-color;
-
-      &:hover {
-        background: #e9ecef;
-        border-color: #adb5bd;
-      }
-    }
-    
-    &.btn-submit {
-      background: $primary-color;
-      border-color: $primary-color;
-      color: white;
-
-      &:hover {
-        background: darken($primary-color, 10%);
-        border-color: darken($primary-color, 10%);
-        transform: translateY(-2px);
-      }
-      
-      &:disabled {
-        background: #bdbdbd;
-        border-color: #bdbdbd;
-        cursor: not-allowed;
-        transform: none;
-      }
-    }
-  }
-}
-
 // Modal de succès
 .modal-overlay {
   position: fixed;
@@ -492,69 +454,6 @@ select.underline-input {
         color: $danger-color;
       }
     }
-  }
-}
-
-// Boutons
-.btn {
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  
-  &.btn-sm {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-  
-  &.btn-outline-primary {
-    background: transparent;
-    border-color: $primary-color;
-    color: $primary-color;
-    
-    &:hover {
-      background: $primary-color;
-      color: white;
-      transform: translateY(-1px);
-    }
-  }
-}
-
-.btn-light {
-  background: #f8f9fa;
-  border-color: #ddd;
-  color: $text-color;
-
-  &:hover {
-    background: #e9ecef;
-  }
-}
-
-.btn-primary {
-  background: $primary-color;
-  border-color: $primary-color;
-  color: white;
-
-  &:hover {
-    background: darken($primary-color, 10%);
-    border-color: darken($primary-color, 10%);
-  }
-}
-
-.btn-danger {
-  background: $danger-color;
-  border-color: $danger-color;
-  color: white;
-
-  &:hover {
-    background: darken($danger-color, 10%);
-    border-color: darken($danger-color, 10%);
   }
 }
 

@@ -2,6 +2,7 @@
 
 // Variables
 $primary-color: #1976d2;
+$primary-light: lighten($primary-color, 12%);
 $success-color: #388e3c;
 $danger-color: #d32f2f;
 $warning-color: #f57c00;
@@ -611,117 +612,6 @@ select.underline-input {
   
   i {
     font-size: 12px;
-  }
-}
-
-// Boutons d'action
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  
-  &.btn-primary {
-    background: $primary-color;
-    color: white;
-    
-    &:hover {
-      background: darken($primary-color, 10%);
-    }
-  }
-  
-  &.btn-danger {
-    background: $danger-color;
-    color: white;
-    
-    &:hover {
-      background: darken($danger-color, 10%);
-    }
-  }
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: $primary-color;
-  cursor: pointer;
-  font-size: 13px;
-  text-decoration: underline;
-  
-  &:hover {
-    color: darken($primary-color, 10%);
-  }
-}
-
-// Actions du formulaire
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  padding: 32px;
-  background: $background-light;
-  border-top: 1px solid $border-color;
-  
-  &.center {
-    justify-content: center;
-  }
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    padding: 24px;
-  }
-  
-  .btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    
-    &.btn-cancel {
-      background: #f8f9fa;
-      border-color: #ddd;
-      color: $text-color;
-
-      &:hover {
-        background: #e9ecef;
-        border-color: #adb5bd;
-      }
-    }
-    
-    &.btn-submit {
-      background: $primary-color;
-      border-color: $primary-color;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background: darken($primary-color, 10%);
-        border-color: darken($primary-color, 10%);
-        transform: translateY(-2px);
-      }
-      
-      &:disabled {
-        background: #bdbdbd;
-        border-color: #bdbdbd;
-        cursor: not-allowed;
-        transform: none;
-        
-        .fa-spinner {
-          animation: spin 1s linear infinite;
-        }
-      }
-    }
   }
 }
 

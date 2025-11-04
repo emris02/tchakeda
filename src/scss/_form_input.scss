@@ -1,5 +1,6 @@
 // Variables
 $primary-color: #1976d2;
+$primary-light: lighten($primary-color, 12%);
 $danger-color: #d32f2f;
 $success-color: #388e3c;
 $text-color: #333;
@@ -177,4 +178,67 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   color: $danger-color;
   font-weight: 600;
 }
+}
+
+/* Global action-bar styling (shared footer for forms) */
+.action-bar {
+  background: #fff;
+  border-top: 1px solid #e9ecef;
+  padding: 12px 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  position: sticky;
+  bottom: 0;
+  z-index: 1200;
+}
+
+.action-bar .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+  margin: 0;
+}
+
+/* Action button color tokens used by all forms (cancel / save) */
+.action-bar .btn-cancel,
+.action-bar .btn-light {
+  background: $danger-color;
+  border-color: $danger-color;
+  color: #fff;
+}
+.action-bar .btn-cancel:hover,
+.action-bar .btn-light:hover {
+  background: darken($danger-color, 6%);
+  border-color: darken($danger-color, 6%);
+}
+
+/* Primary 'save' button in action-bar should be a lighter blue to match add-page tokens */
+.action-bar .btn-save,
+.action-bar .btn-primary {
+  background: $primary-light;
+  border-color: $primary-light;
+  color: #fff;
+}
+.action-bar .btn-save:hover,
+.action-bar .btn-primary:hover {
+  background: darken($primary-light, 6%);
+  border-color: darken($primary-light, 6%);
+}
+
+/* Sticky/fixed behavior for small screens */
+@media (max-width: 768px) {
+  .action-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    border-radius: 0;
+    padding: 10px 14px;
+  }
+  .action-bar .form-actions {
+    justify-content: space-between;
+  }
 }

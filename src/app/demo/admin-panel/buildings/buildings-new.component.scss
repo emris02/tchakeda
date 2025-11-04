@@ -1,16 +1,101 @@
 @use '/src/scss/form_imports';
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+// Variables
+$primary-color: #3498db;
+$danger-color: #e74c3c;
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$text-color: #2c3e50;
+$text-muted: #7f8c8d;
+$border-color: #e1e4e8;
+$card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+$card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+// Styles généraux
+.page-container {
+  padding: 0px;
+  max-width: auto;
+  margin: 0 auto;
 }
 
-.content-container {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 24px;
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $border-color;
+}
+
+.page-title {
+  margin: 0 auto;
+  text-align: center;
+  font-weight: 600;
+  color: $text-color;
+  font-size: 24px;
+}
+
+.back-btn {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 15px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #f8f9fa;
+    transform: translateX(-3px);
+  }
+}
+
+// Cartes et formulaires
+.form-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  padding: 25px;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+/* Action bar (footer-like container for form actions) */
+.action-bar {
+  background: #ffffff; // light distinct block under the white form
+  border-radius: 10px;
+  border: 1px solid lighten($border-color, 6%);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  padding: 14px 20px;
+  margin: 18px 0 32px;
+}
+
+.action-bar .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+  margin: 0;
+}
+
+.action-bar .btn-cancel {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.action-bar .btn-cancel:hover {
+  background: darken(#e74c3c, 6%);
+}
+
+.action-bar .btn-save {
+  background: $primary-color;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.action-bar .btn-save:hover {
+  background: darken($primary-color, 6%);
 }
 
 .building-grid {
@@ -22,21 +107,21 @@
     grid-column: span 2;
   }
 }
-
-.form-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 24px;
-  max-width: auto;
-  margin: 0 auto;
+/* Validation styles for template-driven form controls */
+.underline-input.invalid,
+select.invalid,
+textarea.invalid {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 3px rgba(231,76,60,0.06);
 }
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
+.underline-input.invalid + .label,
+select.invalid + .label,
+textarea.invalid + .label {
+  color: #e74c3c;
+}
+.error {
+  color: #e74c3c;
+  font-size: 0.875rem;
 }
 /* Responsive pour mobile */
 @media (max-width: 768px) {

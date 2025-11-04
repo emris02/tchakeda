@@ -31,9 +31,11 @@
       <input type="text" [(ngModel)]="form.identityNumber" name="identityNumber" class="underline-input" />
       <label class="label">Numéro de pièce</label>
     </div>
-    <div class="form-actions">
-      <button type="button" class="btn btn-light" (click)="cancel()" [disabled]="isSubmitting">Annuler</button>
-      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">Enregistrer</button>
+    <div class="action-bar">
+      <div class="form-actions">
+        <button type="button" class="btn btn-light btn-cancel" (click)="cancel()" [disabled]="isSubmitting">Annuler</button>
+        <button type="submit" class="btn btn-primary btn-save" [disabled]="isSubmitting">Enregistrer</button>
+      </div>
     </div>
     </div>
   </form> 

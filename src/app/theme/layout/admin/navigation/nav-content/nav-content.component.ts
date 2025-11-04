@@ -1,5 +1,5 @@
 // angular import
-import { Component, OnInit, inject, output } from '@angular/core';
+import { Component, OnInit, inject, output, HostListener } from '@angular/core';
 import { Location, LocationStrategy } from '@angular/common';
 
 // project import
@@ -47,6 +47,12 @@ export class NavContentComponent implements OnInit {
         (document.querySelector('#nav-ps-gradient-able') as HTMLElement).style.height = '100%';
       }, 500);
     }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  // eslint-disable-next-line
+  onResize(event: any): void {
+    this.windowWidth = event.target.innerWidth;
   }
 
   fireLeave() {

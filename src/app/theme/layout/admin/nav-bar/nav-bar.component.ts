@@ -1,5 +1,5 @@
 // angular import
-import { Component, output } from '@angular/core';
+import { Component, output, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -34,6 +34,12 @@ export class NavBarComponent {
   toggleMobOption() {
     this.menuClass = !this.menuClass;
     this.collapseStyle = this.menuClass ? 'block' : 'none';
+  }
+
+  @HostListener('window:resize', ['$event'])
+  // eslint-disable-next-line
+  onResize(event: any): void {
+    this.windowWidth = event.target.innerWidth;
   }
 
   navCollapse() {

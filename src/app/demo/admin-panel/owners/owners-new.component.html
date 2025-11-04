@@ -180,21 +180,15 @@
           </div>
         </div>
       </div>
-
-      <!-- Actions du formulaire -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">
-          <i class="fas fa-times"></i>
-          Annuler
-        </button>
-        <button type="submit" class="btn btn-primary btn-submit">
-          <i class="fas fa-plus-circle"></i>
-          Créer le propriétaire
-        </button>
-      </div>
-
     </form>
   </div>
+<!-- Actions -->
+      <div class="action-bar">
+        <div class="form-actions">
+          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+          <button type="submit" class="btn btn-primary btn-save">Créer</button>
+        </div>
+      </div>
 
   <!-- Modal de confirmation -->
   <div *ngIf="showSuccessModal" class="modal-overlay">
@@ -204,15 +198,17 @@
       </div>
       <h5>Propriétaire créé avec succès !</h5>
       <p>Le propriétaire a été ajouté à la base de données.</p>
-      <div class="form-actions">
-        <button type="button" class="btn btn-primary" (click)="goToOwnersList()">
-          <i class="fas fa-list"></i>
-          Voir la liste
-        </button>
-        <button type="button" class="btn btn-outline-primary" (click)="createAnother()">
-          <i class="fas fa-plus"></i>
-          Ajouter un autre
-        </button>
+      <div class="action-bar">
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" (click)="goToOwnersList()">
+            <i class="fas fa-list"></i>
+            Voir la liste
+          </button>
+          <button type="button" class="btn btn-outline-primary" (click)="createAnother()">
+            <i class="fas fa-plus"></i>
+            Ajouter un autre
+          </button>
+        </div>
       </div>
     </div>
   </div>

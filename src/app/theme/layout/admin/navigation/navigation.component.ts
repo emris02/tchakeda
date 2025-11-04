@@ -1,5 +1,5 @@
 // Angular Import
-import { Component, output } from '@angular/core';
+import { Component, output, HostListener } from '@angular/core';
 
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
@@ -26,5 +26,11 @@ export class NavigationComponent {
     if (this.windowWidth < 992) {
       this.NavMobCollapse.emit();
     }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  // eslint-disable-next-line
+  onResize(event: any): void {
+    this.windowWidth = event.target.innerWidth;
   }
 }

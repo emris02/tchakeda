@@ -361,21 +361,15 @@
           </div>
         </div>
       </div>
-
-      <!-- Actions du formulaire -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">
-          <i class="fas fa-times"></i>
-          Annuler
-        </button>
-        <button type="submit" class="btn btn-primary btn-submit" [disabled]="isSubmitting">
-          <i class="fas fa-plus-circle" *ngIf="!isSubmitting"></i>
-          <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
-          {{ isSubmitting ? 'Création en cours...' : 'Créer le recouvreur' }}
-        </button>
-      </div>
     </form>
   </div>
+  <!-- Actions -->
+      <div class="action-bar">
+        <div class="form-actions">
+          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+          <button type="submit" class="btn btn-primary btn-save">Créer</button>
+        </div>
+      </div>
 
   <!-- Modal de succès -->
   <div *ngIf="showSuccessModal" class="modal-overlay">
@@ -391,15 +385,17 @@
           <span>{{ newCollector.apartmentIds?.length || 0 }} appartement(s)</span>
         </div>
       </div>
-      <div class="form-actions center">
-        <button type="button" class="btn btn-primary" (click)="goToCollectorsList()">
-          <i class="fas fa-list"></i>
-          Voir la liste
-        </button>
-        <button type="button" class="btn btn-outline-primary" (click)="createAnother()">
-          <i class="fas fa-plus"></i>
-          Ajouter un autre
-        </button>
+      <div class="action-bar">
+        <div class="form-actions center">
+          <button type="button" class="btn btn-primary" (click)="goToCollectorsList()">
+            <i class="fas fa-list"></i>
+            Voir la liste
+          </button>
+          <button type="button" class="btn btn-outline-primary" (click)="createAnother()">
+            <i class="fas fa-plus"></i>
+            Ajouter un autre
+          </button>
+        </div>
       </div>
     </div>
   </div>

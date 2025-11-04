@@ -54,9 +54,12 @@
       </label>
       <div class="error" *ngIf="errors.collectorId">{{ errors.collectorId }}</div>
     </div>
-    <div class="form-actions">
-      <button type="button" class="btn btn-light" (click)="cancel()">Annuler</button>
-      <button type="submit" class="btn btn-primary">Créer</button>
-    </div>
-  </form>
+    </form>
 </div>
+      <!-- Actions -->
+      <div class="action-bar">
+        <div class="form-actions">
+          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+          <button type="submit" class="btn btn-primary btn-save">Créer</button>
+        </div>
+      </div>

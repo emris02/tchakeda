@@ -1,9 +1,44 @@
 @use '/src/scss/form_imports.scss';
-.page-header { 
+// Variables
+$primary-color: #1976d2;
+$success-color: #388e3c;
+$danger-color: #d32f2f;
+$warning-color: #f57c00;
+$info-color: #0288d1;
+$text-color: #333;
+$text-muted: #666;
+$border-color: #e0e0e0;
+$background-light: #f8f9fa;
+$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+$card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+.page-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $border-color;
+}
+
+.page-title {
+  margin: 0 auto;
+  text-align: center;
+  font-weight: 600;
+  color: $text-color;
+  font-size: 24px;
+}
+
+.back-btn {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 15px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #f8f9fa;
+    transform: translateX(-3px);
+  }
 }
 
 .content-container {
