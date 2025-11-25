@@ -35,8 +35,6 @@ export class ApartmentsComponent implements OnInit {
       apartment._carouselIndex = index;
     }
   }
-  showStatusMenu = false;
-  showSortMenu = false;
   getRoomImages(apartment: ApartmentWithCarousel): string[] {
     return apartment.images || [];
   }
@@ -52,6 +50,12 @@ export class ApartmentsComponent implements OnInit {
   filterName: string = '';
   filterCity: string = '';
   filterRegion: string = '';
+  cityOptions: string[] = [];
+  // pagination
+  page: number = 1;
+  pageSize: number = 10;
+  total: number = 0;
+  displayedApartments: ApartmentWithCarousel[] = [];
   description?: string;
     // Utilitaires pour récupérer le nom et la description de la pièce courante
 
@@ -80,6 +84,8 @@ export class ApartmentsComponent implements OnInit {
 
   ngOnInit(): void {
   this.apartments = this.apartmentsService.getApartments().map(a => ({ ...a, _carouselIndex: 0, _showOverlay: false }));
+  // compute city options
+  this.cityOptions = Array.from(new Set(this.apartments.map(a => a.city).filter(Boolean)));
   this.applyFilters();
   }
 
@@ -91,8 +97,39 @@ export class ApartmentsComponent implements OnInit {
       mention: this.filterMention
     });
     result = this.apartmentsService.sortApartments(result, this.sortOrder);
+    // text filters
+    if (this.filterName) {
+      const q = this.filterName.toLowerCase();
+      result = result.filter(a => (a.name || '').toLowerCase().includes(q) || (a.address || '').toLowerCase().includes(q));
+    }
+    if (this.filterCity) {
+      result = result.filter(a => (a.city || '') === this.filterCity);
+    }
+    if (this.filterRegion) {
+      result = result.filter(a => (a.region || '').toLowerCase().includes(this.filterRegion.toLowerCase()));
+    }
     // Ensure _carouselIndex is present
   this.filteredApartments = result.map(a => ({ ...a, _carouselIndex: 0, _showOverlay: false }));
+  // pagination
+  this.total = this.filteredApartments.length;
+  this.updateDisplayed();
+  }
+
+  updateDisplayed() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.displayedApartments = this.filteredApartments.slice(start, end);
+  }
+
+  onPageChange(p: number) {
+    this.page = p;
+    this.updateDisplayed();
+  }
+
+  onPageSizeChange(size: number) {
+    this.pageSize = size;
+    this.page = 1;
+    this.updateDisplayed();
   }
 
   setSortOrder(order: 'recent' | 'oldest'): void {

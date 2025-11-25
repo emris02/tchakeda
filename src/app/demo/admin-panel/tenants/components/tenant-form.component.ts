@@ -22,6 +22,7 @@ import { TenantsService } from '../tenants.service';
 })
 export class TenantFormComponent {
   form: FormGroup;
+  submitted: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -38,9 +39,21 @@ export class TenantFormComponent {
   }
 
   onSubmit() {
+    this.submitted = true;
     if (this.form.valid) {
       const newTenant = this.tenantsService.createTenant(this.form.value);
       this.dialogRef.close(newTenant);
+      return;
+    }
+    // mark controls as touched to show validation
+    this.form.markAllAsTouched();
+    // focus first invalid control
+    const firstInvalid = Object.keys(this.form.controls).find(k => this.form.get(k)?.invalid);
+    if (firstInvalid) {
+      setTimeout(() => {
+        const el = document.querySelector(`[formcontrolname="${firstInvalid}"]`) as HTMLElement | null;
+        if (el && typeof (el as any).focus === 'function') (el as any).focus();
+      }, 0);
     }
   }
 

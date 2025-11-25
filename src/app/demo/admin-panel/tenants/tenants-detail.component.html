@@ -1,11 +1,9 @@
 <div class="page-container">
-  <!-- En-tête avec bouton retour et titre -->
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="back()">
-      <i class="fas fa-arrow-left"></i> Locataires
+  
+    <button class="btn  back-btn" (click)="back()">
+      &lt;
     </button>
-    <h4 class="page-title">Détails du locataire</h4>
-  </div>
+    <h4 class="page-title">Détail du locataire</h4>
 
   <!-- Modale de suppression -->
   <div *ngIf="showDeleteConfirm" class="modal-overlay">
@@ -15,6 +13,59 @@
       <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteTenant()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale d'abandon de location -->
+  <div *ngIf="showAbandonmentModal" class="modal-overlay">
+    <div class="modal-card large">
+      <h5>Abandonner la location</h5>
+      <p class="warning-text">
+        <i class="fas fa-exclamation-triangle"></i>
+        Vous êtes sur le point d'abandonner votre location. Veuillez lire attentivement les conditions ci-dessous.
+      </p>
+      
+      <div class="abandonment-conditions">
+        <h6>Conditions d'abandon :</h6>
+        <ul>
+          <li>Vous devez payer tous les loyers impayés jusqu'à la date d'abandon</li>
+          <li>Vous devez restituer l'appartement dans son état initial (sans dégradation)</li>
+          <li>Vous devez régler toutes les factures impayées (eau, électricité, etc.)</li>
+          <li>L'abandon prend effet immédiatement après confirmation</li>
+          <li>Vous perdrez tous vos droits sur l'appartement à partir de la date d'abandon</li>
+        </ul>
+      </div>
+
+      <div class="form-group">
+        <label for="abandonmentReason">Raison de l'abandon <span class="required">*</span></label>
+        <textarea 
+          id="abandonmentReason" 
+          [(ngModel)]="abandonmentReason" 
+          class="form-control" 
+          rows="3" 
+          placeholder="Veuillez expliquer la raison de votre abandon..."
+          required></textarea>
+        <div class="error" *ngIf="errors.abandonmentReason">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.abandonmentReason }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="acceptAbandonmentConditions" />
+          J'accepte les conditions d'abandon et je confirme avoir lu et compris toutes les clauses
+        </label>
+        <div class="error" *ngIf="errors.abandonmentConditions">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.abandonmentConditions }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" (click)="closeAbandonmentModal()">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmAbandonment()" [disabled]="!acceptAbandonmentConditions || !abandonmentReason">
+          Confirmer l'abandon
+        </button>
       </div>
     </div>
   </div>
@@ -139,6 +190,25 @@
             </div>
             <div class="error" *ngIf="errors.profession">
               <i class="fas fa-exclamation-circle"></i> {{ errors.profession }}
+            </div>
+          </div>
+          <div class="form-group">
+          <div class="input-container">
+            <select id="maritalStatus" [(ngModel)]="form.maritalStatus" name="maritalStatus" 
+                    class="underline-input">
+              <option value=""></option>
+              <option value="Célibataire">Célibataire</option>
+              <option value="Marié(e)">Marié(e)</option>
+              <option value="Divorcé(e)">Divorcé(e)</option>
+              <option value="Veuf(ve)">Veuf(ve)</option>
+            </select>
+            <label for="maritalStatus" class="label">
+              <i class="fas fa-heart input-icon"></i>
+              Situation matrimoniale <span class="required">*</span>
+            </label>
+          </div>
+            <div class="error" *ngIf="errors.maritalStatus">
+              <i class="fas fa-exclamation-circle"></i> {{ errors.maritalStatus }}
             </div>
           </div>
         </div>
@@ -292,27 +362,26 @@
             <label><i class="fas fa-briefcase"></i> Profession</label>
             <p class="info-value">{{ tenant?.profession || '-' }}</p>
           </div>
+          <div class="info-item">
+            <label><i class="fas fa-briefcase"></i> Situation matrimoniale</label>
+            <p class="info-value">{{ tenant?.maritalStatus || '-' }}</p>
+          </div>
         </div>
       </div>
 
-      <!-- Localisation actuelle -->
+      <!-- Localisation actuelle (bâtiment • appartement • adresse sur la même ligne) -->
       <div class="location-section" *ngIf="getCurrentApartmentId(tenant)">
         <h6>Localisation actuelle</h6>
-        <div class="location-info">
-          <div class="info-item">
-            <label>Bâtiment</label>
-            <p class="info-value">{{ getBuildingName(getCurrentBuildingId(tenant)) || '-' }}</p>
-          </div>
-          <div class="info-item">
-            <label>Appartement</label>
-            <p class="info-value">{{ getApartmentName(getCurrentApartmentId(tenant)) || '-' }}</p>
-          </div>
+        <div class="location-inline">
+          <ng-container *ngIf="getCurrentLocationParts(tenant) as loc">
+            <span class="loc-part">{{ loc.buildingName }}</span>
+            <span class="loc-sep">•</span>
+            <span class="loc-part">{{ loc.apartmentName }}</span>
+            <span class="loc-sep">•</span>
+            <span class="loc-part">{{ loc.address }}</span>
+          </ng-container>
         </div>
       </div>
-      <div class="info-item">
-      <label>Adresse</label>
-      <p class="info-value">{{ getBuildingAdress(getCurrentBuildingId(tenant)) || '-' }}</p>
-    </div>
       <!-- Section personne affiliée -->
   <div class="affiliation-section" *ngIf="tenant?.affiliatedPerson?.fullName">
         <h6>Personne à contacter en cas d'urgence</h6>
@@ -364,6 +433,7 @@
             <th>Montant recouvré</th>
             <th>Quartier</th>
             <th>Statut</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -381,10 +451,26 @@
             <td>
               <span class="status-badge" [ngClass]="{
                 'status-active': isRentalActive(detail.rental),
-                'status-completed': !isRentalActive(detail.rental)
+                'status-completed': !isRentalActive(detail.rental),
+                'status-cancelled': detail.rental?.status === 'cancelled'
               }">
-                {{ isRentalActive(detail.rental) ? 'Active' : 'Terminée' }}
+                <span *ngIf="detail.rental?.status === 'cancelled'">
+                  {{ getCancellationTypeLabel(detail.rental?.cancellationType) }}
+                </span>
+                <span *ngIf="detail.rental?.status !== 'cancelled'">
+                  {{ isRentalActive(detail.rental) ? 'Active' : 'Terminée' }}
+                </span>
               </span>
+            </td>
+            <td>
+              <button 
+                *ngIf="isRentalActive(detail.rental)" 
+                class="btn btn-sm btn-danger" 
+                (click)="openAbandonmentModal(detail.rental!)" 
+                title="Abandonner la location">
+                <i class="fas fa-times"></i> Abandonner
+              </button>
+              <span *ngIf="!isRentalActive(detail.rental)" class="text-muted">-</span>
             </td>
           </tr>
         </tbody>
@@ -397,6 +483,194 @@
         <h6>Aucun historique de location</h6>
         <p>Ce locataire n'a pas encore d'historique de location.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- Section Documents complémentaires -->
+  <div class="form-card">
+    <div class="card-header">
+      <h5>Documents complémentaires</h5>
+      <div class="action-buttons">
+        <button class="action-btn add" (click)="openDocumentUploadModal()" title="Ajouter un document">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Liste des documents requis -->
+    <div class="documents-section">
+      <div class="documents-checklist">
+        <h6>Liste des documents à fournir</h6>
+        <div class="documents-list">
+          <div *ngFor="let docType of requiredDocuments" class="document-item" [class.required]="docType.required" [class.completed]="hasDocumentType(docType.type)">
+            <div class="document-checkbox">
+              <i *ngIf="hasDocumentType(docType.type)" class="fas fa-check-circle check-icon"></i>
+              <i *ngIf="!hasDocumentType(docType.type)" class="far fa-circle empty-icon"></i>
+            </div>
+            <div class="document-info">
+              <span class="document-label">
+                <i class="fas" [ngClass]="docType.icon"></i>
+                {{ docType.label }}
+              </span>
+              <span *ngIf="docType.required" class="required-badge">Requis</span>
+            </div>
+            <div class="document-actions">
+              <button 
+                class="btn-icon btn-primary sm" 
+                (click)="openDocumentUploadModal(docType.type)"
+                title="Ajouter ce document">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents téléchargés -->
+      <div class="documents-uploaded" *ngIf="tenantDocuments.length > 0">
+        <h6>Documents téléchargés</h6>
+        <div class="documents-grid">
+          <div *ngFor="let document of tenantDocuments" class="document-card">
+            <div class="document-card-header">
+              <div class="document-icon">
+                <i class="fas" [ngClass]="getDocumentIcon(document.type)"></i>
+              </div>
+              <div class="document-status">
+                <span class="status-badge" [ngClass]="{
+                  'status-pending': document.status === 'pending',
+                  'status-approved': document.status === 'approved',
+                  'status-rejected': document.status === 'rejected'
+                }">
+                  {{ getDocumentStatusLabel(document.status) }}
+                </span>
+              </div>
+            </div>
+            <div class="document-card-body">
+              <h6 class="document-name">{{ document.name }}</h6>
+              <p class="document-meta">
+                <i class="fas fa-file"></i>
+                {{ document.fileName }}
+              </p>
+              <p class="document-meta">
+                <i class="fas fa-weight"></i>
+                {{ formatFileSize(document.fileSize) }}
+              </p>
+              <p class="document-meta" *ngIf="document.uploadedAt">
+                <i class="fas fa-calendar"></i>
+                {{ document.uploadedAt | date:'dd/MM/yyyy' }}
+              </p>
+              <p class="document-notes" *ngIf="document.notes">
+                <i class="fas fa-comment"></i>
+                {{ document.notes }}
+              </p>
+            </div>
+            <div class="document-card-actions" style="position: relative;">
+              <button class="btn-icon btn-menu sm" (click)="toggleDocumentMenu(document)" title="Actions document">
+                <i class="fas fa-ellipsis-h"></i>
+              </button>
+              <div class="document-menu-dropdown" *ngIf="isDocumentMenuOpen(document)" (mouseleave)="closeDocumentMenu()">
+                <button (click)="viewDocument(document); closeDocumentMenu()"><i class="fas fa-eye"></i> Voir</button>
+                <button (click)="downloadDocument(document); closeDocumentMenu()"><i class="fas fa-download"></i> Télécharger</button>
+                <button (click)="openDocumentUploadModal(document.type, document); closeDocumentMenu()"><i class="fas fa-edit"></i> Modifier</button>
+                <button (click)="deleteDocument(document.id); closeDocumentMenu()"><i class="fas fa-trash"></i> Supprimer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message si aucun document -->
+      <div *ngIf="tenantDocuments.length === 0" class="no-documents">
+        <div class="no-documents-content">
+          <i class="fas fa-folder-open"></i>
+          <h6>Aucun document téléchargé</h6>
+          <p>Commencez par ajouter les documents requis pour compléter le dossier du locataire.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modale d'upload de document -->
+<div *ngIf="showDocumentUploadModal" class="modal-overlay" (click)="closeDocumentUploadModal()">
+    <div class="modal-card large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>{{ selectedDocumentBeingEdited ? 'Modifier le document' : 'Ajouter un document' }}</h5>
+      <button class="modal-close" (click)="closeDocumentUploadModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="documentType">Type de document <span class="required">*</span></label>
+        <select 
+          id="documentType" 
+          [(ngModel)]="selectedDocumentType" 
+          name="documentType" 
+          class="form-control"
+          required>
+          <option value="">Sélectionner un type de document</option>
+          <option *ngFor="let docType of requiredDocuments" [value]="docType.type">
+            {{ docType.label }}
+          </option>
+        </select>
+        <div class="error" *ngIf="errors.documentType">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.documentType }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="documentFile">Fichier <span class="required">*</span></label>
+        <input 
+          type="file" 
+          id="documentFile" 
+          (change)="onDocumentFileSelected($event)" 
+          class="form-control"
+          accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+          required />
+        <div class="file-info" *ngIf="documentFile">
+          <i class="fas fa-file"></i>
+          <span>{{ documentName }}</span>
+          <span class="file-size">({{ formatFileSize(documentFile.size) }})</span>
+        </div>
+        <div class="error" *ngIf="errors.documentFile">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.documentFile }}
+        </div>
+        <small class="form-text text-muted">
+          Formats acceptés: PDF, JPEG, PNG, WebP, Word. Taille maximum: 10MB
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="documentNotes">Notes (optionnel)</label>
+        <textarea 
+          id="documentNotes" 
+          [(ngModel)]="documentNotes" 
+          name="documentNotes" 
+          class="form-control" 
+          rows="3"
+          placeholder="Ajoutez des notes ou des commentaires sur ce document..."></textarea>
+      </div>
+
+      <div class="error" *ngIf="errors.general">
+        <i class="fas fa-exclamation-circle"></i> {{ errors.general }}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="closeDocumentUploadModal()" [disabled]="uploadingDocument">
+        Annuler
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="uploadDocument()" 
+        [disabled]="uploadingDocument || !selectedDocumentType || !documentFile">
+        <i class="fas fa-upload" *ngIf="!uploadingDocument"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="uploadingDocument"></i>
+        {{ uploadingDocument ? 'Téléchargement...' : 'Télécharger' }}
+      </button>
     </div>
   </div>
 </div>

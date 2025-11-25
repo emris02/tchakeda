@@ -1,0 +1,128 @@
+<div class="page-header">
+  <h3>Paiements & Mensualités</h3>
+  <p class="muted">Tableau de bord interne — affichage et gestion (localStorage uniquement)</p>
+</div>
+
+<div class="cards-grid">
+  <div class="card summary-card">
+    <div class="card-body">
+      <div class="card-title">Total perçu</div>
+      <div class="card-value">{{ totalCollected | number:'1.0-0' }} </div>
+    </div>
+  </div>
+  <div class="card summary-card">
+    <div class="card-body">
+      <div class="card-title">Total impayés</div>
+      <div class="card-value text-danger">{{ totalUnpaid | number:'1.0-0' }}</div>
+    </div>
+  </div>
+  <div class="card summary-card">
+    <div class="card-body">
+      <div class="card-title">Commissions recouvreurs</div>
+      <div class="card-value">{{ totalCommissions | number:'1.0-0' }}</div>
+    </div>
+  </div>
+  <div class="card summary-card">
+    <div class="card-body">
+      <div class="card-title">Montants nets propriétaires</div>
+      <div class="card-value">{{ totalOwnerNet | number:'1.0-0' }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="tables-section">
+  <div class="table-card">
+    <h4>Historique des paiements</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Locataire</th>
+          <th>Appartement</th>
+          <th>Montant</th>
+          <th>Méthode</th>
+          <th>Recouvreur</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of displayedPayments">
+          <td>{{ p.date | date:'shortDate' }}</td>
+          <td>{{ tenantsMap.get(p.tenantId)?.name }}</td>
+          <td>{{ propertiesMap.get(contractsMap.get(p.contractId || '')?.propertyId || '')?.address }}</td>
+          <td>{{ p.amount | number:'1.0-0' }}</td>
+          <td>{{ p.method }}</td>
+          <td>{{ collectorsMap.get(p.collectorId || '')?.name }}</td>
+        </tr>
+        <tr *ngIf="payments.length === 0"><td colspan="6">Aucun paiement enregistré</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <h4>Lois impayés / À relancer</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Location ID</th>
+          <th>Locataire</th>
+          <th>Appartement</th>
+          <th>Montant attendu</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of unpaidRentals">
+          <td>{{ r.id }}</td>
+          <td>{{ tenantsMap.get(r.tenantId)?.name }}</td>
+          <td>{{ propertiesMap.get(r.propertyId || '')?.address }}</td>
+          <td>{{ r.monthlyRent | number:'1.0-0' }}</td>
+          <td>{{ r.startDate | date:'shortDate' }}</td>
+          <td>{{ r.endDate | date:'shortDate' }}</td>
+          <td>
+            <button class="btn btn-sm btn-light" (click)="extendContract(r)">Modifier / Étendre</button>
+          </td>
+        </tr>
+        <tr *ngIf="unpaidRentals.length === 0"><td colspan="7">Aucun impayé détecté</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-row">
+    <div class="table-card half">
+      <h4>Versements aux propriétaires</h4>
+      <table class="table">
+        <thead>
+          <tr><th>Propriétaire</th><th>Montant net</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of ownerPayouts">
+            <td>{{ o.owner.name }}</td>
+            <td>{{ o.total | number:'1.0-0' }}</td>
+          </tr>
+          <tr *ngIf="ownerPayouts.length === 0"><td colspan="2">Aucun versement calculé</td></tr>
+        </tbody>
+      </table>
+      <div class="list-pagination">
+        <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+      </div>
+    </div>
+
+    <div class="table-card half">
+      <h4>Commissions recouvreurs</h4>
+      <table class="table">
+        <thead>
+          <tr><th>Recouvreur</th><th>Commission</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of collectorCommissions">
+            <td>{{ c.collector.name }}</td>
+            <td>{{ c.total | number:'1.0-0' }}</td>
+          </tr>
+          <tr *ngIf="collectorCommissions.length === 0"><td colspan="2">Aucune commission</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

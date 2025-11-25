@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OwnersService } from './owners.service';
 import { BuildingsService } from '../buildings/buildings.service';
@@ -26,6 +27,7 @@ export class OwnersNewComponent {
   };
 
   errors: any = {};
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
   buildings: any[] = [];
   newOwner: any = null;
   selectedBuilding: any = null;
@@ -56,7 +58,8 @@ export class OwnersNewComponent {
   }
 
   // Création du propriétaire
-  create() {
+  create(formRef?: NgForm) {
+    if (formRef && formRef.form) formRef.form.markAllAsTouched();
     if (!this.validate()) return;
 
     // Ajout des champs requis pour Owner

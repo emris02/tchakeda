@@ -1,8 +1,20 @@
-<div class="page-header">
-  <h4>Créer un recouvrement</h4>
-</div>
-<div class="content-container">
-  <form (ngSubmit)="create()" class="form-card">
+<div class="page-container add-page">
+  
+      <button class="btn back-btn" (click)="cancel()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Recouvrements</span>
+      </button>
+      <h4 class="page-title">Créer un recouvrement</h4>
+    </div>
+    <div class="header-right">
+      <!-- action slot: place add/list buttons here on listing pages -->
+
+  <div class="content-container">
+  <form #recoveryForm="ngForm" (ngSubmit)="create(recoveryForm)" class="form-card">
+  <div class="form-error-summary" *ngIf="hasErrors">
+      <i class="fas fa-exclamation-circle"></i>
+      Veuillez corriger les champs requis ci-dessous.
+    </div>
     <div class="form-group">
       <select id="rentalId" [(ngModel)]="form.rentalId" name="rentalId" class="underline-input" required>
         <option value="" disabled selected>Choisir une location</option>
@@ -59,7 +71,7 @@
       <!-- Actions -->
       <div class="action-bar">
         <div class="form-actions">
-          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
-          <button type="submit" class="btn btn-primary btn-save">Créer</button>
-        </div>
+            <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+            <button type="button" class="btn btn-primary btn-save" (click)="create(recoveryForm)">Créer</button>
+          </div>
       </div>

@@ -1,0 +1,18 @@
+<nav class="pagination-component" *ngIf="total > 0">
+  <div class="pagination-left">
+    <button class="btn btn-light" (click)="go(page - 1)" [disabled]="page <= 1">Préc</button>
+    <ul class="pages-list">
+      <li *ngFor="let p of pages()" class="page-item">
+        <button class="page-btn" [class.active]="page === p" (click)="go(p)">{{ p }}</button>
+      </li>
+    </ul>
+    <button class="btn btn-light" (click)="go(page + 1)" [disabled]="page >= totalPages">Suiv</button>
+  </div>
+  <div class="pagination-right">
+    <label class="page-size-label">Afficher</label>
+    <select (change)="changeSize($any($event.target).value)" [value]="pageSize">
+      <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+    </select>
+    <span class="muted">Total: {{ total }}</span>
+  </div>
+</nav>

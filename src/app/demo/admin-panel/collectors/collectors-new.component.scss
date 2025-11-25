@@ -1,7 +1,7 @@
 @use '/src/scss/form_imports';
 
 // Variables
-$primary-color: #1976d2;
+$primary-color: #4099ff;
 $primary-light: lighten($primary-color, 12%);
 $success-color: #388e3c;
 $danger-color: #d32f2f;
@@ -17,49 +17,57 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 // Styles généraux
 .page-container {
   padding: 0px;
-  max-width: 1200px;
+  max-width: auto;
   margin: 0 auto;
 }
+
+.page-header-inline{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;
+}
+.page-header-inline .header-left{ display:flex; align-items:center; gap:14px }
+.page-header-inline .page-title{ margin:0; font-size:1.9rem; font-weight:700; color: $text-color }
+.page-header-inline .header-right{ display:flex; gap:8px }
+
+//
+.back-btn i{ font-size: 0.95rem }
+.back-label{ font-weight:600 }
+
+/* Page container font and size adjustments for add/edit pages */
+.page-container{
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  color: $text-color;
+}
+
 
 .page-header {
   display: flex;
   align-items: center;
-  margin-bottom: 32px;
-  gap: 16px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
-  margin: 0;
-  font-size: 24px;
+  margin: 20px auto;
+  text-align: left;
   font-weight: 600;
   color: $text-color;
-  text-align: center;
-  flex: 1;
+  font-size: 18px;
 }
 
 .back-btn {
-  background: #f8f9fa;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  padding: 8px 15px;
   transition: all 0.3s ease;
   
   &:hover {
-    background: #e9ecef;
-    transform: translateX(-2px);
+    background-color: #f8f9fa;
+    transform: translateX(-3px);
   }
 }
-
 // Formulaire principal
 .content-container {
   .form-card {
@@ -206,7 +214,7 @@ select.underline-input {
   
   option {
     padding: 8px 0;
-    border-bottom: 1px solid #f0f0f0;
+//f0f0f0;
     
     &:last-child {
       border-bottom: none;
@@ -457,7 +465,7 @@ select.underline-input {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 24px;
+          font-size: 17px;
         }
       }
       

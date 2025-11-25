@@ -1,10 +1,9 @@
 <div class="page-container">
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="back()">
-      <i class="fas fa-arrow-left"></i> Appartements
+  
+    <button class="btn  back-btn" (click)="back()">
+      &lt;
     </button>
     <h4 class="page-title">Détail de l'appartement</h4>
-  </div>
 
   <!-- Modal de suppression -->
   <div *ngIf="showDeleteConfirm" class="modal-overlay">
@@ -84,6 +83,17 @@
             <span *ngIf="form.type === 'autre' && form.customType">({{ form.customType }})</span>
             <span *ngIf="form.type && form.type !== 'autre'">({{ form.type }})</span>
           </div>
+        </div>
+
+        <div class="form-group">
+          <div class="input-container">
+            <input type="number" id="area" [(ngModel)]="form.area" name="area" class="underline-input" min="0" step="0.5" placeholder="Superficie totale (m²)" />
+            <label for="area" class="label">
+              <i class="fas fa-ruler-combined"></i>
+              Superficie totale (m²)
+            </label>
+          </div>
+          <div class="error" *ngIf="errors.area"><i class="fas fa-exclamation-circle"></i> {{ errors.area }}</div>
         </div>
 
         <div class="form-group">
@@ -235,6 +245,16 @@
               </div>
               
               <div class="form-group" *ngIf="editMode">
+                <input type="number" id="roomArea-{{i}}" class="underline-input"
+                         [(ngModel)]="form.roomAreas[i]" name="form.roomAreas[{{i}}]"
+                         min="0" step="0.5" placeholder="Superficie (m²)" />
+                <label for="roomArea-{{i}}" class="label">
+                  <i class="fas fa-ruler-combined"></i>
+                  Superficie (m²)
+                </label>
+              </div>
+              
+              <div class="form-group" *ngIf="editMode">
                 <textarea id="roomDesc-{{i}}" class="underline-input"
                           [(ngModel)]="form.roomDescriptions[i]" name="form.roomDescriptions[{{i}}]"
                           placeholder="Ex: Dimensions, équipements, orientation..."
@@ -278,6 +298,10 @@
         <div class="form-group">
           <label><i class="fas fa-th-large"></i> Nombre de pièces</label>
           <p>{{ apartment?.rooms || '-' }}</p>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-ruler-combined"></i> Superficie totale</label>
+          <p>{{ (apartment && apartment.area) ? apartment.area + ' m²' : '-' }}</p>
         </div>
         <div class="form-group">
           <label><i class="fas fa-building"></i> Bâtiment</label>
@@ -325,10 +349,13 @@
           
           <!-- Mode visualisation - Overlay simplifié au survol -->
           <ng-container *ngIf="!editMode">
-            <div class="overlay-content">
+              <div class="overlay-content">
               <!-- Badge du nom de la pièce -->
               <div class="room-name-badge">
                 {{ form.roomLabels[i] || 'Pièce ' + (i+1) }}
+                <span *ngIf="form.roomAreas && form.roomAreas[i] && form.roomAreas[i] > 0" class="room-area-badge" style="margin-left: 8px; font-size: 12px; opacity: 0.9;">
+                  <i class="fas fa-ruler-combined"></i> {{ form.roomAreas[i] }} m²
+                </span>
               </div>
               
               <!-- Description qui apparaît au survol -->
@@ -415,6 +442,16 @@
                 
                 <ng-container *ngIf="editPieceIndexMap[i]">
                   <div class="description-edit">
+                    <div class="form-group-inline" style="margin-bottom: 12px;">
+                      <input type="number" [(ngModel)]="form.roomAreas[i]" 
+                              class="room-area-input" 
+                              placeholder="Superficie (m²)"
+                              min="0" step="0.5" 
+                              style="width: 120px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+                      <label class="area-label" style="margin-left: 8px; color: #666; font-size: 14px;">
+                        <i class="fas fa-ruler-combined"></i> m²
+                      </label>
+                    </div>
                     <textarea [(ngModel)]="form.roomDescriptions[i]" 
                               class="description-textarea" 
                               placeholder="Décrivez cette pièce..."

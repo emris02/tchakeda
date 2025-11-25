@@ -1,0 +1,4 @@
+{
+  // Disable the "Are you sure you want to paste large content into the terminal?" prompt
+"terminal.integrated.confirmOnLargePaste": false
+}

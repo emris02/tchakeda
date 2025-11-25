@@ -1,8 +1,16 @@
-<div class="page-header">
-  <h4>Propriétaires</h4>
-  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau propriétaire</button>
-</div>
 <div class="content-container">
+  <div class="page-header">
+   <h4>Propriétaires</h4>
+  <button class="btn-primary add-btn" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau propriétaire</button>
+  <!-- Recherche rapide & filtre à droite -->
+      <div class="quick-search">
+        <input type="search" placeholder="Rechercher par nom, ville..." [(ngModel)]="filterName" (input)="applyFilters()" class="search-input" />
+        <select [(ngModel)]="filterCity" (change)="applyFilters()" class="search-select">
+          <option value="">Toutes les villes</option>
+          <option *ngFor="let c of cityOptions" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+</div>
   <table class="table owners-table">
     <thead>
       <tr>
@@ -16,7 +24,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let owner of owners" (click)="goToDetail(owner)" class="clickable-row">
+      <tr *ngFor="let owner of displayedOwners" (click)="goToDetail(owner)" class="clickable-row">
         <td>{{ owner.name }}</td>
         <td>{{ owner.country }}</td>
         <td>{{ owner.phone }}</td>
@@ -27,4 +35,7 @@
       </tr>
     </tbody>
   </table>
+  <div class="list-pagination">
+    <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+  </div>
 </div>

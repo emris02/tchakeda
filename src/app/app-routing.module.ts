@@ -53,12 +53,20 @@ const routes: Routes = [
         loadChildren: () => import('./demo/admin-panel/recoveries/recoveries.module').then(m => m.RecoveriesModule)
       },
       {
+        path: 'demo/admin-panel/payments',
+        loadComponent: () => import('./demo/admin-panel/payments/payments-dashboard.component').then(c => c.PaymentsDashboardComponent)
+      },
+      {
         path: 'demo/admin-panel/recoveries/payments',
         loadComponent: () => import('./demo/admin-panel/recoveries/recoveries-payments.component').then(c => c.RecoveriePaymentsComponent)
       },
       {
         path: 'demo/admin-panel/collectors',
         loadChildren: () => import('./demo/admin-panel/collectors/collectors.module').then(m => m.CollectorsModule)
+      },
+       {
+        path: 'demo/admin-panel/settings',
+        loadComponent: () => import('./demo/admin-panel/settings/settings.component').then(c => c.SettingsComponent)
       },
     ]
   },

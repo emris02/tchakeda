@@ -1,0 +1,410 @@
+/* Global responsive utilities for tables, modals, cards, buttons, headers, titles, inputs */
+
+/* Breakpoints */
+$screen-sm: 640px;
+$screen-md: 768px;
+$screen-lg: 1024px;
+$screen-xl: 1280px;
+
+/* Base helpers */
+%fluid-container {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tables: make tables horizontally scrollable on small screens and compress spacing */
+.responsive-table, .table, .data-table, .tbl-bootstrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 640px; // encourage horizontal scroll on small screens
+  }
+
+  th, td {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: $screen-md) {
+    th, td { padding: 8px 10px; font-size: 0.9rem; }
+  }
+}
+
+/* Cards: stack and tighten padding on small screens */
+.responsive-card, .card, .form-card, .summary-card, .modal-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  background: #fff;
+  padding: 20px;
+
+  @media (max-width: $screen-md) {
+    padding: 14px;
+    border-radius: 8px;
+  }
+}
+
+/* Modals & overlay: full-width on small screens */
+.responsive-modal, .modal-card, .modal, .mat-dialog-container {
+  max-width: 720px;
+  width: 100%;
+  margin: 24px auto;
+
+  @media (max-width: $screen-md) {
+    margin: 8px 12px;
+    max-width: calc(100% - 24px);
+    border-radius: 8px;
+  }
+}
+
+/* Buttons: scale down on small screens and provide touch-friendly sizes */
+.responsive-btn, .btn, .btn-primary, .btn-ghost, .btn-success, .btn-light, .btn-sm, .btn-outline-danger, .btn-outline {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  min-height: 40px;
+
+  @media (max-width: $screen-md) {
+    padding: 8px 12px;
+    font-size: 0.92rem;
+    min-height: 36px;
+  }
+}
+
+/* Headers and titles */
+.responsive-header, .page-header, .page-header-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+
+  h1, h2, h3, h4 {
+    margin: 0;
+  }
+
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.25rem; }
+
+  @media (max-width: $screen-md) {
+    h1 { font-size: 1.25rem; }
+    h2 { font-size: 1.05rem; }
+    flex-direction: column; align-items: flex-start;
+  }
+}
+
+/* Reduce heading sizes globally to be under 20px to match design spec */
+h1, h2, h3, h4 {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+h1 { font-size: 19px; }
+h2 { font-size: 18px; }
+h3 { font-size: 18px; }
+h4 { font-size: 16px; }
+
+/* Input fields: ensure responsive sizing and spacing using global underline-input tokens */
+.responsive-input, .form-group input.underline-input, .form-group select.underline-input, .form-group textarea.underline-input, input.underline-input, select.underline-input, textarea.underline-input {
+  width: 100%;
+  max-width: 100%;
+
+  input.underline-input,
+  select.underline-input,
+  textarea.underline-input {
+    font-size: 1rem;
+    padding: 0.8rem 0.6rem;
+  }
+
+  @media (max-width: $screen-md) {
+    input.underline-input, select.underline-input, textarea.underline-input {
+      font-size: 0.95rem;
+      padding: 0.7rem 0.5rem;
+    }
+  }
+}
+
+/* Utility: tighter form grid for mobile */
+.responsive-form-grid, .form-grid, .form-row, .form-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: $screen-md) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Provide safe default for any element that wants centered container */
+.centered-container { @extend %fluid-container; max-width: $screen-xl; }
+/* Global card style to match recoveries/payments summary look
+	 - subtle base shadow, raise + stronger shadow on hover
+	 - smooth transform and shadow transitions
+	 - respects reduced-motion preferences
+*/
+.card {
+	border-radius: 12px;
+	background: #fff;
+	border: 1px solid rgba(15,23,42,0.04);
+	box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+	transition: transform 180ms ease, box-shadow 220ms ease;
+}
+.card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 18px 50px rgba(2,6,23,0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.card { transition: none; transform: none; }
+}
+
+/* Make sure summary variants keep slightly stronger presence */
+.summary-card { box-shadow: 0 8px 22px rgba(2,6,23,0.07); }
+
+/* Global responsive overrides applied to common components so templates need no changes */
+@media (max-width: 1024px) {
+	/* Tables: make tables scroll horizontally and tighten spacing */
+	.table, .data-table {
+		display: block;
+		width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.table td, .table th, .data-table td, .data-table th {
+		padding: 8px 10px;
+		font-size: 0.92rem;
+	}
+
+	/* Cards: reduce padding and radius on smaller screens */
+	.card {
+		padding: 14px;
+		border-radius: 8px;
+	}
+
+	/* Modals and modal-cards: use full-width with small margins */
+	.modal-card, .modal, .mat-dialog-container {
+		width: 100% !important;
+		max-width: calc(100% - 24px) !important;
+		margin: 8px 12px !important;
+		border-radius: 8px !important;
+	}
+
+	/* Buttons: slightly smaller and more compact */
+	.btn, .btn-primary, .btn-ghost, .btn-success {
+		padding: 8px 12px !important;
+		font-size: 0.94rem !important;
+		min-height: 36px !important;
+	}
+
+	/* Headers/titles shrink on small screens */
+	.page-header .page-title, h1, h2, h3 {
+		font-size: 1.05rem !important;
+	}
+
+	/* Inputs: consistent spacing for underline-input across screens */
+	.underline-input {
+		font-size: 0.96rem !important;
+		padding: 0.7rem 0.5rem !important;
+	}
+
+	/* Action bar spacing on small screens (kept sticky but compact) */
+	.action-bar {
+		padding: 8px 12px !important;
+	}
+}
+
+/* Very small devices - stack header content and increase tap targets */
+@media (max-width: 420px) {
+	.page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+	.btn { width: 100%; }
+}
+
+/* Specific page-header responsive tweaks applied globally so main components adapt */
+@media (max-width: $screen-md) {
+  .page-header, .responsive-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .page-header .page-title,
+  .page-header-title,
+  .page-header h1,
+  .page-header h2 { font-size: 1.05rem !important; margin: 0; }
+
+  .page-header .page-actions,
+  .page-header .page-header-right,
+  .page-header .action-bar,
+  .card-header-right {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+  }
+
+  .page-header .page-actions .btn,
+  .page-header .page-actions .btn-group,
+  .page-header .page-header-right .btn {
+    flex: 0 1 auto !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-header .page-actions .btn,
+  .page-header .page-actions .btn-group,
+  .page-header .page-header-right .btn { width: 100% !important; }
+}
+
+/* Base page-header layout and spacing (applies to all pages)
+   - centers header content within a fluid container
+   - adds breathing space below header so cards/content are not glued
+*/
+.page-header {
+  @extend %fluid-container;
+  max-width: $screen-xl;
+  padding: 18px 1rem;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* Ensure consistent spacing between primary action (add/new) and the quick-search block
+   across all main list pages. Use a modest gap (12px) which can be adjusted to 10-15px. */
+.page-header .add-btn + .quick-search,
+.page-header .btn-primary + .quick-search {
+  margin-left: 12px;
+}
+
+/* Make sure quick-search aligns to the right actions area on large screens */
+.page-header .quick-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ensure content below headers has space if it doesn't use .content-container */
+.content-container, .page-content, .card-container {
+  margin-top: 12px;
+}
+
+/* stronger separation for header when used near cards */
+.page-header + .card, .page-header + .form-card, .page-header + .content-container, .page-header + .card-container {
+  margin-top: 8px;
+}
+
+/* On larger screens keep title centered vertically and actions to the right */
+@media (min-width: $screen-lg) {
+  .page-header { align-items: center; }
+  .page-header .page-header-title { flex: 1 1 auto; }
+  .page-header .page-actions, .page-header .page-header-right { margin-left: auto; }
+}
+
+/* Slightly reduce spacing on very small screens */
+@media (max-width: 420px) {
+  .page-header { padding: 12px 0.75rem; margin-bottom: 12px; gap: 8px; }
+  .page-header + .card, .page-header + .content-container { margin-top: 6px; }
+}
+
+/* Ensure page-header title and actions align and never overlap
+   - title can shrink and shows ellipsis when too long
+   - actions block is pushed to the right and buttons have spacing
+*/
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-header .page-header-title {
+  flex: 1 1 auto;
+  min-width: 0; /* allow shrinking inside flex */
+}
+
+.page-header .page-header-title h1,
+.page-header .page-header-title h2,
+.page-header .page-title {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
+}
+
+.page-header .page-actions,
+.page-header .page-header-right,
+.page-header .action-bar,
+.card-header-right {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* Styling for "add" pages header to match provided screenshot: small breadcrumb + prominent title */
+.page-container.add-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 0;
+}
+.page-container.add-page .back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #0d6efd; /* bootstrap primary blue */
+  padding: 6px 8px;
+  font-size: 0.95rem;
+}
+.page-container.add-page .back-btn i { font-size: 1.05rem; }
+.page-container.add-page .back-label {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: #0d6efd;
+  font-weight: 600;
+}
+.page-container.add-page .page-title {
+  margin: 0;
+  font-size: 18px; /* match screenshot h3 ~18px */
+  font-weight: 800;
+  color: #222222; /* darker text like screenshot */
+  margin-bottom: 8px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.page-header .page-actions .btn,
+.page-header .page-actions .btn-group,
+.page-header .page-header-right .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: $screen-md) {
+  /* when stacked, allow title to wrap and actions to become full-width if needed */
+  .page-header .page-header-title h1,
+  .page-header .page-header-title h2,
+  .page-header .page-title {
+    white-space: normal;
+  }
+
+  .page-header .page-actions,
+  .page-header .page-header-right { width: 100%; justify-content: flex-start; }
+}
+
+@media (max-width: 420px) {
+  .page-header .page-actions .btn,
+  .page-header .page-actions .btn-group,
+  .page-header .page-header-right .btn { width: 100% !important; }
+}

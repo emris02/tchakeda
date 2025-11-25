@@ -1,7 +1,9 @@
-<div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
-  <button class="btn btn-light" (click)="back()" style="margin-right: 16px;">Retour</button>
-  <h4 style="flex: 1;">Détail du recouvrement</h4>
-</div>
+<div class="page-container">
+  
+    <button class="btn  back-btn" (click)="back()">
+      &lt;
+    </button>
+    <h4 class="page-title">Détail du recouvrement</h4>
 <div class="content-container">
   <form *ngIf="editMode" (ngSubmit)="save()" class="form-card recoverie-grid">
     <div class="form-group">

@@ -1,11 +1,19 @@
-<div class="page-container">
-  <div class="page-header">
+<div class="content-container">
+    <div class="page-header">
     <h4 class="page-title">Gestion des recouvreurs</h4>
-    <button class="btn btn-primary" (click)="goToNewCollector()"> 
+    <button class="btn-primary add-btn" (click)="goToNewCollector()"> 
       <i class="fas fa-plus"></i> Nouveau recouvreur
     </button>
-  </div>
-  <div class="content-container">
+  
+  <!-- Recherche rapide & filtre à droite -->
+      <div class="quick-search">
+        <input type="search" placeholder="Rechercher par nom, ville..." [(ngModel)]="filterName" (input)="applyFilters()" class="search-input" />
+        <select [(ngModel)]="filterCity" (change)="applyFilters()" class="search-select">
+          <option value="">Toutes les villes</option>
+          <option *ngFor="let c of cityOptions" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+</div>
     <table class="table collector-table">
       <thead>
         <tr>
@@ -19,7 +27,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let collector of collectors" class="clickable-row" (click)="editCollector(collector)">
+        <tr *ngFor="let collector of displayedCollectors" class="clickable-row" (click)="editCollector(collector)">
           <td>{{ collector.fullName }}</td>
           <td>{{ collector.country || '-' }}</td>
           <td>{{ collector.phone }}</td>
@@ -29,5 +37,7 @@
         </tr>
       </tbody>
     </table>
+    <div class="list-pagination">
+      <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+    </div>
   </div>
-</div>

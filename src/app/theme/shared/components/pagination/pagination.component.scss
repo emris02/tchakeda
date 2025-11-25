@@ -1,0 +1,17 @@
+.pagination-component{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 12px;
+  background:transparent;
+  font-size:14px;
+}
+.pagination-left{ display:flex; align-items:center; gap:8px }
+.pages-list{ list-style:none; display:flex; gap:6px; margin:0; padding:0 }
+.page-item{ }
+.page-btn{ border:1px solid #e6e9ee; background:white; padding:6px 10px; border-radius:6px; cursor:pointer }
+.page-btn.active{ background:#0b74ff; color:white; border-color:#0b74ff }
+.pagination-right{ display:flex; align-items:center; gap:8px }
+.page-size-label{ font-size:13px; color:#6b7280 }
+.muted{ color:#6b7280 }

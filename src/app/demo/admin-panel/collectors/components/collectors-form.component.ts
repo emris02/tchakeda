@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -23,6 +24,7 @@ export class CollectorsFormComponent {
   };
   errors: Record<string, string> = {};
   isSubmitting = false;
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
 
   constructor(
     private dialogRef: MatDialogRef<CollectorsFormComponent>,
@@ -38,10 +40,19 @@ export class CollectorsFormComponent {
     this.errors = {};
     if (!this.form.fullName) this.errors['fullName'] = 'Nom requis';
     if (!this.form.phone) this.errors['phone'] = 'Téléphone requis';
-    return Object.keys(this.errors).length === 0;
+    const valid = Object.keys(this.errors).length === 0;
+    if (!valid) {
+      const firstKey = Object.keys(this.errors)[0];
+      setTimeout(() => {
+        const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+        if (el && typeof (el as any).focus === 'function') (el as any).focus();
+      }, 0);
+    }
+    return valid;
   }
 
-  save() {
+  save(formRef?: NgForm) {
+    if (formRef && formRef.form) formRef.form.markAllAsTouched();
     if (!this.validate()) return;
     this.isSubmitting = true;
     const result = this.collectorsService.createCollector({ ...this.form });

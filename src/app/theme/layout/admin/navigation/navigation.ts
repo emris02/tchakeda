@@ -15,13 +15,14 @@ export interface NavigationItem {
     title?: string;
     type?: string;
   };
+  queryParams?: any;
   children?: NavigationItem[];
 }
 
 export const NavigationItems: NavigationItem[] = [
   {
     id: 'navigation',
-    title: 'Navigation',
+    title: '',
     type: 'group',
     icon: 'icon-group',
     children: [
@@ -36,7 +37,7 @@ export const NavigationItems: NavigationItem[] = [
   },
   {
     id: 'biens-immobilier',
-    title: 'Biens Immobilier',
+    title: ' ',
     type: 'group',
     icon: 'icon-group',
     children: [
@@ -79,19 +80,20 @@ export const NavigationItems: NavigationItem[] = [
   url: '/demo/admin-panel/apartments'
       },      
       {
-        id: 'tenants',
-        title: 'Locataires',
-        type: 'item',
-        icon: 'feather icon-users',
-  url: '/demo/admin-panel/tenants'
-      },
-      {
         id: 'rentals',
         title: 'Locations',
         type: 'item',
         icon: 'feather icon-file-text',
   url: '/demo/admin-panel/rentals'
       },
+      {
+        id: 'tenants',
+        title: 'Locataires',
+        type: 'item',
+        icon: 'feather icon-users',
+        url: '/demo/admin-panel/tenants',
+          },
+  
       {
         id: 'recoveries',
         title: 'Recouvrements',
@@ -116,33 +118,18 @@ export const NavigationItems: NavigationItem[] = [
             classes: 'nav-child-icon'
           }
         ]
-      }
-    ]
-  },
-  {
-    id: 'Authentication',
-    title: 'Authentication',
-    type: 'group',
-    icon: 'icon-group',
-    children: [
-      {
-        id: 'signup',
-        title: 'Sign up',
-        type: 'item',
-        url: '/register',
-        icon: 'feather icon-at-sign',
-        target: true,
-        breadcrumbs: false
       },
-      {
-        id: 'signin',
-        title: 'Sign in',
+    
+    
+ 
+   {
+        id: 'settings',
+        title: 'Paramètres',
         type: 'item',
-        url: '/login',
-        icon: 'feather icon-log-in',
-        target: true,
-        breadcrumbs: false
-      }
-    ]
-  },
+        icon: 'feather icon-settings',
+          url: '/demo/admin-panel/settings',
+          queryParams: { collectorId: 42 },
+        },
+  ]
+   },
 ];

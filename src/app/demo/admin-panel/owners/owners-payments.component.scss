@@ -1,9 +1,10 @@
+@use '/src/scss/form_imports';
 .payments-table {
   width: 100%;
   border-collapse: collapse;
   th, td {
     padding: 12px 16px;
-    border-bottom: 1px solid #eee;
+//eee;
   }
   th {
     background: #f8f9fa;
@@ -22,3 +23,104 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   padding: 24px;
 }
+
+.owners-payments .filter-panel { display:flex; gap:10px; align-items:center; }
+.owners-payments .period-select { width: 180px; }
+.owners-payments .search-input { width: 260px; }
+.owners-payments .btn-filter { display:inline-flex; align-items:center; gap:8px; }
+
+.owners-payments .payments-table thead th { background:#f1f5f9; font-weight:700; }
+.owners-payments .payments-table td, .owners-payments .payments-table th { padding: 14px 12px; border-bottom:1px solid #eee; }
+
+.owners-payments .card { border-radius:10px; box-shadow:0 6px 18px rgba(11,22,36,0.04); }
+.owners-payments .card-body { padding:12px 18px; }
+
+/* Enhanced, responsive & professional styles for owners payments */
+.owners-payments {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #1f2937; /* gray-800 */
+
+  .page-header h4 {
+    font-size: 1.4rem;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .card { background: #fff; }
+
+  .filter-panel {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .underline-input {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(15,23,42,0.06);
+    padding: 8px 10px;
+    min-height: 42px;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  select.underline-input {
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: 1px solid rgba(15,23,42,0.06);
+    background: #fff;
+  }
+  .underline-input:focus, .underline-input:active {
+    outline: none;
+    border-bottom-color: rgba(59,130,246,0.9); /* blue-500 */
+    box-shadow: 0 2px 8px rgba(59,130,246,0.06);
+  }
+
+  .period-select, .search-input { min-width: 160px; }
+
+  .summary-card { width: 100%; }
+  .summary-card .card-body { gap: 28px; align-items: flex-start; }
+
+  .method-list { display:flex; flex-wrap:wrap; gap:10px; }
+
+  .content-container { padding: 12px; }
+
+  .payments-table {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* table responsiveness */
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .payments-table thead th { white-space: nowrap; }
+
+  /* subtle hover and row spacing */
+  .payments-table tbody tr { transition: background .12s ease; }
+  .payments-table tbody tr:hover { background: #fbfdff; }
+
+  .muted { color: #6b7280; }
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .owners-payments {
+    .filter-panel { gap: 8px; }
+    .period-select, .search-input, .underline-input { width: 100%; min-width: 0; }
+    .summary-card .card-body { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .method-list { width: 100%; }
+    .payments-table thead { display: none; }
+    .payments-table tbody td { display: block; width: 100%; box-sizing: border-box; }
+    .payments-table tbody tr { margin-bottom: 12px; display: block; border: 1px solid #eef2f7; border-radius: 8px; padding: 12px; }
+    .payments-table tbody td::before { content: attr(data-label); font-weight:600; display:block; margin-bottom:6px; color:#374151; }
+  }
+}
+
+.summary-card { border-radius:10px; box-shadow:0 6px 18px rgba(11,22,36,0.04); }
+.summary-card .card-body { display:flex; gap:24px; align-items:center; padding:16px 20px; }
+.summary-amount { font-size:20px; font-weight:700; margin-top:6px; }
+.muted { color:#6b7280; }
+.method-list { gap:8px; }
+.method-chip { background:#eef2ff; padding:6px 10px; border-radius:999px; margin-right:8px; font-size:13px; }
+.period-row { font-size:14px; color:#374151; margin-bottom:4px; }

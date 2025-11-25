@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BuildingsService, Building } from './buildings.service';
 import { ApartmentsService } from '../apartments/apartments.service';
 import { OwnersService, Owner } from '../owners/owners.service';
+import { CollectorsService } from '../collectors/collectors.service';
 import { MatDialog } from '@angular/material/dialog';
 import { OwnerFormComponent } from '../owners/components/owner-form.component';
 
@@ -51,6 +52,8 @@ export class BuildingsDetailComponent implements OnInit {
   errors: any = {};
   owners: Owner[] = [];
   isCustomType = false;
+  collectorContextId: number | null = null;
+  canManage: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -59,12 +62,17 @@ export class BuildingsDetailComponent implements OnInit {
     private ownersService: OwnersService,
     private apartmentsService: ApartmentsService
     , private dialog: MatDialog
+    , private collectorsService: CollectorsService
   ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.building = this.buildingsService.getBuildingById(id);
     this.owners = this.ownersService.getOwners();
+    // Collector context (optional) - show manage controls only if affiliated
+  const q = this.route.snapshot.queryParamMap.get('collectorId');
+  this.collectorContextId = q ? Number(q) : null;
+  this.canManage = this.collectorContextId ? this.collectorsService.isBuildingAffiliated(this.collectorContextId, id) : true;
     if (this.building) {
       this.form = { ...this.building };
       this.isCustomType = this.form.type === 'autre';

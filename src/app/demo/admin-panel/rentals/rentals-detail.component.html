@@ -1,10 +1,9 @@
 <div class="page-container">
-  <div class="page-header d-flex align-items-center justify-content-between">
-    <button class="btn btn-light back-btn" (click)="back()">
-      <i class="fas fa-arrow-left"></i> Locations
+  
+    <button class="btn  back-btn" (click)="back()">
+      &lt;
     </button>
-    <h4 class="page-title">Détails de la location</h4>
-  </div>
+    <h4 class="page-title">Détail de la location</h4>
 
   <!-- ✅ Modal de suppression -->
   <div *ngIf="showDeleteConfirm" class="modal-overlay">
@@ -18,133 +17,74 @@
     </div>
   </div>
 
+  <!-- Modal d'annulation par l'admin -->
+  <div *ngIf="showAdminCancellationModal" class="modal-overlay">
+    <div class="modal-card large">
+      <h5>Annuler la location (Administration)</h5>
+      <p class="warning-text">
+        <i class="fas fa-exclamation-triangle"></i>
+        Vous êtes sur le point d'annuler cette location en tant qu'administrateur.
+      </p>
+      
+      <div class="cancellation-info" *ngIf="rental">
+        <h6>Informations sur la location :</h6>
+        <div class="info-item">
+          <label>Appartement :</label>
+          <span>{{ rental.apartmentName || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Locataire :</label>
+          <span>{{ rental.tenantName || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Bâtiment :</label>
+          <span>{{ rental.buildingName || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Loyer mensuel :</label>
+          <span>{{ rental.price ? (rental.price | number) + ' FCFA' : '-' }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="adminCancellationReason">Raison de l'annulation <span class="required">*</span></label>
+        <textarea 
+          id="adminCancellationReason" 
+          [(ngModel)]="adminCancellationReason" 
+          class="form-control" 
+          rows="4" 
+          placeholder="Veuillez expliquer la raison de l'annulation administrative..."
+          required></textarea>
+        <div class="error" *ngIf="errors.adminCancellationReason">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.adminCancellationReason }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" (click)="closeAdminCancellationModal()">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmAdminCancellation()" [disabled]="!adminCancellationReason">
+          Confirmer l'annulation
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="content-container">
-    <!-- ✅ Mode édition -->
-    <form *ngIf="editMode" (ngSubmit)="save()" class="form-card">
+    
+
+  <!-- ✅ Mode visualisation -->
+  <div class="form-card">
       <div class="card-header">
         <h5>Informations de la location</h5>
         <div class="action-buttons">
-          <button class="action-btn save" type="submit" title="Enregistrer les modifications">
-            <i class="fas fa-check"></i>
+          <button 
+            *ngIf="rental?.status === 'active'" 
+            class="action-btn cancel" 
+            title="Annuler la location" 
+            (click)="showAdminCancellationModal = true">
+            <i class="fas fa-times"></i>
           </button>
-        </div>
-      </div>
-      <div class="form-grid two-columns">
-        <!-- Row 1: Bâtiment + Appartement -->
-        <div class="form-group">
-          <div class="select-with-action">
-            <select [(ngModel)]="form.buildingId" name="buildingId" class="underline-input" (change)="onBuildingChange()" required>
-              <option [ngValue]="null">Sélectionner...</option>
-              <option *ngFor="let b of buildings" [ngValue]="b.id">{{ b.name || ('Bâtiment ' + b.id) }}</option>
-            </select>
-            <label class="label">
-              <i class="fas fa-building"></i>
-              Bâtiment
-            </label>
-            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewBuilding()" title="Ajouter un bâtiment">
-                <i class="fas fa-plus"></i> Nouveau bâtiment
-            </button>
-          </div>
-          <div class="error" *ngIf="errors.buildingId"><i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}</div>
-        </div>
-
-        <div class="form-group">
-          <div class="select-with-action">
-            <select [(ngModel)]="form.apartmentId" name="apartmentId" class="underline-input" required>
-              <option [ngValue]="null">Sélectionner...</option>
-              <option *ngFor="let apt of (filteredApartments.length ? filteredApartments : apartments)" [ngValue]="apt.id">{{ apt.name }}</option>
-            </select>
-            <label class="label">
-              <i class="fas fa-door-open"></i>
-              Appartement
-            </label>
-            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewApartment()" title="Ajouter un appartement">
-              <i class="fas fa-plus"></i> Nouvel appartement
-            </button>
-          </div>
-          <div class="error" *ngIf="errors.apartmentId"><i class="fas fa-exclamation-circle"></i> {{ errors.apartmentId }}</div>
-        </div>
-
-        <!-- Row 2: Locataire + Recouvreur + Loyer -->
-        <div class="form-group">
-          <div class="select-with-action">
-            <select [(ngModel)]="form.collectorId" name="collectorId" class="underline-input" required>
-              <option [ngValue]="null">Sélectionner...</option>
-              <option *ngFor="let c of collectors" [ngValue]="c.id">{{ c.fullName }}</option>
-            </select>
-            <label class="label">
-              <i class="fas fa-user-tie"></i>
-              Recouvreur
-            </label>
-            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewCollector()" title="Ajouter un recouvreur">
-              <i class="fas fa-plus"></i> Nouveau recouvreur
-            </button>
-          </div>
-          <div class="error" *ngIf="errors['collectorId']"><i class="fas fa-exclamation-circle"></i> {{ errors['collectorId'] }}</div>
-        </div>
-
-        <div class="form-group">
-          <div class="select-with-action">
-            <select [(ngModel)]="form.tenantId" name="tenantId" class="underline-input" required>
-              <option [ngValue]="null">Sélectionner...</option>
-              <option *ngFor="let t of tenants" [ngValue]="t.id">{{ t.fullName }}</option>
-            </select>
-            <label class="label">
-              <i class="fas fa-user"></i>
-              Locataire
-            </label>
-            <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewTenant()" title="Ajouter un locataire">
-              <i class="fas fa-plus"></i> Nouveau locataire
-            </button>
-            </div>
-          <div class="error" *ngIf="errors.tenantId"><i class="fas fa-exclamation-circle"></i> {{ errors.tenantId }}</div>
-        </div>
-
-        <div class="form-group full-width">
-          <div class="input-container">
-            <div class="input-with-button">
-              <input type="number" [(ngModel)]="form.price" name="price" class="underline-input" required min="1" />
-              <label for="price" class="label">
-                <i class="fas fa-money-bill-wave"></i>
-                Loyer mensuel (CFA)
-              </label>
-            </div>
-            <div class="error" *ngIf="errors['price']">{{ errors['price'] }}</div>
-          </div>
-          <div class="error" *ngIf="errors.price"><i class="fas fa-exclamation-circle"></i> {{ errors.price }}</div>
-        </div>
-
-        <!-- Row 3: Date début + Date fin -->
-        <div class="form-group">
-          <div class="select-with-action">
-            <input type="date" [(ngModel)]="form.startDate" name="startDate" class="underline-input" required />
-            <label class="label">
-              <i class="fas fa-calendar-alt"></i>
-              Date début
-            </label>
-          </div>
-          <div class="error" *ngIf="errors.startDate"><i class="fas fa-exclamation-circle"></i> {{ errors.startDate }}</div>
-        </div>
-
-        <div class="form-group">
-          <div class="select-with-action">
-            <input type="date" [(ngModel)]="form.endDate" name="endDate" class="underline-input" />
-            <label class="label">
-              <i class="fas fa-calendar-alt"></i>
-              Date fin
-            </label>
-          </div>
-          <div class="error" *ngIf="errors.endDate"><i class="fas fa-exclamation-circle"></i> {{ errors.endDate }}</div>
-        </div>
-      </div>
-    </form>
-
-    <!-- ✅ Mode visualisation -->
-    <div *ngIf="!editMode" class="form-card">
-      <div class="card-header">
-        <h5>Informations de la location</h5>
-        <div class="action-buttons">
-          <button class="action-btn edit" (click)="enableEdit()" title="Modifier">
+          <button class="action-btn edit" title="Modifier les informations" (click)="toggleLocationEdit()">
             <i class="fas fa-edit"></i>
           </button>
           <button class="action-btn delete" title="Supprimer la location" (click)="showDeleteConfirm = true">
@@ -153,52 +93,381 @@
         </div>
       </div>
       
-      <div class="details-grid">
-        <div class="info-card">
-          <label><i class="fas fa-building"></i> Bâtiment</label>
-          <p>{{ getBuildingName(rental?.buildingId) }}</p>
+      <!-- Property header: title, location, price and badges -->
+      <div class="property-header">
+        <div class="property-main">
+          <h2 class="property-title">{{ propertyTitle }}</h2>
+          <div class="property-location"><i class="fas fa-map-marker-alt"></i> {{ locationText }}</div>
         </div>
-        <div class="info-card">
-          <label><i class="fas fa-door-open"></i> Appartement</label>
-          <p>{{ getApartmentName(rental?.apartmentId) }}</p>
-        </div>
-        <div class="info-card">
-          <label><i class="fas fa-user"></i> Locataire</label>
-          <p>{{ getTenantName(rental?.tenantId) }}</p>
-        </div>
-        <div class="info-card">
-          <label><i class="fas fa-user-tie"></i> Recouvreur</label>
-          <p>{{ getCollectorName(rental?.collectorId) }}</p>
-        </div>
-        <div class="info-card">
-          <label><i class="fas fa-money-bill-wave"></i> Mensualité</label>
-          <p>{{ rental?.price }} Fcfa</p>
-        </div>
-        <div class="info-card">
-          <label><i class="fas fa-calendar-alt"></i> Date de début</label>
-          <p>{{ rental?.startDate | date:'dd/MM/yyyy' }}</p>
-        </div>
-        <div class="info-card">
-          <label><i class="fas fa-calendar-alt"></i> Date de fin</label>
-          <p>{{ rental?.endDate | date:'dd/MM/yyyy' }}</p>
+        <div class="property-meta">
+          <div class="price">{{ (rental?.price || 0) | number }} Fcfa / mois</div>
+          <div class="rental-status">
+            <span class="status-badge" [ngClass]="{
+              'status-active': rental?.status === 'active',
+              'status-completed': rental?.status === 'ended',
+              'status-cancelled': rental?.status === 'cancelled'
+            }">
+              <span *ngIf="rental?.status === 'active'">
+                <i class="fas fa-check-circle"></i> Active
+              </span>
+              <span *ngIf="rental?.status === 'ended'">
+                <i class="fas fa-calendar-check"></i> Terminée
+              </span>
+              <span *ngIf="rental?.status === 'cancelled'">
+                <i class="fas fa-times-circle"></i> {{ getCancellationTypeLabel(rental?.cancellationType) }}
+              </span>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ✅ Contrat + Historique paiements -->
-    <div class="contract-history-grid">
-      <!-- Contrat -->
-      <div class="form-card contract-card">
+      <!-- Badges row -->
+      <div class="badges-row">
+        <span class="badge" *ngFor="let b of badges" (click)="onBadgeClick(b)" [class.active]="selectedBadgeType === b.type">
+          <i [class]="b.icon"></i>
+          <span class="badge-label">{{ b.label }}</span>
+        </span>
+      </div>
+
+      <!-- Contrat de location (moved lower) -->
+
+      <!-- New layout: gallery left, tenant card right, details below -->
+      <div class="rental-top-grid">
+        <div class="gallery-card">
+          <div class="thumbnails">
+            <img *ngFor="let img of galleryImages" [src]="(img.url || img.src || img)" class="thumb" (click)="setMainImage(img)" [class.active]="(img.url || img.src || img) === mainImage" />
+          </div>
+          <div class="main-image-wrapper" [class.zoomable]="mainImage">
+            <img *ngIf="mainImage" [src]="mainImage" alt="Image logement" class="main-image" />
+            <div *ngIf="!mainImage" class="main-placeholder">Aucune image</div>
+          </div>
+        </div>
+
+        <div class="tenant-card">
+          <div class="tenant-bio">
+            <div class="tenant-avatar">
+              <img [src]="getTenantAvatar(rental?.tenantId)" alt="avatar" />
+            </div>
+            <h4 class="tenant-name">{{ getTenantName(rental?.tenantId) }}</h4>
+            <div class="tenant-country"><i class="fas fa-globe"></i> {{ getTenantCity(rental?.tenantId) }}</div>
+            <div class="tenant-phone"><i class="fas fa-phone"></i> {{ getTenantPhone(rental?.tenantId) }}</div>
+            <p class="tenant-about">{{ getTenantAbout(rental?.tenantId) }}</p>
+            <div class="tenant-actions">
+              <button class="btn btn-success btn-block" (click)="goToTenantDetailChannel(rental?.tenantId)">Voir le locataire</button>
+            </div>
+          </div>
+
+          <div class="tenant-stats">
+            <div class="stat"><strong>{{ paymentHistory.length }}</strong><span>Paiements</span></div>
+            <div class="stat"><strong>{{ (rental?.price || 0) | number }} Fcfa</strong><span>Mensualité</span></div>
+            <div class="stat"><strong>{{ occupiedApartmentsCount }}</strong><span>Appartements occupés</span></div>
+          </div>
+        
+        </div>
+      </div>
+
+        <!-- Small map section (under tenant card) -->
+        <div class="small-map-section">
+          <div class="small-map" (click)="openMapModal()" title="Cliquer pour agrandir">
+            <img [src]="getStaticMapUrl(800,180)" alt="Carte de la location" />
+            <div class="map-cta">Voir la carte</div>
+          </div>
+        </div>
+
+        <!-- Icon switch (3 circular icon buttons) -->
+      <div class="icon-switch">
+        <button class="icon-btn" [class.active]="activeTab === 'info'" (click)="switchTab('info')" title="Informations">
+          <i class="fas fa-info"></i>
+        </button>
+        <button class="icon-btn" [class.active]="activeTab === 'payment'" (click)="switchTab('payment')" title="Paiements">
+          <i class="fas fa-wallet"></i>
+        </button>
+        <button class="icon-btn" [class.active]="activeTab === 'invoice'" (click)="switchTab('invoice')" title="Factures">
+          <i class="fas fa-file-invoice"></i>
+        </button>
+      </div>
+
+        
+
+  <div class="tab-contents">
+        <div *ngIf="activeTab === 'payment'" class="tab-pane">
+        <!-- Historique paiements (existing) -->
+        <div class="form-card payment-history">
+          <div class="card-header">
+            <h5>Historique de paiement</h5>
+            <div class="payment-filters">
+              <!-- Boutons switch pour les statuts de paiement -->
+              <div class="payment-status-filters">
+                <button 
+                  class="status-filter-btn" 
+                  [class.active]="!paymentStatusFilter || paymentStatusFilter === ''"
+                  (click)="paymentStatusFilter = ''; applyPaymentFilters()">
+                  <i class="fas fa-list"></i> Tous
+                </button>
+                <button 
+                  class="status-filter-btn status-paid" 
+                  [class.active]="paymentStatusFilter === 'paid'"
+                  (click)="paymentStatusFilter = 'paid'; applyPaymentFilters()">
+                  <i class="fas fa-check-circle"></i> Payé
+                </button>
+                <button 
+                  class="status-filter-btn status-pending" 
+                  [class.active]="paymentStatusFilter === 'pending'"
+                  (click)="paymentStatusFilter = 'pending'; applyPaymentFilters()">
+                  <i class="fas fa-clock"></i> En attente
+                </button>
+                <button 
+                  class="status-filter-btn status-overdue" 
+                  [class.active]="paymentStatusFilter === 'overdue'"
+                  (click)="paymentStatusFilter = 'overdue'; applyPaymentFilters()">
+                  <i class="fas fa-exclamation-triangle"></i> En retard
+                </button>
+              </div>
+              <!-- Filtre de période -->
+              <select [(ngModel)]="selectedPeriod" name="selectedPeriod" class="period-filter" (change)="applyPaymentFilters()">
+                <option value="">Toutes les périodes</option>
+                <option *ngFor="let period of paymentPeriods" [value]="period">{{ period }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Période</th>
+                  <th>Montant</th>
+                  <th>Date</th>
+                  <th>Mode</th>
+                  <th>Statut</th>
+                  <th>Recouvreur</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of filteredPayments()">
+                  <td>{{ payment.period }}</td>
+                  <td>{{ payment.amount }} Fcfa</td>
+                  <td>{{ payment.paymentDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ payment.paymentMethod }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="{'status-paid': payment.status === 'Payé', 'status-pending': payment.status !== 'Payé'}">
+                      {{ payment.status }}
+                    </span>
+                  </td>
+                  <td>{{ payment.collector }}</td>
+                </tr>
+                <tr *ngIf="filteredPayments().length === 0">
+                  <td colspan="6" class="no-data">Aucun paiement enregistré</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  </div>
+      </div>
+
+        <div *ngIf="activeTab === 'info'" class="tab-pane">
+          <div id="infoSection" class="form-card info-card-large">
+            <div class="card-header">
+              <h5>{{ locationEditMode ? 'Modifier la location' : 'Informations' }}</h5>
+              <div class="action-buttons" *ngIf="locationEditMode">
+                <button type="button" class="action-btn save" (click)="saveLocationChanges()" title="Enregistrer">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="action-btn cancel" (click)="cancelLocationEdit()" title="Annuler">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="info-grid professional">
+              <!-- Display mode -->
+              <ng-container *ngIf="!locationEditMode">
+                <div class="info-row">
+                  <div class="info-label">Titre</div>
+                  <div class="info-value">{{ propertyTitle }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Localisation</div>
+                  <div class="info-value">{{ locationText || '-' }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Bâtiment</div>
+                  <div class="info-value">{{ getBuildingName(rental?.buildingId) }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Appartement</div>
+                  <div class="info-value">{{ getApartmentName(rental?.apartmentId) }}</div>
+                </div>
+                <div class="info-row" *ngIf="getApartmentArea(rental?.apartmentId)">
+                  <div class="info-label">Superficie</div>
+                  <div class="info-value">{{ getApartmentArea(rental?.apartmentId) }} m²</div>
+                </div>
+                <div class="info-row" *ngIf="getApartmentRooms(rental?.apartmentId)">
+                  <div class="info-label">Nombre de pièces</div>
+                  <div class="info-value">{{ getApartmentRooms(rental?.apartmentId) }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Mensualité</div>
+                  <div class="info-value">{{ rental?.price | number }} Fcfa</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Période</div>
+                  <div class="info-value">{{ formatRentalPeriodPublic(rental) }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Statut</div>
+                  <div class="info-value">
+                    <span class="status-badge" [ngClass]="{
+                      'status-active': rental?.status === 'active',
+                      'status-completed': rental?.status === 'ended',
+                      'status-cancelled': rental?.status === 'cancelled'
+                    }">
+                      <span *ngIf="rental?.status === 'active'">Active</span>
+                      <span *ngIf="rental?.status === 'ended'">Terminée</span>
+                      <span *ngIf="rental?.status === 'cancelled'">
+                        {{ getCancellationTypeLabel(rental?.cancellationType) }}
+                        <small *ngIf="rental?.cancellationDate" class="cancellation-date">
+                          ({{ rental?.cancellationDate | date:'dd/MM/yyyy' }})
+                        </small>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="info-row" *ngIf="rental?.cancellationReason">
+                  <div class="info-label">Raison d'annulation</div>
+                  <div class="info-value">{{ rental?.cancellationReason }}</div>
+                </div>
+              </ng-container>
+
+              <!-- Inline edit mode using the same structure & classes as the full edit form -->
+              <ng-container *ngIf="locationEditMode">
+                <!-- avoid nested .form-card to keep a single main white card -->
+                <div class="full-width">
+                  <div class="form-grid two-columns">
+                    <!-- Bâtiment -->
+                    <div class="form-group">
+                      <div class="select-with-action">
+                        <select [(ngModel)]="tempLocationForm.buildingId" name="inline_buildingId" class="underline-input" (change)="onTempBuildingChange()">
+                          <option [ngValue]="null">Sélectionner...</option>
+                          <option *ngFor="let b of buildings" [ngValue]="b.id">{{ b.name || ('Bâtiment ' + b.id) }}</option>
+                        </select>
+                        <label class="label"><i class="fas fa-building"></i> Bâtiment</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewBuilding()" title="Ajouter un bâtiment">
+                          <i class="fas fa-plus"></i> Nouveau bâtiment
+                        </button>
+                      </div>
+                      <div class="error" *ngIf="errors.buildingId"><i class="fas fa-exclamation-circle"></i> {{ errors.buildingId }}</div>
+                    </div>
+
+                    <!-- Appartement -->
+                    <div class="form-group">
+                      <div class="select-with-action">
+                        <select [(ngModel)]="tempLocationForm.apartmentId" name="inline_apartmentId" class="underline-input">
+                          <option [ngValue]="null">Sélectionner...</option>
+                          <option *ngFor="let a of (filteredApartments.length ? filteredApartments : apartments)" [ngValue]="a.id">{{ a.name }}</option>
+                        </select>
+                        <label class="label"><i class="fas fa-door-open"></i> Appartement</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewApartment()" title="Ajouter un appartement">
+                          <i class="fas fa-plus"></i> Nouvel appartement
+                        </button>
+                      </div>
+                      <div class="error" *ngIf="errors.apartmentId"><i class="fas fa-exclamation-circle"></i> {{ errors.apartmentId }}</div>
+                    </div>
+
+                    <!-- Locataire -->
+                    <div class="form-group">
+                      <div class="select-with-action">
+                        <select [(ngModel)]="tempLocationForm.tenantId" name="inline_tenantId" class="underline-input">
+                          <option [ngValue]="null">Sélectionner...</option>
+                          <option *ngFor="let t of tenants" [ngValue]="t.id">{{ t.fullName }}</option>
+                        </select>
+                        <label class="label"><i class="fas fa-user"></i> Locataire</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewTenant()" title="Ajouter un locataire">
+                          <i class="fas fa-plus"></i> Nouveau locataire
+                        </button>
+                      </div>
+                      <div class="error" *ngIf="errors.tenantId"><i class="fas fa-exclamation-circle"></i> {{ errors.tenantId }}</div>
+                    </div>
+
+                    <!-- Recouvreur -->
+                    <div class="form-group">
+                      <div class="select-with-action">
+                        <select [(ngModel)]="tempLocationForm.collectorId" name="inline_collectorId" class="underline-input">
+                          <option [ngValue]="null">Sélectionner...</option>
+                          <option *ngFor="let c of collectors" [ngValue]="c.id">{{ c.fullName }}</option>
+                        </select>
+                        <label class="label"><i class="fas fa-user-tie"></i> Recouvreur</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToNewCollector()" title="Ajouter un recouvreur">
+                          <i class="fas fa-plus"></i> Nouveau recouvreur
+                        </button>
+                      </div>
+                      <div class="error" *ngIf="errors.collectorId"><i class="fas fa-exclamation-circle"></i> {{ errors.collectorId }}</div>
+                    </div>
+
+                    <!-- Mensualité -->
+                    <div class="form-group">
+                      <div class="input-container">
+                        <div class="input-with-button">
+                          <input type="number" [(ngModel)]="tempLocationForm.price" name="inline_price" class="underline-input" min="1" />
+                          <label class="label"><i class="fas fa-money-bill-wave"></i> Loyer mensuel (CFA)</label>
+                        </div>
+                        <div class="error" *ngIf="errors.price"><i class="fas fa-exclamation-circle"></i> {{ errors.price }}</div>
+                      </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="form-group">
+                      <div class="select-with-action">
+                        <input type="date" [(ngModel)]="tempLocationForm.startDate" name="inline_startDate" class="underline-input" />
+                        <label class="label"><i class="fas fa-calendar-alt"></i> Date début</label>
+                      </div>
+                      <div class="error" *ngIf="errors.startDate"><i class="fas fa-exclamation-circle"></i> {{ errors.startDate }}</div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="select-with-action">
+                        <input type="date" [(ngModel)]="tempLocationForm.endDate" name="inline_endDate" class="underline-input" />
+                        <label class="label"><i class="fas fa-calendar-alt"></i> Date fin</label>
+                      </div>
+                      <div class="error" *ngIf="errors.endDate"><i class="fas fa-exclamation-circle"></i> {{ errors.endDate }}</div>
+                    </div>
+                  </div>
+
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'invoice'" class="tab-pane">
+          <div class="form-card invoice-card">
+            <h5>Factures</h5>
+            <div *ngIf="invoices.length === 0">Aucune facture générée pour cette location.</div>
+            <div *ngIf="invoices.length > 0">
+              <div class="invoice-list">
+                <div class="invoice-row" *ngFor="let inv of invoices">
+                  <div class="invoice-left">
+                    <div class="invoice-title">{{ inv.title || ('Facture #' + inv.id) }}</div>
+                    <div class="invoice-meta">{{ inv.date | date:'dd/MM/yyyy' }} • {{ inv.status }}</div>
+                  </div>
+                  <div class="invoice-right">{{ inv.amount }} Fcfa</div>
+                </div>
+              </div>
+            </div>
+              
+
+      
+      <!-- Contrat de location (placé tout en bas, après les onglets) -->
+      <div id="contractSection" class="contract-section" style="margin-top:24px;padding-top:18px;">
         <h5>Contrat de location</h5>
         <div class="contract-image-container">
           <img *ngIf="contractImage" [src]="contractImage" alt="Contrat" class="contract-image" />
           <div *ngIf="!contractImage" class="contract-placeholder">
             <i class="fas fa-file-contract"></i>
             <p>Aucun contrat</p>
-            <label class="upload-icon-label">
-              <i class="fas fa-upload upload-icon" (click)="triggerContractUpload()"></i>
-              <input type="file" accept="image/*,.pdf" (change)="onContractSelected($event)" style="display:none;" #contractInput />
-            </label>
+            <div>
+              <button class="btn btn-outline-primary" (click)="triggerContractUpload()">Ajouter un contrat</button>
+              <input id="contractInput" type="file" accept="image/*,.pdf" (change)="onContractSelected($event)" style="display:none;" />
+            </div>
           </div>
         </div>
         <div class="contract-actions" *ngIf="contractImage">
@@ -211,14 +480,12 @@
         </div>
       </div>
 
-      <!-- Modal contrat -->
+      <!-- Modal contrat (aperçu) -->
       <div *ngIf="showContractModal" class="modal-overlay">
         <div class="modal-card contract-modal">
           <div class="modal-header">
             <h5>Contrat de location</h5>
-            <button class="close-btn" (click)="showContractModal = false">
-              <i class="fas fa-times"></i>
-            </button>
+            <button class="close-btn" (click)="showContractModal = false"><i class="fas fa-times"></i></button>
           </div>
           <div class="modal-body">
             <ng-container *ngIf="contractImage && contractImage.startsWith('data:application/pdf')">
@@ -231,47 +498,20 @@
         </div>
       </div>
 
-      <!-- Historique paiements -->
-      <div class="form-card payment-history">
-        <div class="card-header">
-          <h5>Historique de paiement</h5>
-          <select [(ngModel)]="selectedPeriod" name="selectedPeriod" class="period-filter">
-            <option value="">Toutes les périodes</option>
-            <option *ngFor="let period of paymentPeriods" [value]="period">{{ period }}</option>
-          </select>
-        </div>
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Période</th>
-                <th>Montant</th>
-                <th>Date</th>
-                <th>Mode</th>
-                <th>Statut</th>
-                <th>Recouvreur</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let payment of filteredPayments()">
-                <td>{{ payment.period }}</td>
-                <td>{{ payment.amount }} Fcfa</td>
-                <td>{{ payment.paymentDate | date:'dd/MM/yyyy' }}</td>
-                <td>{{ payment.paymentMethod }}</td>
-                <td>
-                  <span class="status-badge" [ngClass]="{'status-paid': payment.status === 'Payé', 'status-pending': payment.status !== 'Payé'}">
-                    {{ payment.status }}
-                  </span>
-                </td>
-                <td>{{ payment.collector }}</td>
-              </tr>
-              <tr *ngIf="filteredPayments().length === 0">
-                <td colspan="6" class="no-data">Aucun paiement enregistré</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- Large map modal (opened when user clicks small map) -->
+      <div *ngIf="showMapModal" class="modal-overlay">
+        <div class="modal-card map-modal">
+          <div class="modal-header">
+            <h5>Carte - {{ propertyTitle }}</h5>
+            <div>
+              <button class="action-btn" title="Ouvrir dans OpenStreetMap" (click)="openMapInNewTab()"><i class="fas fa-external-link-alt"></i></button>
+              <button class="close-btn" (click)="closeMapModal()"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          <div class="modal-body">
+            <img [src]="getStaticMapUrl(1200,600)" alt="Carte agrandie" style="width:100%; height:auto; max-height:70vh; object-fit:cover;" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
+  

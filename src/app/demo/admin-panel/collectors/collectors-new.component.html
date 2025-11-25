@@ -1,15 +1,22 @@
-<div class="page-container">
-  <!-- En-tête avec navigation -->
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="cancel()">
-      <i class="fas fa-arrow-left"></i> Recouvreurs
-    </button>
-    <h4 class="page-title">Nouveau recouvreur</h4>
-  </div>
+<div class="page-container add-page">
+  
+      <button class="btn back-btn" (click)="cancel()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Recouvreurs</span>
+      </button>
+      <h4 class="page-title">Créer un recouvreur</h4>
+    </div>
+    <div class="header-right">
+      <!-- action slot: place add/list buttons here on listing pages -->
+
 
   <!-- Formulaire de création -->
   <div class="content-container">
-    <form (ngSubmit)="create()" class="form-card collector-form">
+  <form #collectorForm="ngForm" (ngSubmit)="create(collectorForm)" class="form-card collector-form">
+  <div class="form-error-summary" *ngIf="hasErrors">
+        <i class="fas fa-exclamation-circle"></i>
+        Veuillez corriger les champs requis ci-dessous.
+      </div>
       
       <!-- Section informations personnelles -->
       <div class="form-section">
@@ -365,10 +372,16 @@
   </div>
   <!-- Actions -->
       <div class="action-bar">
-        <div class="form-actions">
-          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
-          <button type="submit" class="btn btn-primary btn-save">Créer</button>
-        </div>
+          <div class="form-actions">
+            <div class="action-error-summary" *ngIf="hasErrors">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez corriger les champs requis ci-dessous.
+            </div>
+            <div class="action-buttons">
+              <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+              <button type="button" class="btn btn-primary btn-save" (click)="create(collectorForm)">Créer</button>
+            </div>
+          </div>
       </div>
 
   <!-- Modal de succès -->

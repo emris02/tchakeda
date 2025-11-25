@@ -1,10 +1,12 @@
 @use '/src/scss/form_imports';
+
 // Variables
-$primary-color: #1976d2;
+$primary-color: #4099ff;
 $danger-color: #d32f2f;
 $success-color: #2e7d32;
 $warning-color: #ed6c02;
 $text-color: #333;
+$title-color: #ffffff;
 $text-muted: #666;
 $border-color: #e0e0e0;
 $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -13,7 +15,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 // Styles généraux
 .page-container {
   padding: 0px;
-  max-width: 1200px;
+  max-width: auto;
   margin: 0 auto;
 }
 
@@ -27,27 +29,20 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .page-title {
-  margin: 0 auto;
-  text-align: center;
+  margin: 20px auto;
+  text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .back-btn {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 8px 16px;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: #e9ecef;
-  }
+  gap: 10px;
 }
 
 // Cartes
@@ -55,14 +50,14 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   background: #fff;
   border-radius: 8px;
   box-shadow: $card-shadow;
-  padding: 24px;
-  margin: 0 auto 24px auto;
+  padding: 20px;
+  margin: 24px auto 24px auto;
 
   h5 {
     margin-bottom: 16px;
     font-size: 16px;
     font-weight: 600;
-    border-bottom: 1px solid #f0f0f0;
+//f0f0f0;
     padding-bottom: 8px;
     color: $text-color;
   }
@@ -532,7 +527,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       
       td {
         padding: 12px;
-        border-bottom: 1px solid #f0f0f0;
+    //f0f0f0;
         color: $text-color;
       }
     }

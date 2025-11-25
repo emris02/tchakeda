@@ -1,0 +1,374 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <h1>
+      <mat-icon>settings</mat-icon>
+      Paramètres de l'Agence
+    </h1>
+    <p>Gérez les paramètres et configurations de votre agence immobilière</p>
+  </div>
+
+  <mat-tab-group (selectedTabChange)="onTabChange($event)" [selectedIndex]="selectedTab">
+    
+    <!-- Onglet Général -->
+    <mat-tab label="Général">
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>business</mat-icon>
+              Informations Générales
+            </mat-card-title>
+            <mat-card-subtitle>Informations de base de votre agence immobilière</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="generalForm" class="settings-form">
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nom de l'agence</mat-label>
+                    <input matInput class="underline-input" formControlName="agencyName" placeholder="Ex: TCHAK Immobilier">
+                    <mat-icon matSuffix>business</mat-icon>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput class="underline-input" formControlName="email" type="email" placeholder="contact@agence.com">
+                    <mat-icon matSuffix>email</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Téléphone</mat-label>
+                    <input matInput class="underline-input" formControlName="phone" placeholder="+221 XX XXX XX XX">
+                    <mat-icon matSuffix>phone</mat-icon>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Adresse</mat-label>
+                    <input matInput class="underline-input" formControlName="address" placeholder="Adresse complète">
+                    <mat-icon matSuffix>location_on</mat-icon>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Ville</mat-label>
+                    <input matInput class="underline-input" formControlName="city" placeholder="Dakar">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Pays</mat-label>
+                    <mat-select class="underline-input" formControlName="country">
+                      <mat-option *ngFor="let country of countries" [value]="country.value">
+                        {{ country.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Devise</mat-label>
+                    <mat-select class="underline-input" formControlName="currency">
+                      <mat-option *ngFor="let currency of currencies" [value]="currency.value">
+                        {{ currency.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Langue</mat-label>
+                    <mat-select class="underline-input" formControlName="language">
+                      <mat-option value="fr">Français</mat-option>
+                      <mat-option value="en">English</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button mat-button (click)="generalForm.reset()">Annuler</button>
+            <button mat-raised-button color="primary" (click)="onSaveGeneral()" [disabled]="!generalForm.valid">
+              <mat-icon>save</mat-icon>
+              Sauvegarder
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Notifications -->
+    <mat-tab label="Notifications">
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>notifications</mat-icon>
+              Préférences de Notification
+            </mat-card-title>
+            <mat-card-subtitle>Configurez comment vous souhaitez recevoir les alertes et notifications</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="notificationForm" class="settings-form">
+              <h3>Canaux de notification</h3>
+              <div class="toggle-row">
+                <mat-slide-toggle formControlName="emailNotifications" color="primary">
+                  Notifications par Email
+                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="smsNotifications" color="primary">
+                  Notifications par SMS
+                </mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <h3>Types d'alertes</h3>
+              <div class="toggle-column">
+                <mat-slide-toggle formControlName="newPropertyAlerts" color="primary">
+                  Nouvelles propriétés ajoutées
+                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="newClientAlerts" color="primary">
+                  Nouveaux clients inscrits
+                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="paymentReminders" color="primary">
+                  Rappels de paiement
+                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="maintenanceAlerts" color="primary">
+                  Alertes de maintenance
+                </mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <h3>Rapports automatiques</h3>
+              <div class="toggle-column">
+                <mat-slide-toggle formControlName="weeklyReports" color="primary">
+                  Rapport hebdomadaire
+                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="monthlyReports" color="primary">
+                  Rapport mensuel
+                </mat-slide-toggle>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button mat-button (click)="notificationForm.reset()">Réinitialiser</button>
+            <button mat-raised-button color="primary" (click)="onSaveNotifications()">
+              <mat-icon>save</mat-icon>
+              Sauvegarder
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Agence -->
+    <mat-tab label="Agence">
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>corporate_fare</mat-icon>
+              Informations Agence
+            </mat-card-title>
+            <mat-card-subtitle>Détails administratifs et professionnels de votre agence</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="agencyForm" class="settings-form">
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Numéro de licence</mat-label>
+                    <input matInput class="underline-input" formControlName="licenseNumber" placeholder="N° licence professionnelle">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Identifiant fiscal</mat-label>
+                    <input matInput class="underline-input" formControlName="taxId" placeholder="N° identification fiscale">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nom du gérant</mat-label>
+                    <input matInput class="underline-input" formControlName="managerName" placeholder="Nom du responsable">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Année de création</mat-label>
+                    <input matInput class="underline-input" formControlName="foundationYear" type="number" min="1900" max="2030">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Spécialités</mat-label>
+                    <input matInput class="underline-input" formControlName="specialties" placeholder="Ex: Résidentiel, Commercial...">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Nombre de biens gérés</mat-label>
+                    <input matInput class="underline-input" formControlName="propertyCount" type="number" min="0">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Nombre d'employés</mat-label>
+                    <input matInput class="underline-input" formControlName="employeeCount" type="number" min="0">
+                  </mat-form-field>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button mat-button (click)="agencyForm.reset()">Annuler</button>
+            <button mat-raised-button color="primary" (click)="onSaveAgency()" [disabled]="!agencyForm.valid">
+              <mat-icon>save</mat-icon>
+              Sauvegarder
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Financier -->
+    <mat-tab label="Financier">
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>euro</mat-icon>
+              Paramètres Financiers
+            </mat-card-title>
+            <mat-card-subtitle>Configuration des taux, commissions et paramètres de paiement</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="financialForm" class="settings-form">
+              <h3>Commissions et taxes</h3>
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Commission par défaut (%)</mat-label>
+                    <input matInput class="underline-input" formControlName="defaultCommission" type="number" min="0" max="100" step="0.1">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Taux de TVA (%)</mat-label>
+                    <input matInput class="underline-input" formControlName="vatRate" type="number" min="0" max="100" step="0.1">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <h3>Paramètres de paiement</h3>
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Jours avant échéance</mat-label>
+                    <input matInput class="underline-input" formControlName="paymentDueDays" type="number" min="1" max="90">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Pénalité de retard (%)</mat-label>
+                    <input matInput class="underline-input" formControlName="latePaymentFee" type="number" min="0" max="20" step="0.1">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Dépôt de garantie (mois)</mat-label>
+                    <input matInput class="underline-input" formControlName="securityDepositMonths" type="number" min="1" max="6" step="0.5">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Début année fiscale</mat-label>
+                    <input matInput class="underline-input" formControlName="fiscalYearStart" placeholder="JJ/MM">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <h3>Informations bancaires</h3>
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Banque</mat-label>
+                    <input matInput class="underline-input" formControlName="bankName" placeholder="Nom de la banque">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group half-width">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Numéro de compte</mat-label>
+                    <input matInput class="underline-input" formControlName="accountNumber" placeholder="N° de compte">
+                  </mat-form-field>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button mat-button (click)="financialForm.reset()">Annuler</button>
+            <button mat-raised-button color="primary" (click)="onSaveFinancial()" [disabled]="!financialForm.valid">
+              <mat-icon>save</mat-icon>
+              Sauvegarder
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+  <!-- Bouton d'export global -->
+  <div class="export-section">
+    <button mat-stroked-button color="primary" (click)="exportSettings()">
+      <mat-icon>download</mat-icon>
+      Exporter tous les paramètres
+    </button>
+  </div>
+</div>

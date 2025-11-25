@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CollectorsService } from './collectors.service';
 import { BuildingsService, Building } from '../buildings/buildings.service';
@@ -36,6 +37,7 @@ export class CollectorsNewComponent {
   } as any;
   isSubmitting = false;
   errors: any = {};
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
   buildings: Building[] = [];
   apartments: Apartment[] = [];
   filteredApartments: Apartment[] = [];
@@ -82,10 +84,22 @@ export class CollectorsNewComponent {
       if (!this.form.affiliatedPerson.fullName) this.errors.affiliatedPersonFullName = 'Nom du proche requis';
       if (!this.form.affiliatedPerson.phone) this.errors.affiliatedPersonPhone = 'Téléphone du proche requis';
     }
-    return Object.keys(this.errors).length === 0;
+    const valid = Object.keys(this.errors).length === 0;
+    if (!valid) {
+      const firstKey = Object.keys(this.errors)[0];
+      setTimeout(() => {
+        const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+        if (el && typeof (el as any).focus === 'function') (el as any).focus();
+      }, 0);
+    }
+    return valid;
   }
 
-  create() {
+  create(formRef?: NgForm) {
+    // mark all controls as touched so required messages appear for template-driven forms
+    if (formRef && formRef.form) {
+      formRef.form.markAllAsTouched();
+    }
     if (!this.validate()) return;
     this.isSubmitting = true;
     const created = this.collectorsService.createCollector({

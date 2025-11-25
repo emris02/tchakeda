@@ -1,0 +1,17 @@
+<div class="search-filter">
+  <div class="left">
+    <input [placeholder]="placeholder || 'Rechercher...'" [formControl]="searchControl" class="search-input" />
+    <!-- Example contextual filter: a generic select for categories. Individual pages can render more advanced content by listening to (filterChange) -->
+    <select (change)="onFilterChange('category', $any($event.target).value)" class="filter-select">
+      <option value="">Tous</option>
+      <option value="type1">Type 1</option>
+      <option value="type2">Type 2</option>
+    </select>
+  </div>
+  <div class="right">
+    <button class="btn icon" (click)="onRefresh()" title="Actualiser">🔄</button>
+    <button class="btn icon" (click)="onPrint()" title="Imprimer">📄</button>
+    <div class="divider"></div>
+    <button class="btn add" (click)="onAddNew()">+ Nouveau</button>
+  </div>
+</div>

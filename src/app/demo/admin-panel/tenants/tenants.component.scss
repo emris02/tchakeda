@@ -1,5 +1,18 @@
 @use '/src/scss/form_imports';
 
+// Variables
+$primary-color: #4099ff;
+$danger-color: #e74c3c;
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$info-color: #3498db;
+$text-color: #2c3e50;
+$text-muted: #7f8c8d;
+$border-color: #e1e4e8;
+$background-light: #f8f9fa;
+$card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+$card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
 .tenant-photo {
   width: 40px;
   height: 40px;
@@ -17,7 +30,7 @@
   border-radius: 50%;
   background: #e0e0e0;
   color: #888;
-  font-size: 24px;
+  font-size: 17px;
   border: 2px solid #e0e0e0;
 }
 .tenants-table {
@@ -25,7 +38,7 @@
   border-collapse: collapse;
   th, td {
     padding: 18px 10px;
-    border-bottom: 1px solid #eee;
+//eee;
   }
   th {
     background: #f8f9fa;
@@ -56,3 +69,38 @@
  {
     --bs-btn-color: #fff;
 }
+// Bouton ajout
+    .add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 5%) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+
+      i {
+        font-size: 14px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba($primary-color, 0.4);
+        background: linear-gradient(135deg, darken($primary-color, 3%) 0%, darken($primary-color, 8%) 100%);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+    .quick-search{
+      display:flex; align-items:center; gap:8px; margin-left:12px;
+      .search-input{ padding:8px 12px; border:1px solid $border-color; border-radius:8px; min-width:220px }
+      .search-select{ padding:8px 10px; border:1px solid $border-color; border-radius:8px; background:white }
+    }

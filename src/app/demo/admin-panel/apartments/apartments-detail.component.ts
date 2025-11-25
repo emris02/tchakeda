@@ -33,7 +33,9 @@ export class ApartmentsDetailComponent implements OnInit {
   form: any = {
     images: [],
     roomLabels: [],
-    roomDescriptions: []
+    roomDescriptions: [],
+    roomAreas: [],
+    area: 0
   };
   
   errors: any = {};
@@ -52,7 +54,7 @@ export class ApartmentsDetailComponent implements OnInit {
   
   // Gestion de l'édition inline des pièces
   editPieceIndexMap: { [index: number]: boolean } = {};
-  pieceEditBackup: { [index: number]: { label: string; desc: string; img: string } } = {};
+  pieceEditBackup: { [index: number]: { label: string; desc: string; img: string; area?: number } } = {};
   // Hover state pour l'overlay (utilisé dans le template)
   isHovered: boolean[] = [];
   
@@ -104,6 +106,8 @@ export class ApartmentsDetailComponent implements OnInit {
       if (!this.form.images) this.form.images = [];
       if (!this.form.roomLabels) this.form.roomLabels = [];
       if (!this.form.roomDescriptions) this.form.roomDescriptions = [];
+      if (!this.form.roomAreas) this.form.roomAreas = [];
+      if (!this.form.area) this.form.area = 0;
       
       // Synchronise les tableaux
       this.synchronizeRoomArrays();
@@ -144,7 +148,8 @@ export class ApartmentsDetailComponent implements OnInit {
     const maxLength = Math.max(
       this.form.images.length,
       this.form.roomLabels.length,
-      this.form.roomDescriptions.length
+      this.form.roomDescriptions.length,
+      this.form.roomAreas ? this.form.roomAreas.length : 0
     );
 
     // Assure que tous les tableaux ont la même longueur
@@ -156,6 +161,10 @@ export class ApartmentsDetailComponent implements OnInit {
     }
     while (this.form.roomDescriptions.length < maxLength) {
       this.form.roomDescriptions.push('');
+    }
+    if (!this.form.roomAreas) this.form.roomAreas = [];
+    while (this.form.roomAreas.length < maxLength) {
+      this.form.roomAreas.push(0);
     }
     // Synchronise aussi l'état de survol pour le template
     while (this.isHovered.length < maxLength) {
@@ -191,10 +200,12 @@ export class ApartmentsDetailComponent implements OnInit {
     this.form.rooms = desired;
 
     // agrandir ou réduire les tableaux pour correspondre au nouveau nombre
+    if (!this.form.roomAreas) this.form.roomAreas = [];
     while (this.form.images.length < desired) {
       this.form.images.push(this.roomImagesService.getDefaultRoomImage());
       this.form.roomLabels.push('');
       this.form.roomDescriptions.push('');
+      this.form.roomAreas.push(0);
       this.isHovered.push(false);
     }
     while (this.form.roomLabels.length < desired) {
@@ -202,6 +213,9 @@ export class ApartmentsDetailComponent implements OnInit {
     }
     while (this.form.roomDescriptions.length < desired) {
       this.form.roomDescriptions.push('');
+    }
+    while (this.form.roomAreas.length < desired) {
+      this.form.roomAreas.push(0);
     }
 
     // Si on réduit, tronquer les tableaux
@@ -213,6 +227,9 @@ export class ApartmentsDetailComponent implements OnInit {
     }
     if (this.form.roomDescriptions.length > desired) {
       this.form.roomDescriptions.splice(desired);
+    }
+    if (this.form.roomAreas.length > desired) {
+      this.form.roomAreas.splice(desired);
     }
     if (this.isHovered.length > desired) {
       this.isHovered.splice(desired);
@@ -303,9 +320,11 @@ export class ApartmentsDetailComponent implements OnInit {
     }
 
     // Ajoute la nouvelle pièce
+    if (!this.form.roomAreas) this.form.roomAreas = [];
     this.form.images.push(this.newRoomImage);
     this.form.roomLabels.push(this.newRoomLabel.trim());
     this.form.roomDescriptions.push(this.newRoomDescription || '');
+    this.form.roomAreas.push(0);
   // Maintient l'état de survol en phase
   this.isHovered.push(false);
   // Met à jour automatiquement le nombre de pièces dans le formulaire
@@ -351,6 +370,9 @@ export class ApartmentsDetailComponent implements OnInit {
       this.form.images.splice(index, 1);
       this.form.roomLabels.splice(index, 1);
       this.form.roomDescriptions.splice(index, 1);
+      if (this.form.roomAreas && this.form.roomAreas.length > index) {
+        this.form.roomAreas.splice(index, 1);
+      }
       // Supprime l'état de survol correspondant
       if (this.isHovered && this.isHovered.length > index) {
         this.isHovered.splice(index, 1);
@@ -377,7 +399,8 @@ export class ApartmentsDetailComponent implements OnInit {
     this.pieceEditBackup[index] = {
       label: this.form.roomLabels[index] || '',
       desc: this.form.roomDescriptions[index] || '',
-      img: this.form.images[index] || ''
+      img: this.form.images[index] || '',
+      area: this.form.roomAreas && this.form.roomAreas[index] ? this.form.roomAreas[index] : 0
     };
     this.editPieceIndexMap[index] = true;
   }
@@ -404,6 +427,8 @@ export class ApartmentsDetailComponent implements OnInit {
       this.form.roomLabels[index] = this.pieceEditBackup[index].label;
       this.form.roomDescriptions[index] = this.pieceEditBackup[index].desc;
       this.form.images[index] = this.pieceEditBackup[index].img;
+      if (!this.form.roomAreas) this.form.roomAreas = [];
+      this.form.roomAreas[index] = this.pieceEditBackup[index].area || 0;
       delete this.pieceEditBackup[index];
     }
     this.editPieceIndexMap[index] = false;

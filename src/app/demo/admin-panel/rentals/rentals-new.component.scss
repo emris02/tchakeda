@@ -1,6 +1,6 @@
 @use '/src/scss/form_imports.scss';
 // Variables
-$primary-color: #1976d2;
+$primary-color: #4099ff;
 $success-color: #388e3c;
 $danger-color: #d32f2f;
 $warning-color: #f57c00;
@@ -12,6 +12,32 @@ $background-light: #f8f9fa;
 $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 
+// Styles généraux
+.page-container {
+  padding: 0px;
+  max-width: auto;
+  margin: 0 auto;
+}
+
+.page-header-inline{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;
+}
+.page-header-inline .header-left{ display:flex; align-items:center; gap:14px }
+.page-header-inline .page-title{ margin:0; font-size:1.9rem; font-weight:700; color: $text-color }
+.page-header-inline .header-right{ display:flex; gap:8px }
+
+//
+.back-btn i{ font-size: 0.95rem }
+.back-label{ font-weight:600 }
+
+/* Page container font and size adjustments for add/edit pages */
+.page-container{
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  color: $text-color;
+}
+
+
 .page-header {
   display: flex;
   align-items: center;
@@ -22,11 +48,11 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .page-title {
-  margin: 0 auto;
-  text-align: center;
+  margin: 20px auto;
+  text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .back-btn {
@@ -87,7 +113,7 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     background: transparent;
     transition: border-color 0.2s;
     &:focus {
-      border-bottom-color: #1976d2;
+      border-bottom-color: #4099ff;
     }
   }
 

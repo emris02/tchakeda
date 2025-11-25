@@ -1,7 +1,7 @@
 @use '/src/scss/form_imports';
 
 // Variables
-$primary-color: #1976d2;
+$primary-color: #4099ff;
 $danger-color: #d32f2f;
 $success-color: #2e7d32;
 $warning-color: #ed6c02;
@@ -14,7 +14,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
 // Styles généraux
 .page-container {
-  padding: 20px;
+  padding: 0px;
   max-width: auto;
   margin: 0 auto;
 }
@@ -29,27 +29,20 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .page-title {
-  margin: 0 auto;
-  text-align: center;
+  margin: 20px auto;
+  text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .back-btn {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 8px 16px;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: #e9ecef;
-  }
+  gap: 10px;
 }
 
 // Cartes
@@ -57,14 +50,14 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   background: #fff;
   border-radius: 8px;
   box-shadow: $card-shadow;
-  padding: 24px;
-  margin: 0 auto 24px auto;
+  padding: 20px;
+  margin: 24px auto 24px auto;
 
   h5 {
     margin-bottom: 16px;
     font-size: 16px;
     font-weight: 600;
-    border-bottom: 1px solid #f0f0f0;
+//f0f0f0;
     padding-bottom: 8px;
     color: $text-color;
   }
@@ -148,7 +141,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   align-items: center;
   padding: 16px 20px;
   background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
+  //
   
   h4 {
     margin: 0;
@@ -542,9 +535,9 @@ input[type="file"].hidden-input {
   transition: border-color 0.2s;
   
   &:focus {
-    border-color: #1976d2;
+    border-color: #4099ff;
     background: #fffde7;
-    color: #1976d2;
+    color: #4099ff;
   }
 }
 
@@ -733,7 +726,7 @@ input[type="file"].hidden-input {
   height: 120px;
   object-fit: cover;
   border-radius: 8px;
-  border: 2px solid #1976d2;
+  border: 2px solid #4099ff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 .btn-remove-preview {
@@ -994,7 +987,7 @@ input[type="file"].hidden-input {
 
       td {
         padding: 12px 15px;
-        border-bottom: 1px solid #f0f0f0;
+    //f0f0f0;
         white-space: nowrap;
       }
     }

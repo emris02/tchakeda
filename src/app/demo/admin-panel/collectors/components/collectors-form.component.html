@@ -3,7 +3,11 @@
     <span aria-hidden="true">&times;</span>
   </button>
 
-  <form (ngSubmit)="save()" [class.submitting]="isSubmitting" class="form-card collector-form">
+  <form #collectorModalForm="ngForm" (ngSubmit)="save(collectorModalForm)" [class.submitting]="isSubmitting" class="form-card collector-form">
+  <div class="form-error-summary" *ngIf="hasErrors">
+      <i class="fas fa-exclamation-circle"></i>
+      Veuillez corriger les champs requis ci-dessous.
+    </div>
     <div class="form-grid grid-2x2">
     <div class="form-group">
       <input type="text" [(ngModel)]="form.fullName" name="fullName" class="underline-input" required />     

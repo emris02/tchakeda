@@ -1,6 +1,7 @@
 import { Component, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { OwnersService } from '../owners.service';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,7 +29,8 @@ export class OwnerFormComponent {
   constructor(
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogRef: MatDialogRef<OwnerFormComponent>
+    private dialogRef: MatDialogRef<OwnerFormComponent>,
+    private ownersService: OwnersService
   ) {
     this.form = this.fb.group({
       fullName: [data?.fullName || '', Validators.required],
@@ -42,9 +44,25 @@ export class OwnerFormComponent {
 
   onSubmit() {
     if (this.form.valid) {
-      const newOwner = { id: Date.now(), ...this.form.value };
-      this.saved.emit(newOwner);
-      if (this.dialogRef) this.dialogRef.close(newOwner);
+      // Normalize fields and persist via OwnersService so owner exists in localStorage
+      const payload: any = {
+        name: this.form.value.fullName,
+        email: this.form.value.email,
+        phone: this.form.value.phone,
+        country: this.form.value.country,
+        adress: this.form.value.adress,
+        profession: this.form.value.profession
+      };
+      try {
+        const created = this.ownersService.addOwner(payload as any);
+        this.saved.emit(created);
+        if (this.dialogRef) this.dialogRef.close(created);
+      } catch (e) {
+        // fallback: emit local object if service unavailable
+        const newOwner = { id: Date.now(), name: this.form.value.fullName, ...this.form.value };
+        this.saved.emit(newOwner);
+        if (this.dialogRef) this.dialogRef.close(newOwner);
+      }
     }
   }
 

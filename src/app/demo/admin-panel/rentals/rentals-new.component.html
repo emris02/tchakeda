@@ -1,13 +1,20 @@
-<div class="page-container">
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="cancel()">
-      <i class="fas fa-arrow-left"></i> Location
-    </button>
-    <h4 class="page-title">Ajouter une location</h4>
-  </div>
+<div class="page-container add-page">
+  
+      <button class="btn back-btn" (click)="cancel()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Locations</span>
+      </button>
+      <h4 class="page-title">Créer une location</h4>
+    </div>
+    <div class="header-right">
+      <!-- action slot: place add/list buttons here on listing pages -->
 
-<div class="content-container">
-  <form (ngSubmit)="create()" class="form-card rental-grid">
+  <div class="content-container">
+  <form #rentalForm="ngForm" (ngSubmit)="create(rentalForm)" class="form-card rental-grid">
+    <div class="form-error-summary" *ngIf="hasErrors">
+      <i class="fas fa-exclamation-circle"></i>
+      Veuillez corriger les champs requis ci-dessous.
+    </div>
     
     <!-- Propriétaire -->
     <div class="form-group">
@@ -48,7 +55,7 @@
     <!-- Appartement -->
     <div class="form-group">
       <div class="input-with-button">
-        <select id="apartmentId" [(ngModel)]="form.apartmentId" name="apartmentId" class="underline-input" required>
+        <select id="apartmentId" [(ngModel)]="form.apartmentId" name="apartmentId" class="underline-input" required (change)="onApartmentChange()">
           <option [ngValue]="0">Sélectionner...</option>
           <option *ngFor="let apartment of filteredApartments" [ngValue]="apartment.id">{{ apartment.name }}</option>
         </select>
@@ -65,8 +72,7 @@
 
     <!-- Locataire -->
         <div class="form-group">
-          <div class="select-with-action">
-            <div class="input-container">
+          <div class="input-with-button">           
               <select id="tenantId" [(ngModel)]="form.tenantId" name="tenantId" class="underline-input">
                 <option [ngValue]="null">Sélectionner un locataire...</option>
                 <option *ngFor="let tenant of tenants" [ngValue]="tenant.id">{{ tenant.fullName }}</option>
@@ -74,8 +80,7 @@
               <label for="tenantId" class="label">
                 <i class="fas fa-user"></i>
                 Locataire
-              </label>
-            </div>
+              </label>           
             <div class="error" *ngIf="errors['tenantId']"><i class="fas fa-exclamation-circle"></i> {{ errors['tenantId'] }}</div>
             <button type="button" class="btn btn-outline-primary btn-sm" (click)="openTenantDialog()" title="Ajouter un locataire">
               <i class="fas fa-user-plus"></i> Nouveau locataire
@@ -95,9 +100,15 @@
       <div class="error" *ngIf="errors['price']">{{ errors['price'] }}</div>
     </div>
 
-    <!-- Caution -->
+    <!-- Caution toggle + field -->
     <div class="form-group">
-      <input type="number" id="deposit" [(ngModel)]="form.deposit" name="deposit" class="underline-input" required min="0" step="1000" placeholder="Caution (CFA)" />
+      <label class="checkbox-inline">
+        <input type="checkbox" [(ngModel)]="showDeposit" (ngModelChange)="onShowDepositChange($event)" name="showDeposit" /> Avec caution
+      </label>
+    </div>
+
+    <div class="form-group" *ngIf="showDeposit">
+      <input type="number" id="deposit" [(ngModel)]="form.deposit" name="deposit" class="underline-input" min="0" step="1000" placeholder="Caution (CFA)" />
       <label for="deposit" class="label">
         <i class="fas fa-hand-holding-dollar"></i>
         Caution (CFA)
@@ -146,7 +157,14 @@
 <!-- Actions -->
       <div class="action-bar">
         <div class="form-actions">
-          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
-          <button type="submit" class="btn btn-primary btn-save">Créer</button>
-        </div>
+            <div class="action-error-summary" *ngIf="hasErrors">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez corriger les champs requis ci-dessous.
+            </div>
+            <div class="action-buttons">
+              <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+              <button type="button" class="btn btn-primary btn-save" (click)="create(rentalForm)">Créer</button>
+            </div>
+          </div>
       </div>
+    

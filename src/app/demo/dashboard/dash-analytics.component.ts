@@ -5,8 +5,15 @@ import { Component, viewChild } from '@angular/core';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { ProductSaleComponent } from './product-sale/product-sale.component';
 
-// 3rd party import
+// domain services (localStorage-based)
+import { ApartmentsService } from '../admin-panel/apartments/apartments.service';
+import { RentalsService } from '../admin-panel/rentals/rentals.service';
+import { TenantsService } from '../admin-panel/tenants/tenants.service';
+import { OwnersService } from '../admin-panel/owners/owners.service';
+import { CollectorsService } from '../admin-panel/collectors/collectors.service';
+import { RecoveriesService } from '../admin-panel/recoveries/recoveries.service';
 
+// 3rd party import
 import { ApexOptions, ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 @Component({
   selector: 'app-dash-analytics',
@@ -22,9 +29,29 @@ export class DashAnalyticsComponent {
   chartOptions_1!: Partial<ApexOptions>;
   chartOptions_2!: Partial<ApexOptions>;
   chartOptions_3!: Partial<ApexOptions>;
+  cards: DashboardCard[] = [];
+  totalApartments = 0;
+  occupiedApartments = 0;
+  vacantApartments = 0;
+  totalRentals = 0;
+  activeRentals = 0;
+  totalTenants = 0;
+  totalCollectors = 0;
+  occupancyRate = 0;
+  paidAmountTotal = 0;
+  pendingAmountTotal = 0;
+  paidPaymentsCount = 0;
+  pendingPaymentsCount = 0;
 
   // constructor
-  constructor() {
+  constructor(
+    private apartmentsService: ApartmentsService,
+    private rentalsService: RentalsService,
+    private tenantsService: TenantsService,
+    private ownersService: OwnersService,
+    private collectorsService: CollectorsService,
+    private recoveriesService: RecoveriesService
+  ) {
     this.chartOptions = {
       chart: {
         height: 205,
@@ -209,41 +236,10 @@ export class DashAnalyticsComponent {
         }
       }
     };
+
+    // Initialise les cartes avec des statistiques immobilières réelles
+    this.initRealEstateCards();
   }
-  cards = [
-    {
-      background: 'bg-c-blue',
-      title: 'Orders Received',
-      icon: 'icon-shopping-cart',
-      text: 'Completed Orders',
-      number: '486',
-      no: '351'
-    },
-    {
-      background: 'bg-c-green',
-      title: 'Total Sales',
-      icon: 'icon-tag',
-      text: 'This Month',
-      number: '1641',
-      no: '213'
-    },
-    {
-      background: 'bg-c-yellow',
-      title: 'Revenue',
-      icon: 'icon-repeat',
-      text: 'This Month',
-      number: '$42,56',
-      no: '$5,032'
-    },
-    {
-      background: 'bg-c-red',
-      title: 'Total Profit',
-      icon: 'icon-shopping-cart',
-      text: 'This Month',
-      number: '$9,562',
-      no: '$542'
-    }
-  ];
 
   images = [
     {
@@ -262,4 +258,89 @@ export class DashAnalyticsComponent {
       size: 'PNG-150KB'
     }
   ];
+
+  /**
+   * Construit les cartes et résumés du dashboard à partir des données locales
+   */
+  private initRealEstateCards(): void {
+    const apartments = this.apartmentsService.getApartments();
+    const rentals = this.rentalsService.getRentals();
+    const tenants = this.tenantsService.getTenants();
+    const owners = this.ownersService.getOwners();
+    const collectors = this.collectorsService.getCollectors();
+    const recoveries = this.recoveriesService.getRecoveries();
+
+    const occupiedApartments = apartments.filter(a => !!a.tenant || a.status === 'rent').length;
+    const activeRentals = rentals.filter(r => r.status === 'active' || !r.status).length;
+    const endedRentals = rentals.filter(r => r.status === 'ended').length;
+    const paidRecoveries = recoveries.filter(r => (r.status || '').toLowerCase() === 'paid');
+    const pendingRecoveries = recoveries.filter(r => (r.status || '').toLowerCase() !== 'paid');
+    const paidAmount = paidRecoveries.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+    const pendingAmount = pendingRecoveries.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+    const totalRecoveriesAmount = paidAmount + pendingAmount;
+
+    this.totalApartments = apartments.length;
+    this.occupiedApartments = occupiedApartments;
+    this.vacantApartments = Math.max(this.totalApartments - occupiedApartments, 0);
+    this.totalRentals = rentals.length;
+    this.activeRentals = activeRentals;
+    this.totalTenants = tenants.length;
+    this.totalCollectors = collectors.length;
+    this.occupancyRate = this.totalApartments ? Math.round((occupiedApartments / this.totalApartments) * 100) : 0;
+    this.paidAmountTotal = paidAmount;
+    this.pendingAmountTotal = pendingAmount;
+    this.paidPaymentsCount = paidRecoveries.length;
+    this.pendingPaymentsCount = pendingRecoveries.length;
+
+    this.cards = [
+      {
+        background: 'bg-primary text-white',
+        title: 'Appartements',
+        icon: 'feather icon-grid',
+        text: 'Occupés / Vacants',
+        number: this.totalApartments,
+        no: `${this.occupiedApartments} / ${this.vacantApartments}`
+      },
+      {
+        background: 'bg-primary text-white',
+        title: 'Maisons en location',
+        icon: 'feather icon-home',
+        text: 'Locations actives',
+        number: this.activeRentals,
+        no: `${this.totalRentals} contrats`
+      },
+      {
+        background: 'bg-primary text-white',
+        title: 'Locataires',
+        icon: 'feather icon-users',
+        text: 'Locataires suivis',
+        number: this.totalTenants,
+        no: `${owners.length} propriétaires`
+      },
+      {
+        background: 'bg-primary text-white',
+        title: 'Recouvreurs',
+        icon: 'feather icon-user-check',
+        text: 'Montant recouvré',
+        number: this.totalCollectors,
+        no: this.formatCurrency(totalRecoveriesAmount)
+      }
+    ];
+  }
+
+  private formatCurrency(value: number): string {
+    if (!value) {
+      return '0 F CFA';
+    }
+    return `${Math.round(value).toLocaleString('fr-FR')} F CFA`;
+  }
+}
+
+interface DashboardCard {
+  background: string;
+  title: string;
+  icon: string;
+  text: string;
+  number: string | number;
+  no: string | number;
 }

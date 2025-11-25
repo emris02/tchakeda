@@ -1,11 +1,9 @@
 <div class="page-container">
-  <!-- En-tête -->
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="back()">
-      <i class="fas fa-arrow-left"></i> Bâtiments
+  
+    <button class="btn  back-btn" (click)="back()">
+      &lt;
     </button>
     <h4 class="page-title">Détail du bâtiment</h4>
-  </div>
 
   <!-- Modal suppression -->
   <div *ngIf="showDeleteConfirm" class="modal-overlay">
@@ -23,7 +21,7 @@
   <div class="form-card">
     <div class="card-header">
       <h5>Informations du bâtiment</h5>
-      <div class="action-buttons" *ngIf="!editMode">
+      <div class="action-buttons" *ngIf="!editMode && ( (collectorContextId === null) || (collectorContextId !== null && (canManage === true)) )">
         <button class="action-btn edit" (click)="enableEdit()" title="Modifier">
           <i class="fas fa-edit"></i>
         </button>
@@ -162,20 +160,10 @@
           <div class="error" *ngIf="errors.ownerId">{{ errors.ownerId }}</div>
         </div>
       </div>
-
-      <!-- Actions -->
-      <div class="form-actions full-width">
-        <button type="button" class="btn btn-light" (click)="cancelEdit()">Annuler</button>
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-      </div>
     </form>
 
 <!-- Mode lecture -->
-<div *ngIf="!editMode" class="details-section">
-  <h3 class="section-title">
-    <i class="fas fa-info-circle"></i>
-    <span> Détails du bâtiment</span>
-  </h3>
+<div *ngIf="!editMode" class="card-content">
 
   <div class="details-grid">
     <div class="form-group">

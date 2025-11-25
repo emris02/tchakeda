@@ -1,8 +1,16 @@
-<div class="page-header">
-  <h4>Locataires</h4>
-  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i>Nouvelle location</button>
-</div>
 <div class="content-container">
+  <div class="page-header">
+  <h4>Locataires</h4>
+  <button class="btn-primary add-btn" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau locataire</button>
+<!-- Recherche rapide & filtre à droite -->
+      <div class="quick-search">
+        <input type="search" placeholder="Rechercher par nom, ville..." [(ngModel)]="filterName" (input)="applyFilters()" class="search-input" />
+        <select [(ngModel)]="filterCity" (change)="applyFilters()" class="search-select">
+          <option value="">Toutes les villes</option>
+          <option *ngFor="let c of cityOptions" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+</div>
   <table class="table tenants-table">
     <thead>
       <tr>
@@ -18,7 +26,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let tenant of tenants" (click)="goToDetail(tenant)" class="clickable-row">
+      <tr *ngFor="let tenant of displayedTenants" (click)="goToDetail(tenant)" class="clickable-row">
         <td>
           <img *ngIf="tenant.identityImage" [src]="tenant.identityImage" alt="Photo" class="tenant-photo" />
           <img *ngIf="!tenant.identityImage && tenant.profileImage" [src]="tenant.profileImage" alt="Photo" class="tenant-photo" />
@@ -37,4 +45,7 @@
       </tr>
     </tbody>
   </table>
+  <div class="list-pagination">
+    <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+  </div>
 </div>

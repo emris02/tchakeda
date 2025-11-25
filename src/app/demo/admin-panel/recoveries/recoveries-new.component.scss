@@ -1,4 +1,71 @@
 @use '/src/scss/form_imports';
+// Variables
+$primary-color: #4099ff;
+$primary-dark: #2d7dd2;
+$success-color: #2e7d32;
+$warning-color: #ed6c02;
+$danger-color: #d32f2f;
+$text-color: #333;
+$text-muted: #666;
+$border-color: #e0e0e0;
+$bg-light: #f8f9fa;
+$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+$card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+// Styles généraux
+.page-container {
+  padding: 0px;
+  max-width: auto;
+  margin: 0 auto;
+}
+
+.page-header-inline{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;
+}
+.page-header-inline .header-left{ display:flex; align-items:center; gap:14px }
+.page-header-inline .page-title{ margin:0; font-size:1.9rem; font-weight:700; color: $text-color }
+.page-header-inline .header-right{ display:flex; gap:8px }
+
+//
+.back-btn i{ font-size: 0.95rem }
+.back-label{ font-weight:600 }
+
+/* Page container font and size adjustments for add/edit pages */
+.page-container{
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  color: $text-color;
+}
+
+
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $border-color;
+}
+
+.page-title {
+  margin: 20px auto;
+  text-align: left;
+  font-weight: 600;
+  color: $text-color;
+  font-size: 18px;
+}
+
+.back-btn {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 15px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #f8f9fa;
+    transform: translateX(-3px);
+  }
+}
 .form-card {
   background: #fff;
   border-radius: 8px;

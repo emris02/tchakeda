@@ -8,30 +8,37 @@ export interface Apartment {
   city: string;
   region: string;
   buildingId: number;
-  type?: string;       // Type d’appartement (studio, F2, F3, etc.)
+  tenantId?: number;
+  type?: string;       // Type d'appartement (studio, F2, F3, etc.)
   rooms?: number;      // Nombre de pièces
   tenant?: string;     // Nom du locataire
   mention?: string;    // Loyer ou note
   status?: 'free' | 'sale' | 'rent' | 'construction'; // Statut de l'appartement
   customType?: string; // Type personnalisé
-  images?: string[];   // ✅ Images de l’appartement
+  images?: string[];   // ✅ Images de l'appartement
   roomLabels?: string[]; // ✅ Labels des pièces associées aux images
   roomDescriptions?: string[]; // ✅ Descriptions des pièces associées aux images
+  roomAreas?: number[]; // ✅ Superficie de chaque pièce en m²
+  area?: number;       // ✅ Superficie totale de l'appartement en m²
   description?: string;
   createdAt: string;   // Date de création
 }
 
 @Injectable({ providedIn: 'root' })
 export class ApartmentsService {
-  /** Ajoute une image à une pièce d'un appartement */
-  addRoomImage(apartmentId: number, image: string, label: string): void {
+  /** Ajoute une image à une pièce d'un appartement et enregistre le label/description; met à jour rooms */
+  addRoomImage(apartmentId: number, image: string, label: string, description?: string): void {
     const apartments = this.getApartments();
     const apt = apartments.find(a => a.id === apartmentId);
     if (apt) {
       if (!apt.images) apt.images = [];
       if (!apt.roomLabels) apt.roomLabels = [];
+      if (!apt.roomDescriptions) apt.roomDescriptions = [];
       apt.images.push(image);
-      apt.roomLabels.push(label);
+      apt.roomLabels.push(label || '');
+      apt.roomDescriptions.push(description || '');
+      // Ensure rooms count matches images length
+      apt.rooms = apt.images.length;
       this.updateApartment(apt);
     }
   }
@@ -59,6 +66,12 @@ export class ApartmentsService {
   /** Récupère un appartement par son ID */
   getApartmentById(id: number): Apartment | undefined {
     return this.getApartments().find(a => a.id === id);
+  }
+
+  /** Récupère les appartements d'un bâtiment donné */
+  getApartmentsByBuilding(buildingId: number): Apartment[] {
+    if (buildingId === undefined || buildingId === null) return [];
+    return this.getApartments().filter(a => Number(a.buildingId) === Number(buildingId));
   }
 
   /** Crée un nouvel appartement */
@@ -129,8 +142,13 @@ export class ApartmentsService {
 
   /** Met à jour un appartement existant */
   updateApartment(updated: Apartment): void {
-    const apartments = this.getApartments().map(a => 
-      a.id === updated.id ? { ...updated } : a
+    // normalize: if updated provides images array, prefer its length for rooms
+    const toSave = { ...updated } as Apartment;
+    if (toSave.images && Array.isArray(toSave.images)) {
+      toSave.rooms = toSave.images.length;
+    }
+    const apartments = this.getApartments().map(a =>
+      a.id === toSave.id ? { ...toSave } : a
     );
     localStorage.setItem(this.storageKey, JSON.stringify(apartments));
   }

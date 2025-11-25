@@ -1,6 +1,7 @@
 
 
 import { Component, Inject } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApartmentsService } from './apartments.service';
 import { BuildingsService } from '../buildings/buildings.service';
@@ -17,7 +18,7 @@ import { TenantsService, Tenant } from '../tenants/tenants.service';
   standalone: false
 })
 export class ApartmentsNewComponent {
-  pendingImages: Array<{ dataUrl: string, label: string, description: string }> = [];
+  pendingImages: Array<{ dataUrl: string, label: string, description: string, area?: number }> = [];
   // Sélection multiple d'images
   onNewImagesSelected(event: any) {
     const files: FileList = event.target.files;
@@ -34,7 +35,7 @@ export class ApartmentsNewComponent {
       if (file.size > 2 * 1024 * 1024) return; // 2MB max
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.pendingImages.push({ dataUrl: e.target.result, label: '', description: '' });
+        this.pendingImages.push({ dataUrl: e.target.result, label: '', description: '', area: undefined });
       };
       reader.readAsDataURL(file);
       added++;
@@ -59,14 +60,17 @@ export class ApartmentsNewComponent {
       this.images.push(img.dataUrl);
       this.roomLabels.push(img.label);
       this.roomDescriptions.push(img.description || '');
+      this.roomAreas.push(img.area || 0);
       this.pendingImages.splice(idx, 1);
     }
   }
   errors: any = {};
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
   buildings: any[] = [];
   images: string[] = [];
   roomLabels: string[] = [];
   roomDescriptions: string[] = [];
+  roomAreas: number[] = [];
   availableRoomTypes: Array<{label: string, image: string}> = [];
   // Pour compatibilité template (ajout d'image pièce)
   isAddingRoom = false;
@@ -82,6 +86,7 @@ export class ApartmentsNewComponent {
       this.images.splice(i, 1);
       if (this.roomLabels) this.roomLabels.splice(i, 1);
       if (this.roomDescriptions) this.roomDescriptions.splice(i, 1);
+      if (this.roomAreas) this.roomAreas.splice(i, 1);
     }
   }
   startAddingRoom() { this.isAddingRoom = true; }
@@ -92,6 +97,7 @@ export class ApartmentsNewComponent {
       this.images.push(this.newRoomImage);
       this.roomLabels.push(this.newRoomLabel);
       this.roomDescriptions.push(this.newRoomDescription || '');
+      this.roomAreas.push(0);
       // Reset champs temporaires
       this.newRoomLabel = '';
       this.newRoomImage = '';
@@ -119,6 +125,7 @@ export class ApartmentsNewComponent {
   type: '',
     rooms: 1,
     rent: 0,
+    area: 0,
     status: 'Libre',
     buildingId: 0,
     roomImages: [] as string[],
@@ -168,6 +175,7 @@ export class ApartmentsNewComponent {
     this.images.splice(index, 1);
     this.roomLabels.splice(index, 1);
     this.roomDescriptions.splice(index, 1);
+    if (this.roomAreas) this.roomAreas.splice(index, 1);
     this.form.roomImages = this.images;
   }
 
@@ -232,9 +240,10 @@ export class ApartmentsNewComponent {
       reader.onload = (e: any) => {
         if (this.images.length < 6) {
           this.images.push(e.target.result);
-          // Synchronise roomLabels et roomDescriptions avec le nombre d'images
+          // Synchronise roomLabels, roomDescriptions et roomAreas avec le nombre d'images
           while (this.roomLabels.length < this.images.length) this.roomLabels.push('');
           while (this.roomDescriptions.length < this.images.length) this.roomDescriptions.push('');
+          while (this.roomAreas.length < this.images.length) this.roomAreas.push(0);
           this.form.roomImages = this.images;
         }
       };
@@ -250,10 +259,19 @@ export class ApartmentsNewComponent {
     if (!this.form.rooms || this.form.rooms < 1) this.errors.rooms = 'Nombre de pièces requis';
     if (!this.form.rent || this.form.rent < 1) this.errors.rent = 'Loyer requis';
     if (!this.form.buildingId) this.errors.buildingId = 'Bâtiment requis';
-    return Object.keys(this.errors).length === 0;
+    const valid = Object.keys(this.errors).length === 0;
+    if (!valid) {
+      const firstKey = Object.keys(this.errors)[0];
+      setTimeout(() => {
+        const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+        if (el && typeof (el as any).focus === 'function') (el as any).focus();
+      }, 0);
+    }
+    return valid;
   }
 
-  create() {
+  create(formRef?: NgForm) {
+    if (formRef && formRef.form) formRef.form.markAllAsTouched();
     if (!this.validate()) return;
     // Enregistre le type automatiquement s'il n'existe pas déjà
     const typeToSave = this.form.type;
@@ -286,12 +304,14 @@ export class ApartmentsNewComponent {
     // Renseigne le champ tenant si un locataire est sélectionné
     let tenantName = '';
     if (this.selectedTenant) tenantName = this.selectedTenant.fullName;
-    // Synchronisation des tableaux images, labels et descriptions
+    // Synchronisation des tableaux images, labels, descriptions et superficies
     // Si un tableau est plus court, on le complète avec des valeurs vides
     while (this.roomLabels.length < this.images.length) this.roomLabels.push('');
     while (this.roomDescriptions.length < this.images.length) this.roomDescriptions.push('');
+    while (this.roomAreas.length < this.images.length) this.roomAreas.push(0);
     while (this.images.length < this.roomLabels.length) this.images.push(this.roomImagesService.getDefaultApartmentImage());
     while (this.roomDescriptions.length < this.roomLabels.length) this.roomDescriptions.push('');
+    while (this.roomAreas.length < this.roomLabels.length) this.roomAreas.push(0);
 
     const totalImages = this.images.length;
     const apartmentData = {
@@ -305,8 +325,12 @@ export class ApartmentsNewComponent {
       images: this.images.length > 0 ? this.images : [this.roomImagesService.getDefaultApartmentImage()],
       roomLabels: this.roomLabels.length > 0 ? this.roomLabels : [],
       roomDescriptions: this.roomDescriptions.length > 0 ? this.roomDescriptions : [],
+      roomAreas: this.roomAreas.length > 0 ? this.roomAreas : [],
+      area: this.form.area || 0,
       status,
-      tenant: tenantName
+      tenant: tenantName,
+      // ensure tenantId is undefined when not provided (TS expects number | undefined)
+      tenantId: (this.form.tenantId !== null && this.form.tenantId !== undefined) ? this.form.tenantId : undefined
     };
     this.apartmentsService.createApartment(apartmentData);
     this.router.navigate(['demo/admin-panel/apartments']);

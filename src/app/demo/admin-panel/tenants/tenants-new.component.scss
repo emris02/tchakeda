@@ -1,7 +1,7 @@
 @use '/src/scss/form_imports';
 
 // Variables étendues
-$primary-color: #1976d2;
+$primary-color: #4099ff;
 $primary-light: #42a5f5;
 $primary-dark: #1565c0;
 $danger-color: #d32f2f;
@@ -29,6 +29,25 @@ $border-radius-sm: 6px;
   margin: 0 auto;
 }
 
+.page-header-inline{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;
+}
+.page-header-inline .header-left{ display:flex; align-items:center; gap:14px }
+.page-header-inline .page-title{ margin:0; font-size:1.9rem; font-weight:700; color: $text-color }
+.page-header-inline .header-right{ display:flex; gap:8px }
+
+//
+.back-btn i{ font-size: 0.95rem }
+.back-label{ font-weight:600 }
+
+/* Page container font and size adjustments for add/edit pages */
+.page-container{
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  color: $text-color;
+}
+
+
 .page-header {
   display: flex;
   align-items: center;
@@ -39,11 +58,11 @@ $border-radius-sm: 6px;
 }
 
 .page-title {
-  margin: 0 auto;
-  text-align: center;
+  margin: 20px auto;
+  text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .back-btn {
@@ -61,53 +80,11 @@ $border-radius-sm: 6px;
 // Cartes et formulaires
 .form-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 5px;
   box-shadow: $card-shadow;
   padding: 25px;
   position: relative;
   margin-bottom: 30px;
-}
-
-/* Action bar (footer-like container for form actions) */
-.action-bar {
-  background: #ffffff; // light distinct block under the white form
-  border-radius: 10px;
-  border: 1px solid lighten($border-color, 6%);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-  padding: 14px 20px;
-  margin: 18px 0 32px;
-}
-
-.action-bar .form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  align-items: center;
-  margin: 0;
-}
-
-.action-bar .btn-cancel {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-}
-
-.action-bar .btn-cancel:hover {
-  background: darken(#e74c3c, 6%);
-}
-
-.action-bar .btn-save {
-  background: $primary-color;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-}
-
-.action-bar .btn-save:hover {
-  background: darken($primary-color, 6%);
 }
 
 // Grille améliorée

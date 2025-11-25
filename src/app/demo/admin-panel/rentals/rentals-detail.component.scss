@@ -6,6 +6,7 @@ $success-color: #2ecc71;
 $text-color: #2c3e50;
 $text-muted: #7f8c8d;
 $border-color: #e1e4e8;
+$background-light: #f8f9fa;
 $card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
@@ -19,37 +20,34 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 .page-header {
   display: flex;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 12px;
   position: relative;
-  padding-bottom: 15px;
+  padding-bottom: 8px;
   border-bottom: 1px solid $border-color;
 }
 
 .page-title {
-  margin: 0 auto;
-  text-align: center;
+  margin: 20px auto;
+  text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .back-btn {
-  border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 8px 15px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    transform: translateX(-3px);
-  }
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 // Cartes et formulaires
 .form-card {
-  background: white;
+  // background: white;
   border-radius: 12px;
-  box-shadow: $card-shadow;
+  // box-shadow: $card-shadow;
   padding: 25px;
   position: relative;
   margin-bottom: 30px;
@@ -60,8 +58,8 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid $border-color;
+  margin:8px 0; 
+  // border-bottom: 1px solid $border-color;
 }
 
 .card-header h5 {
@@ -285,6 +283,52 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 }
 
+/* lightweight contract section (non-card) shown at page bottom */
+.contract-section {
+  border-top: 1px solid $border-color;
+  padding-top: 18px;
+  margin-top: 18px;
+
+  h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-color;
+    margin-bottom: 12px;
+  }
+
+  .contract-image-container {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    margin-bottom: 15px;
+
+    .contract-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .contract-placeholder {
+      color: $text-muted;
+      font-size: 14px;
+      text-align: center;
+      
+      i {
+        font-size: 48px;
+        margin-bottom: 10px;
+        display: block;
+        color: #ced4da;
+      }
+    }
+  }
+  .contract-actions { display:flex; gap:8px; margin-top:10px; }
+}
+
 /* Historique des paiements */
 .payment-history {
   background: #fff;
@@ -294,8 +338,8 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
   .card-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 16px;
     margin-bottom: 20px;
 
     h5 {
@@ -305,12 +349,74 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       color: $text-color;
     }
 
+    .payment-filters {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .payment-status-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .status-filter-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 16px;
+          border: 2px solid #ddd;
+          border-radius: 8px;
+          background: #fff;
+          color: $text-color;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          i {
+            font-size: 14px;
+          }
+
+          &:hover {
+            border-color: $primary-color;
+            background: rgba($primary-color, 0.05);
+          }
+
+          &.active {
+            border-color: $primary-color;
+            background: $primary-color;
+            color: #fff;
+          }
+
+          &.status-paid.active {
+            border-color: #2e7d32;
+            background: #2e7d32;
+            color: #fff;
+          }
+
+          &.status-pending.active {
+            border-color: #ed6c02;
+            background: #ed6c02;
+            color: #fff;
+          }
+
+          &.status-overdue.active {
+            border-color: #d32f2f;
+            background: #d32f2f;
+            color: #fff;
+          }
+        }
+    }
+
     .period-filter {
       border: 1px solid #ddd;
       border-radius: 6px;
       padding: 8px 12px;
       font-size: 14px;
       background: #fff;
+        min-width: 180px;
+      }
     }
   }
 
@@ -346,7 +452,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
         td {
           padding: 12px 15px;
-          border-bottom: 1px solid #f0f0f0;
+      //f0f0f0;
           white-space: nowrap;
         }
       }
@@ -398,6 +504,122 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   padding: 20px;
 }
+
+/* New layout: gallery + tenant card */
+.rental-top-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 18px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gallery-card {
+  display: flex;
+  gap: 12px;
+}
+
+.thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 90px;
+}
+
+.thumb {
+  width: 90px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.thumb.active { border-color: $primary-color; }
+
+.main-image-wrapper {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  height: 360px;
+  background: #f7f9fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-image-wrapper.zoomable .main-image {
+  transition: transform 0.35s ease;
+}
+
+.main-image-wrapper.zoomable:hover .main-image {
+  transform: scale(1.08);
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tenant-card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: $card-shadow;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tenant-bio { text-align: center; }
+.tenant-avatar img { width: 96px; height: 96px; object-fit: cover; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.tenant-name { margin: 8px 0 4px 0; font-size: 18px; font-weight: 700; }
+.tenant-country, .tenant-phone { color: $text-muted; font-size: 14px; margin-bottom: 6px; }
+.tenant-about { color: $text-muted; font-size: 13px; margin-top: 8px; }
+.tenant-actions .btn-block { width: 100%; }
+
+.tenant-stats { display:flex; gap:12px; justify-content: space-between; margin-top:8px; }
+.tenant-stats .stat { background: $background-light; padding: 10px; border-radius:8px; flex:1; text-align:center; }
+.tenant-stats .stat strong { display:block; font-size:16px; }
+
+/* Small map under tenant card */
+.tenant-map { position:relative; margin-top:12px; border-radius:8px; overflow:hidden; cursor:pointer; border:1px solid #e9ecef; }
+.tenant-map iframe { display:block; }
+.tenant-map .map-cta { position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,0.6); color:#fff; padding:6px 10px; border-radius:6px; font-size:12px; }
+.small-map-section { margin-top:8px; margin-bottom:8px; }
+.small-map { position:relative; border-radius:8px; overflow:hidden; cursor:pointer; border:1px solid #e9ecef; }
+.small-map img { display:block; width:100%; height:180px; object-fit:cover; }
+.small-map .map-cta { position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,0.6); color:#fff; padding:6px 10px; border-radius:6px; font-size:12px; }
+
+.map-modal { width: 90%; max-width: 1100px; max-height: 90vh; display:flex; flex-direction:column; }
+.map-modal .modal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; }
+.map-modal .modal-body { flex:1; overflow:hidden; }
+.map-modal .close-btn { background:none; border:none; font-size:18px; cursor:pointer; color:$text-muted; }
+.map-modal .action-btn { margin-right:8px; }
+
+.tabs-row { display:flex; gap:8px; margin-bottom:12px; }
+.tab-btn { padding:10px 16px; border-radius:8px; border:1px solid $border-color; background: #fff; cursor:pointer; }
+.tab-btn.active { background: $primary-color; color: white; border-color: $primary-color; }
+
+.info-card-large .info-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
+.invoice-card { min-height:120px; }
+
+/* Professional info grid styling */
+.info-grid.professional { display:grid; grid-template-columns: 200px 1fr; gap:12px; align-items:center; }
+.info-row { display:contents; }
+.info-label { font-weight:600; color:$text-muted; padding:8px 0; }
+.info-value { padding:8px 0; color:$text-color; }
+.inline-input { width:100%; padding:8px; border:1px solid $border-color; border-radius:6px; }
+.inline-select { width:100%; padding:8px; border:1px solid $border-color; border-radius:6px; }
+.info-actions .btn { padding:8px 12px; }
+
 
 .modal-card {
   background: white;
@@ -470,7 +692,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   
   .upload-icon {
-    font-size: 24px;
+    font-size: 17px;
     color: $primary-color;
     transition: all 0.3s ease;
     
@@ -556,6 +778,106 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 .form-grid, .details-grid {
   animation: fadeIn 0.5s ease-out;
 }
+
+/* Property header and badges for HomFinder-style */
+.property-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:12px;
+
+  .property-main { flex:1; }
+  .property-title { margin:0; font-size:22px; font-weight:700; color:$text-color; }
+  .property-location { color:$text-muted; margin-top:6px; }
+
+  .property-meta { text-align:right; min-width:200px; }
+  .price { font-size:18px; font-weight:700; color:$primary-color; }
+  .area-safety { margin-top:6px; color:$text-muted; font-size:13px; }
+  .safety-bar { display:inline-block; padding:4px 8px; border-radius:12px; font-weight:600; }
+  .safety-bar.safe { background: #e6ffed; color: #1e7a3a; }
+}
+
+.badges-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.badge { display:inline-flex; align-items:center; gap:8px; background:$background-light; padding:8px 12px; border-radius:20px; font-size:13px; color:$text-color; }
+.badge i { color:$primary-color; }
+.badge .badge-label { opacity:0.9; }
+
+/* Active badge style (selected) */
+.badges-row .badge {
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+}
+.badges-row .badge.active {
+  background: $primary-color;
+  color: #fff;
+  border-color: $primary-color;
+}
+.badges-row .badge.active i { color: #fff; }
+
+/* Icon switch */
+.icon-switch { display:flex; gap:12px; align-items:center; justify-content:flex-start; margin:14px 0; }
+.icon-btn { width:44px; height:44px; border-radius:50%; border:1px solid $border-color; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.18s ease; }
+.icon-btn i { font-size:16px; color:$text-muted; }
+.icon-btn.active { background:$primary-color; border-color:$primary-color; }
+.icon-btn.active i { color: #fff; }
+
+/* Room chips (pieces) - clickable icons similar to thumbnails */
+.room-labels { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.room-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid $border-color;
+  background:#fff;
+  cursor:pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+
+  i {
+    display:inline-flex;
+    width:34px;
+    height:34px;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background: #f5f7fa;
+    color: $text-muted;
+    font-size:14px;
+    transition: all 0.18s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $card-hover-shadow;
+  }
+
+  &.active {
+    background: $primary-color;
+    border-color: $primary-color;
+    color: #fff;
+
+    i {
+      background: transparent;
+      color: #fff;
+    }
+  }
+
+  &:focus {
+    outline: 2px solid rgba($primary-color, 0.18);
+    outline-offset: 2px;
+  }
+}
+
+/* Tab pane transition */
+.tab-contents .tab-pane { animation: fadeIn 0.35s ease-out; }
+
+/* Map card */
+.map-card { margin-top:18px; }
+.map-frame { border-radius:8px; overflow:hidden; border:1px solid #e9ecef; }
 
 .full-width {
   grid-column: 1 / -1;

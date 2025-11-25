@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TenantsService } from './tenants.service';
 import { ApartmentsService, Apartment } from '../apartments/apartments.service';
@@ -78,6 +79,7 @@ export class TenantsNewComponent {
     locations: []
   };
   errors: any = {};
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
 
   constructor(
     private tenantsService: TenantsService,
@@ -126,10 +128,19 @@ export class TenantsNewComponent {
       if (!this.form.affiliatedPerson.phone) this.errors.affiliatedPersonPhone = 'Téléphone requis';
       if (!this.form.affiliatedPerson.address) this.errors.affiliatedPersonAddress = 'Adresse requise';
     }
-    return Object.keys(this.errors).length === 0;
+    const valid = Object.keys(this.errors).length === 0;
+    if (!valid) {
+      const firstKey = Object.keys(this.errors)[0];
+      setTimeout(() => {
+        const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+        if (el && typeof (el as any).focus === 'function') (el as any).focus();
+      }, 0);
+    }
+    return valid;
   }
 
-  create() {
+  create(formRef?: NgForm) {
+    if (formRef && formRef.form) formRef.form.markAllAsTouched();
     if (!this.validate()) return;
     this.isSubmitting = true;
     try {

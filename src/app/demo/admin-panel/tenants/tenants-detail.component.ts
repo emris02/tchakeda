@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TenantsService, Tenant } from './tenants.service';
+import { TenantsService, Tenant, TenantDocument } from './tenants.service';
 import { RentalsService, Rental } from '../rentals/rentals.service';
 import { ApartmentsService, Apartment } from '../apartments/apartments.service';
 import { OwnersService, Owner } from '../owners/owners.service';
@@ -35,6 +35,49 @@ export class TenantsDetailComponent implements OnInit {
   tenants: Tenant[] = [];
   rental: Rental | undefined;
   paymentHistory: any[] = [];
+  // Abandonment modal
+  showAbandonmentModal = false;
+  abandonmentReason = '';
+  acceptAbandonmentConditions = false;
+  selectedRentalForAbandonment: Rental | undefined;
+  // Documents management
+  tenantDocuments: TenantDocument[] = [];
+  showDocumentUploadModal = false;
+  selectedDocumentType = '';
+  documentFile: File | null = null;
+  documentName = '';
+  documentNotes = '';
+  uploadingDocument = false;
+  selectedDocumentBeingEdited: TenantDocument | null = null;
+  requiredDocuments = [
+    { type: 'identity', label: 'Copie de la carte d\'identité', required: true, icon: 'fa-id-card' },
+    { type: 'rent_receipt', label: 'Dernières quittances de loyer', required: false, icon: 'fa-receipt' },
+    { type: 'electricity_bill', label: 'Dernière facture d\'électricité ou de téléphone', required: false, icon: 'fa-bolt' },
+    { type: 'tax_notice', label: 'Dernier avis d\'impôts sur le revenu', required: false, icon: 'fa-file-invoice-dollar' },
+    { type: 'pay_slip', label: 'Les trois derniers bulletins de salaire', required: false, icon: 'fa-money-check' },
+    { type: 'employment_certificate', label: 'Attestation de l\'employeur ou contrat de travail', required: false, icon: 'fa-briefcase' },
+    { type: 'deposit', label: 'Dépôt de garantie d\'un mois', required: false, icon: 'fa-money-bill-wave' },
+    { type: 'guarantor', label: 'Garants si besoin', required: false, icon: 'fa-user-shield' },
+    { type: 'activity_report', label: 'Pour les non salariés : 2 derniers bilans d\'activité', required: false, icon: 'fa-chart-line' },
+    { type: 'contract', label: 'Contrat de location', required: false, icon: 'fa-file-contract' },
+    { type: 'edl', label: 'État des lieux (EDL)', required: false, icon: 'fa-clipboard-check' },
+    { type: 'quittance', label: 'Quittances de loyer', required: false, icon: 'fa-file-alt' }
+  ];
+
+  // Dropdown menu state for document actions
+  documentMenuOpenId: number | null = null;
+
+  toggleDocumentMenu(document: any): void {
+    this.documentMenuOpenId = this.documentMenuOpenId === document.id ? null : document.id;
+  }
+
+  isDocumentMenuOpen(document: any): boolean {
+    return this.documentMenuOpenId === document.id;
+  }
+
+  closeDocumentMenu(): void {
+    this.documentMenuOpenId = null;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -90,6 +133,16 @@ export class TenantsDetailComponent implements OnInit {
         }
       }
       this.loadRentalDetails();
+      this.loadTenantDocuments();
+    }
+  }
+
+  /**
+   * Charge les documents du locataire
+   */
+  private loadTenantDocuments(): void {
+    if (this.tenant) {
+      this.tenantDocuments = this.tenantsService.getTenantDocuments(this.tenant.id);
     }
   }
     // Charger les locataires
@@ -210,10 +263,28 @@ export class TenantsDetailComponent implements OnInit {
   }
 
   // Vérifier si une location est active
+  // Une location est active si :
+  // 1. Elle n'a pas de statut (compatibilité avec les anciennes données) OU son statut est 'active'
+  // 2. ET la date de fin est dans le futur ou aujourd'hui
+  // 3. ET elle n'est pas annulée
   isRentalActive(rental?: Rental): boolean {
     if (!rental) return false;
+    
+    // Si la location est annulée, elle n'est pas active
+    if (rental.status === 'cancelled') return false;
+    
+    // Si la location est terminée, elle n'est pas active
+    if (rental.status === 'ended') return false;
+    
+    // Si la location n'a pas de statut ou est 'active', vérifier la date
+    // (compatibilité : les anciennes locations sans statut sont considérées comme actives si la date est valide)
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Réinitialiser les heures pour comparer uniquement les dates
     const endDate = new Date(rental.endDate);
+    endDate.setHours(0, 0, 0, 0);
+    
+    // La location est active si la date de fin est dans le futur ou aujourd'hui
+    // ET si le statut n'est pas 'ended' ou 'cancelled' (déjà vérifié ci-dessus)
     return endDate >= today;
   }
 
@@ -301,6 +372,44 @@ export class TenantsDetailComponent implements OnInit {
     const building = this.buildings.find(b => b.id === buildingId);
     return building ? building.address : '-';
   }
+
+    /**
+     * Retourne les parts de localisation (bâtiment, appartement, adresse) pour l'affichage
+     * Cherche d'abord l'appartement, puis retombe sur la location (rental) si l'appartement manque.
+     */
+    getCurrentLocationParts(t?: Tenant) {
+      const empty = { buildingName: '-', apartmentName: '-', address: '-' };
+      if (!t) return empty;
+      const aptId = this.getCurrentApartmentId(t);
+      if (!aptId) return empty;
+
+      let apartment = this.apartmentsService.getApartmentById(aptId as number) as any;
+      let rental = this.rentalsService.getRentals().find(r => Number(r.apartmentId) === Number(aptId) && Number(r.tenantId) === Number(t.id));
+
+      // If apartment not found, try to build minimal from rental
+      if (!apartment && rental) {
+        const fallbackBuilding = rental.buildingId ? this.buildingsService.getBuildingById(Number(rental.buildingId)) : undefined;
+        apartment = {
+          id: Number(aptId),
+          name: rental.apartmentName || ('Appartement ' + aptId),
+          address: fallbackBuilding ? fallbackBuilding.address : (rental.buildingName || '-') ,
+          buildingId: Number(rental.buildingId) || undefined
+        } as any;
+      }
+
+      if (!apartment) return empty;
+
+      const building = apartment.buildingId ? this.buildingsService.getBuildingById(Number(apartment.buildingId)) : undefined;
+      const buildingName = building ? (building.name || ('Bâtiment ' + building.id)) : (apartment.buildingId ? ('Bâtiment ' + apartment.buildingId) : '-');
+      const apartmentName = apartment.name || ('Appartement ' + apartment.id);
+      const address = apartment.address || (building ? building.address : '-') || '-';
+
+      return {
+        buildingName,
+        apartmentName,
+        address
+      };
+    }
 
   // Obtenir le nom d'un locataire
   getTenantName(tenantId: number | undefined): string {
@@ -466,5 +575,340 @@ export class TenantsDetailComponent implements OnInit {
   // Retour à la liste des locataires
   back(): void {
     this.router.navigate(['demo/admin-panel/tenants']);
+  }
+
+  // ==================== Gestion de l'abandon de location ====================
+  
+  /**
+   * Ouvre la modale d'abandon de location
+   */
+  openAbandonmentModal(rental: Rental): void {
+    if (!this.tenant) return;
+    if (rental.tenantId !== this.tenant.id) {
+      alert('Erreur: Cette location n\'appartient pas à ce locataire.');
+      return;
+    }
+    if (rental.status === 'cancelled') {
+      alert('Cette location est déjà annulée.');
+      return;
+    }
+    this.selectedRentalForAbandonment = rental;
+    this.abandonmentReason = '';
+    this.acceptAbandonmentConditions = false;
+    this.errors = {};
+    this.showAbandonmentModal = true;
+  }
+
+  /**
+   * Ferme la modale d'abandon
+   */
+  closeAbandonmentModal(): void {
+    this.showAbandonmentModal = false;
+    this.selectedRentalForAbandonment = undefined;
+    this.abandonmentReason = '';
+    this.acceptAbandonmentConditions = false;
+    this.errors = {};
+  }
+
+  /**
+   * Confirme l'abandon de location
+   */
+  confirmAbandonment(): void {
+    if (!this.selectedRentalForAbandonment || !this.tenant) return;
+    
+    // Validation
+    this.errors = {};
+    if (!this.abandonmentReason || !this.abandonmentReason.trim()) {
+      this.errors.abandonmentReason = 'La raison de l\'abandon est requise.';
+      return;
+    }
+    if (!this.acceptAbandonmentConditions) {
+      this.errors.abandonmentConditions = 'Vous devez accepter les conditions d\'abandon.';
+      return;
+    }
+
+    // Conditions d'abandon (clauses contractuelles)
+    const conditions = `
+      Conditions d'abandon acceptées:
+      - Paiement de tous les loyers impayés jusqu'à la date d'abandon
+      - Restitution de l'appartement dans son état initial
+      - Règlement de toutes les factures impayées
+      - Perte de tous les droits sur l'appartement à partir de la date d'abandon
+    `;
+
+    // Appeler le service pour annuler la location
+    this.rentalsService.cancelRentalByTenantAbandonment(
+      this.selectedRentalForAbandonment.id,
+      this.abandonmentReason.trim(),
+      conditions,
+      this.tenant.id
+    ).subscribe({
+      next: () => {
+        alert('La location a été annulée avec succès.');
+        this.closeAbandonmentModal();
+        // Recharger les données
+        if (this.tenant) {
+          this.loadTenantData(this.tenant.id);
+        }
+      },
+      error: (err: any) => {
+        alert('Erreur lors de l\'annulation de la location: ' + (err.message || 'Erreur inconnue'));
+      }
+    });
+  }
+
+  /**
+   * Retourne le libellé du type d'annulation
+   */
+  getCancellationTypeLabel(type?: string): string {
+    if (!type) return 'Annulée';
+    switch (type) {
+      case 'tenant_abandonment':
+        return 'Abandonnée';
+      case 'owner_eviction':
+        return 'Expulsée';
+      case 'collector_cancellation':
+        return 'Annulée (Recouvreur)';
+      case 'admin_cancellation':
+        return 'Annulée (Admin)';
+      default:
+        return 'Annulée';
+    }
+  }
+
+  // ==================== Gestion des documents ====================
+
+  /**
+   * Ouvre la modale d'upload de document
+   */
+  openDocumentUploadModal(documentType?: string, docToEdit?: TenantDocument | null): void {
+    if (!this.tenant) return;
+    this.selectedDocumentBeingEdited = docToEdit || null;
+    this.selectedDocumentType = documentType || (docToEdit ? docToEdit.type : '');
+    this.documentFile = null;
+    // If editing, prefill notes and display name
+    if (this.selectedDocumentBeingEdited) {
+      this.documentName = this.selectedDocumentBeingEdited.name || '';
+      this.documentNotes = this.selectedDocumentBeingEdited.notes || '';
+    } else {
+      this.documentName = '';
+      this.documentNotes = '';
+    }
+    this.uploadingDocument = false;
+    this.errors = {};
+    this.showDocumentUploadModal = true;
+  }
+
+  /**
+   * Ferme la modale d'upload de document
+   */
+  closeDocumentUploadModal(): void {
+    this.showDocumentUploadModal = false;
+    this.selectedDocumentType = '';
+    this.documentFile = null;
+    this.documentName = '';
+    this.documentNotes = '';
+    this.uploadingDocument = false;
+    this.errors = {};
+    this.selectedDocumentBeingEdited = null;
+  }
+
+  /**
+   * Gère la sélection d'un fichier
+   */
+  onDocumentFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    // Vérifier la taille (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      this.errors.documentFile = 'La taille du fichier doit être inférieure à 10MB.';
+      return;
+    }
+
+    // Vérifier le type de fichier
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type)) {
+      this.errors.documentFile = 'Format de fichier non autorisé. Utilisez PDF, JPEG, PNG, WebP ou Word.';
+      return;
+    }
+
+    this.documentFile = file;
+    this.documentName = file.name;
+    delete this.errors.documentFile;
+  }
+
+  /**
+   * Upload un document
+   */
+  uploadDocument(): void {
+    if (!this.tenant) return;
+
+    // If creating a new document, a file is required. When editing, file is optional.
+    if (!this.selectedDocumentBeingEdited && !this.documentFile) {
+      this.errors.documentFile = 'Veuillez sélectionner un fichier.';
+      return;
+    }
+
+    if (!this.selectedDocumentType) {
+      this.errors.documentType = 'Veuillez sélectionner un type de document.';
+      return;
+    }
+
+    // Trouver le nom du document depuis requiredDocuments
+    const docType = this.requiredDocuments.find(d => d.type === this.selectedDocumentType);
+    const documentName = docType ? docType.label : this.documentName || this.selectedDocumentType;
+
+    this.uploadingDocument = true;
+    this.errors = {};
+
+    // If there is a file selected, read it and then add/update. If editing without file,
+    // update metadata immediately.
+    if (!this.documentFile && this.selectedDocumentBeingEdited) {
+      try {
+        const updates: Partial<TenantDocument> = {
+          type: this.selectedDocumentType,
+          name: documentName,
+          notes: this.documentNotes || undefined,
+          uploadedAt: new Date().toISOString()
+        };
+        this.tenantsService.updateTenantDocument(this.tenant.id, this.selectedDocumentBeingEdited.id, updates);
+        this.loadTenantDocuments();
+        this.closeDocumentUploadModal();
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour du document:', error);
+        this.errors.general = 'Une erreur est survenue lors de la mise à jour du document.';
+      } finally {
+        this.uploadingDocument = false;
+      }
+      return;
+    }
+
+    // Lire le fichier comme base64
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const fileUrl = e.target.result;
+        const documentPayload: Omit<TenantDocument, 'id' | 'uploadedAt'> = {
+          type: this.selectedDocumentType,
+          name: documentName,
+          fileUrl: fileUrl,
+          fileName: this.documentFile!.name,
+          fileSize: this.documentFile!.size,
+          status: 'pending',
+          notes: this.documentNotes || undefined
+        };
+
+        if (this.selectedDocumentBeingEdited) {
+          // update existing document
+          this.tenantsService.updateTenantDocument(this.tenant!.id, this.selectedDocumentBeingEdited.id, {
+            ...documentPayload,
+            uploadedAt: new Date().toISOString()
+          });
+        } else {
+          this.tenantsService.addDocumentToTenant(this.tenant!.id, documentPayload);
+        }
+
+        this.loadTenantDocuments();
+        this.closeDocumentUploadModal();
+      } catch (error) {
+        console.error('Erreur lors de l\'upload du document:', error);
+        this.errors.general = 'Une erreur est survenue lors de l\'upload du document.';
+      } finally {
+        this.uploadingDocument = false;
+      }
+    };
+    reader.onerror = () => {
+      this.errors.general = 'Erreur lors de la lecture du fichier.';
+      this.uploadingDocument = false;
+    };
+    if (this.documentFile) {
+      reader.readAsDataURL(this.documentFile);
+    } else {
+      // Should not happen (we handle no-file case earlier), but guard for safety
+      this.uploadingDocument = false;
+      this.errors.general = 'Aucun fichier sélectionné.';
+    }
+  }
+
+  /**
+   * Supprime un document
+   */
+  deleteDocument(documentId: number): void {
+    if (!this.tenant) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
+
+    this.tenantsService.removeDocumentFromTenant(this.tenant.id, documentId);
+    this.loadTenantDocuments();
+  }
+
+  /**
+   * Ouvre un document dans un nouvel onglet
+   */
+  viewDocument(doc: TenantDocument): void {
+    if (doc.fileUrl) {
+      window.open(doc.fileUrl, '_blank');
+    }
+  }
+
+  /**
+   * Télécharge un document
+   */
+  downloadDocument(doc: TenantDocument): void {
+    if (doc.fileUrl) {
+      const link = window.document.createElement('a');
+      link.href = doc.fileUrl;
+      link.download = doc.fileName;
+      link.click();
+    }
+  }
+
+  /**
+   * Vérifie si un type de document existe
+   */
+  hasDocumentType(documentType: string): boolean {
+    if (!this.tenant) return false;
+    return this.tenantsService.hasDocumentType(this.tenant.id, documentType);
+  }
+
+  /**
+   * Récupère les documents d'un type spécifique
+   */
+  getDocumentsByType(documentType: string): TenantDocument[] {
+    return this.tenantDocuments.filter(d => d.type === documentType);
+  }
+
+  /**
+   * Retourne l'icône pour un type de document
+   */
+  getDocumentIcon(documentType: string): string {
+    const docType = this.requiredDocuments.find(d => d.type === documentType);
+    return docType ? docType.icon : 'fa-file';
+  }
+
+  /**
+   * Formate la taille du fichier
+   */
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  /**
+   * Retourne le libellé du statut du document
+   */
+  getDocumentStatusLabel(status?: string): string {
+    switch (status) {
+      case 'approved':
+        return 'Approuvé';
+      case 'rejected':
+        return 'Rejeté';
+      case 'pending':
+      default:
+        return 'En attente';
+    }
   }
 }

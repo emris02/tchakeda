@@ -1,5 +1,5 @@
 // Variables
-$primary-color: #1976d2;
+$primary-color: #4099ff;
 $primary-light: lighten($primary-color, 12%);
 $danger-color: #d32f2f;
 $success-color: #388e3c;
@@ -29,7 +29,7 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       transition: color 0.2s;
     }
     &:focus {
-      border-bottom-color: #1976d2;
+      border-bottom-color: #4099ff;
     }
     &:focus::placeholder {
       color: #bbb;
@@ -55,7 +55,7 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     top: -0.7rem;
     left: 0;
     font-size: 0.85rem;
-    color: #1976d2;
+    color: #4099ff;
     background: #fff;
     padding: 0 0.2em;
   }
@@ -67,118 +67,345 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     display: block;
   }
   
-/* ================================
-   Actions de formulaire
-================================ */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;   // boutons alignés à droite
-  align-items: center;
-  gap: 15px;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #e9ecef;
+// /* ================================
+//    Actions de formulaire
+// ================================ */
+// .form-actions {
+//   display: flex;
+//   justify-content: flex-end;   // boutons alignés à droite
+//   align-items: center;
+//   gap: 15px;
+//   margin-top: 30px;
+//   padding-top: 20px;
+//   border-top: 1px solid #e9ecef;
 
-  // option pour étendre la zone sur toute la largeur
-  &.full-width {
-    grid-column: 1 / -1;
-    width: 100%;
+//   // option pour étendre la zone sur toute la largeur
+//   &.full-width {
+//     grid-column: 1 / -1;
+//     width: 100%;
+//   }
+
+//   // version flottante (fixée en bas à droite de l'écran)
+//   &.floating {
+//     position: fixed;
+//     bottom: 20px;
+//     right: 20px;
+//     background: white;
+//     padding: 10px 15px;
+//     border-radius: 8px;
+//     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+//     border: 1px solid #e9ecef;
+//     z-index: 1050;
+//   }
+// }
+
+// /* ================================
+//    Boutons
+// ================================ */
+// .btn {
+//   padding: 10px 20px;
+//   border-radius: 6px;
+//   font-weight: 500;
+//   transition: all 0.3s ease;
+//   border: 1px solid transparent;
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   cursor: pointer;
+
+//   &:disabled {
+//     opacity: 0.6;
+//     cursor: not-allowed;
+
+//     &:hover {
+//       transform: none;
+//     }
+//   }
+
+//   &.btn-sm {
+//     padding: 6px 12px;
+//     font-size: 13px;
+//   }
+// }
+
+// /* Bouton primaire */
+// .btn-primary {
+//   background: $primary-color;
+//   border-color: $primary-color;
+//   color: #fff;
+//   --bs-btn-color: #fff;
+
+//   &:hover {
+//     background: darken($primary-color, 8%);
+//     border-color: darken($primary-color, 8%);
+//     transform: translateY(-2px);
+//   }
+// }
+
+// /* Bouton clair */
+// .btn-light {
+//   background: #f8f9fa;
+//   border-color: #ddd;
+//   color: $text-color;
+
+//   &:hover {
+//     background: #e9ecef;
+//   }
+// }
+
+// /* Bouton succès */
+// .btn-success {
+//   background: $success-color;
+//   border-color: $success-color;
+//   color: #fff;
+
+//   &:hover {
+//     background: darken($success-color, 8%);
+//     border-color: darken($success-color, 8%);
+//   }
+// }
+
+// /* ================================
+//    Messages d'erreur
+// ================================ */
+// .error {
+//   color: $danger-color;
+//   font-size: 0.85rem;
+//   margin-top: 5px;
+// }
+
+// .required {
+//   color: $danger-color;
+//   font-weight: 600;
+// }
+}
+
+/* Global helpers for underline-input variants */
+/* Make selects visually compatible with floating-label pattern but with rounded box */
+select.underline-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid $border-color;
+  background: #fff;
+  color: $text-color;
+  min-height: 44px;
+}
+
+/* Textareas: keep comfortable padding when using underline-input */
+textarea.underline-input {
+  padding: 0.9rem 0.6rem;
+  min-height: 100px;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* Apply the rounded/boxed select style to plain inputs so all inputs
+   visually match the select appearance and behave consistently with
+   floating-label tokens. Placed after the underline rules to override
+   the underline-only visuals. */
+input.underline-input,
+input.form-control,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea:not(.underline-input) {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid $border-color;
+  background: #fff;
+  color: $text-color;
+  min-height: 44px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: none;
+}
+
+input.underline-input:focus,
+input.form-control:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  border-color: $primary-color;
+  box-shadow: 0 6px 18px rgba(64,153,255,0.06);
+  outline: none;
+}
+
+/* Keep floating-label behaviour working: label floats when input has content */
+.form-group .underline-input:not(:placeholder-shown) + .label,
+.form-group .underline-input:focus + .label {
+  top: -0.7rem;
+  left: 0;
+  font-size: 0.85rem;
+  color: $primary-color;
+  background: #fff;
+  padding: 0 0.2em;
+}
+
+/* Input groups with suffix (currency, unit) */
+.input-with-suffix {
+  position: relative;
+
+  .underline-input {
+    padding-right: 48px; /* reserve space for suffix */
   }
 
-  // version flottante (fixée en bas à droite de l'écran)
-  &.floating {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
-    z-index: 1050;
+  .suffix {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+    font-weight: 600;
   }
 }
 
-/* ================================
-   Boutons
-================================ */
-.btn {
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
+/* Ensure the floating label sits above inputs when floated */
+.form-group .label {
+  z-index: 2;
+  display: inline-block;
+  padding: 0 0.2em;
+}
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+/* Fallback: if a component used underline-input but did not include a label sibling,
+   add a subtle placeholder-color behavior so the field doesn't look broken. */
+.underline-input[placeholder=" "] {
+  &::placeholder { color: transparent; }
+}
 
-    &:hover {
-      transform: none;
+/* Modal form inputs: make modals visually consistent with underline-input pattern
+   without requiring template changes. This styles inputs/selects/textareas inside
+   `.modal` / `.modal-card` to use the same spacing, borders and rounded selects. */
+.modal, .modal-card {
+  .form-group {
+    position: relative;
+    margin-bottom: 1rem;
+
+    /* If the modal uses a top label (label before input), keep it readable */
+    > label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 0.95rem;
+      color: $text-muted;
+    }
+
+    /* Inputs inside modals: give them the same tokens as underline-input but boxed */
+    input, input.form-control, select, textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      font-size: 1rem;
+      color: $text-color;
+      background: #fff;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: none;
+      outline: none;
+    }
+
+    input:focus, input.form-control:focus, select:focus, textarea:focus {
+      border-color: $primary-color;
+      box-shadow: 0 6px 18px rgba(64,153,255,0.06);
+    }
+
+    /* If the modal already uses the .underline-input class, keep that visual
+       (underline or floating behavior will be applied by the global rules). */
+    .underline-input {
+      border: none;
+      border-bottom: 2px solid #ccc;
+      background: transparent;
+      padding: 1rem 0 0.5rem 0;
+      border-radius: 0;
+    }
+
+    /* Ensure selects inside modals use rounded style */
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, $text-muted 50%), linear-gradient(135deg, $text-muted 50%, transparent 50%), linear-gradient(to right, $border-color, $border-color);
+      background-position: calc(100% - 18px) calc(1rem + 4px), calc(100% - 12px) calc(1rem + 4px), 100% 0;
+      background-size: 8px 8px, 8px 8px, 1px 1.5rem;
+      background-repeat: no-repeat;
     }
   }
+}
 
-  &.btn-sm {
-    padding: 6px 12px;
-    font-size: 13px;
+/* Angular Material dialogs and generic overlay containers
+   Ensure any dialog content using overlay containers or Material dialogs
+   inherits the same underline-input and floating-label tokens. */
+.cdk-overlay-container,
+.cdk-overlay-pane,
+.mat-dialog-container,
+.mat-dialog-content,
+.dialog-ref,
+.overlay-dialog {
+  .form-group {
+    position: relative;
+    margin-bottom: 1rem;
+
+    /* If templates already use input + label (preferred), floating label works */
+    .underline-input {
+      width: 100%;
+      border: none;
+      border-bottom: 2px solid #ccc;
+      background: transparent;
+      padding: 1rem 0 0.5rem 0;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    /* fallback for boxed inputs inside dialogs */
+    input.boxed, select.boxed, textarea.boxed {
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+      background: #fff;
+    }
+
+    /* ensure label floats above dialogs' inputs when used as input + label */
+    .label { z-index: 3; }
   }
 }
 
-/* Bouton primaire */
-.btn-primary {
-  background: $primary-color;
-  border-color: $primary-color;
-  color: #fff;
-  --bs-btn-color: #fff;
+/*
+  When a modal or dialog is open we often end up with two action-bars:
+  - the page's sticky `.action-bar` (bottom)
+  - the modal's own `.action-bar`
 
-  &:hover {
-    background: darken($primary-color, 8%);
-    border-color: darken($primary-color, 8%);
-    transform: translateY(-2px);
+  Hide the page-level `.action-bar` while a modal/overlay exists to avoid
+  duplicate controls. Re-enable action-bars that are inside overlay/dialog
+  containers so modal action bars remain visible.
+
+  Note: this uses the CSS relational `:has()` selector to detect overlay
+  elements in the document. Modern browsers (Chrome/Edge/Safari) support it.
+*/
+body:has(.modal-overlay),
+body:has(.cdk-overlay-container .mat-dialog-container),
+body:has(.cdk-overlay-pane .mat-dialog-container) {
+  .action-bar {
+    display: none !important;
   }
 }
 
-/* Bouton clair */
-.btn-light {
-  background: #f8f9fa;
-  border-color: #ddd;
-  color: $text-color;
-
-  &:hover {
-    background: #e9ecef;
-  }
+/* Re-enable action-bars that are _inside_ overlays/modal containers */
+body:has(.modal-overlay) .modal .action-bar,
+body:has(.modal-overlay) .modal-card .action-bar,
+body:has(.cdk-overlay-container .mat-dialog-container) .mat-dialog-container .action-bar,
+body:has(.cdk-overlay-container .cdk-overlay-pane) .cdk-overlay-pane .action-bar,
+body:has(.cdk-overlay-pane .mat-dialog-container) .mat-dialog-container .action-bar {
+  display: flex !important;
 }
 
-/* Bouton succès */
-.btn-success {
-  background: $success-color;
-  border-color: $success-color;
-  color: #fff;
-
-  &:hover {
-    background: darken($success-color, 8%);
-    border-color: darken($success-color, 8%);
-  }
-}
-
-/* ================================
-   Messages d'erreur
-================================ */
-.error {
-  color: $danger-color;
-  font-size: 0.85rem;
-  margin-top: 5px;
-}
-
-.required {
-  color: $danger-color;
-  font-weight: 600;
-}
-}
 
 /* Global action-bar styling (shared footer for forms) */
 .action-bar {
@@ -199,6 +426,70 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   gap: 12px;
   align-items: center;
   margin: 0;
+}
+
+/* Error summary placed inside action-bar (centered, red) */
+.action-bar .action-error-summary {
+  flex: 1 1 auto;
+  text-align: center;
+  color: $danger-color;
+  background: rgba(211, 47, 47, 0.06);
+  border: 1px solid rgba(211, 47, 47, 0.14);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-bar .action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Responsive sizing for action-bar buttons to match the screenshot style
+   - Desktop: larger, comfortable padding and min-width for readable CTA
+   - Tablet: slightly smaller
+   - Mobile: compact buttons but with clear tap targets */
+.action-bar .action-buttons .btn {
+  padding: 8px 14px;
+  min-width: 92px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Slightly larger on large screens */
+@media (min-width: 1200px) {
+  .action-bar .action-buttons .btn {
+    padding: 10px 18px;
+    min-width: 110px;
+    height: 44px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+}
+
+/* Compact on smaller screens while preserving tap target */
+@media (max-width: 768px) {
+  .action-bar .action-buttons .btn {
+    padding: 7px 10px;
+    min-width: 72px;
+    height: 36px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+  /* Make primary save button slightly more prominent on mobile */
+  .action-bar .btn-save, .action-bar .btn-primary {
+    min-width: 84px;
+    padding: 8px 12px;
+  }
 }
 
 /* Action button color tokens used by all forms (cancel / save) */
@@ -240,5 +531,233 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
   .action-bar .form-actions {
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
   }
+
+  /* On small screens place the error summary above the buttons and allow wrapping */
+  .action-bar .action-error-summary {
+    position: static;
+    left: auto;
+    transform: none;
+    order: -1; /* show before buttons */
+    width: 100%;
+    max-width: 100%;
+    margin: 6px 0 0 0;
+    font-size: 0.95rem;
+    padding: 8px 10px;
+    text-align: center;
+  }
+
+  .action-bar .action-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* Apartments-specific overrides on small screens: remove absolute centering so message flows naturally */
+  .apartments-action-bar .action-error-summary {
+    position: static;
+    left: auto;
+    transform: none;
+    order: -1;
+    width: 100%;
+    max-width: 100%;
+    margin: 6px 0 0 0;
+  }
+}
+
+/* Very small devices — tighten spacing and font-size */
+@media (max-width: 430px) {
+  .action-bar .action-error-summary {
+    font-size: 0.85rem;
+    padding: 6px 8px;
+  }
+  .action-bar .action-buttons {
+    gap: 6px;
+  }
+}
+
+/* Apartments-specific layout (kept in global styles so component can simply use the HTML classes)
+   centers the error message and keeps buttons grouped on the right. */
+.apartments-action-bar .form-actions {
+  position: relative;
+}
+.apartments-action-bar .action-error-summary {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 60%;
+  margin: 0 auto;
+}
+.apartments-action-bar .action-buttons {
+  margin-left: auto;
+}
+
+/* ================================
+   Modal sizing helpers
+   Ensure a modal never overlaps the top header nor the bottom action-bar.
+   - Define CSS variables for header/actionbar heights (can be overridden by app)
+   - Constrain .modal-dialog and .modal-body with calc(100vh - header - actionbar)
+   - Make modal body scrollable when content exceeds available space
+   This works well with Bootstrap-like markup (.modal, .modal-dialog, .modal-content, .modal-body).
+*/
+
+:root {
+  /* Default values - override these in your global layout if your header/actionbar heights differ */
+  --app-header-height: 64px;
+  --app-actionbar-height: 72px; /* default sticky action-bar height */
+}
+
+/* Modal outer wrapper: keep centered but allow spacing from header/actionbar */
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reserve space for fixed header and sticky action-bar so the dialog never overlaps them */
+  padding-top: calc(var(--app-header-height, 64px) + 12px);
+  padding-bottom: calc(var(--app-actionbar-height, 72px) + 12px);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  /* Ensure modal appears above header and action-bar */
+  z-index: 1400;
+}
+
+/* Limit dialog height so it never reaches under header or past action-bar */
+.modal-dialog {
+  width: 100%;
+  max-width: 900px; /* sensible default, override in component if needed */
+  margin: auto; /* allow flex centering and small margins */
+  box-sizing: border-box;
+  /* Leave a small gap from header and action-bar via container padding; additionally cap height */
+  max-height: calc(100vh - var(--app-header-height, 64px) - var(--app-actionbar-height, 72px) - 40px);
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  overflow: hidden; /* body becomes scrollable instead */
+  border-radius: 8px;
+}
+
+/* Modal body scrolls when content is too tall */
+.modal-body {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Reserve space for header/title and footer (approx 120px) - adjust if your modal header/footer sizes differ */
+  max-height: calc(100vh - var(--app-header-height, 64px) - var(--app-actionbar-height, 72px) - 120px);
+}
+
+/* Make sure modal-footer stays visible and doesn't get cut; it will stick to bottom of modal-content */
+.modal-footer {
+  flex: 0 0 auto;
+  padding: 0.75rem 1.25rem;
+}
+
+/* Small screens: reduce max-width and increase spacing to avoid edge collisions */
+@media (max-width: 576px) {
+  .modal-dialog {
+    max-width: 100%;
+    padding: 0 8px;
+  }
+  .modal-body {
+    max-height: calc(100vh - var(--app-header-height, 56px) - var(--app-actionbar-height, 72px) - 120px);
+  }
+}
+
+/* Backdrop z-index adjust so header stays below the backdrop but modal above header */
+.modal-backdrop {
+  z-index: 1350;
+}
+
+/* Hide global action-bar when a modal is open and adjust modal spacing
+   - Bootstrap adds `modal-open` to <body> when a modal is active; use that hook
+   - Reduce modal bottom padding when action-bar is hidden so dialog centers nicely
+*/
+/* Hide any site action-bar variants when a modal is open so modal uses its own actions
+   Covers: .action-bar, apartments-specific action bars, floating/sticky .form-actions
+*/
+/* Hide only the global / page-level action-bars when a modal is open.
+   Keep action-bar elements that are inside a modal visible (they should be used for modal actions).
+*/
+body.modal-open > .action-bar,
+body.modal-open > .apartments-action-bar,
+body.modal-open .page-action-bar,
+body.modal-open .page-footer > .action-bar,
+body.modal-open .form-actions.floating,
+body.modal-open .form-actions.sticky,
+body.modal-open .form-actions.fixed {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Ensure any action-bar placed inside a modal remains visible and inherits modal styling */
+.modal .action-bar,
+.modal .modal-action-bar {
+  display: flex !important;
+  position: static !important;
+  width: 100%;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0 0 8px 8px;
+}
+
+/* When modal is open reduce modal bottom padding (we previously reserved space for action-bar) */
+body.modal-open .modal {
+  padding-bottom: 12px !important;
+}
+
+/* Make modal footer buttons match action-bar buttons so modal uses its own action buttons */
+.modal-footer .btn {
+  /* copy action-bar button sizing tokens */
+  padding: 8px 14px;
+  min-width: 92px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 1200px) {
+  .modal-footer .btn {
+    padding: 10px 18px;
+    min-width: 110px;
+    height: 44px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-footer .btn {
+    padding: 7px 10px;
+    min-width: 72px;
+    height: 36px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+  .modal-footer .btn-primary, .modal-footer .btn-save {
+    min-width: 84px;
+    padding: 8px 12px;
+  }
+}
+
+/* Ensure modal footer buttons keep the same color tokens as action-bar buttons */
+.modal-footer .btn-cancel,
+.modal-footer .btn-light {
+  background: $danger-color;
+  border-color: $danger-color;
+  color: #fff;
+}
+.modal-footer .btn-save,
+.modal-footer .btn-primary {
+  background: $primary-light;
+  border-color: $primary-light;
+  color: #fff;
 }

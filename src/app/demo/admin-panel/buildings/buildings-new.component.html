@@ -1,14 +1,16 @@
-<div class="page-container">
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="cancel()" title="Retour à la liste">
-      <i class="fas fa-arrow-left"></i> Retour
-    </button>
-    <h4 class="page-title">Créer un appartement</h4>
-  </div>
+<div class="page-container add-page">
+  
+      <button class="btn back-btn" (click)="cancel()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Bâtiments</span>
+      </button>
+      <h4 class="page-title">Créer un bâtiment</h4>
+    </div>
+    <div class="header-right">
+      <!-- action slot: place add/list buttons here on listing pages -->
 
 <div class="content-container">
-  <form #buildingForm="ngForm" (ngSubmit)="create()" class="form-card building-grid">
-
+  <form #buildingForm="ngForm" (ngSubmit)="create(buildingForm)" class="form-card building-grid">
     <!-- Nom du bâtiment -->
     <div class="form-group">
       <input type="text" id="name" [(ngModel)]="form.name" name="name" #nameCtrl="ngModel" class="underline-input" required placeholder="Nom du bâtiment" [class.invalid]="nameCtrl.invalid && (nameCtrl.touched || buildingForm.submitted)" />
@@ -17,9 +19,6 @@
         Nom du bâtiment
       </label>
       <div class="error" *ngIf="errors.name">{{ errors.name }}</div>
-      <div class="error" *ngIf="nameCtrl.invalid && (nameCtrl.touched || buildingForm.submitted)">
-        Le nom du bâtiment est requis.
-      </div>
     </div>
 
     <!-- Type de bâtiment -->
@@ -40,30 +39,26 @@
         Type de bâtiment
       </label>
       <input *ngIf="isCustomType" type="text" id="customType" [(ngModel)]="form.customType" name="customType" class="underline-input" placeholder="Saisir le type" />
-      <div class="error" *ngIf="typeCtrl.invalid && (typeCtrl.touched || buildingForm.submitted)">Type requis.</div>
       <div class="error" *ngIf="errors.type">{{ errors.type }}</div>
-      <div class="error" *ngIf="errors.customType">{{ errors.customType }}</div>
     </div>
 
     <!-- Nombre d'étages -->
     <div class="form-group">
-      <input type="number" id="floors" [(ngModel)]="form.floors" name="floors" #floorsCtrl="ngModel" class="underline-input" required min="1" placeholder="Nombre d'étages" [class.invalid]="floorsCtrl.invalid && (floorsCtrl.touched || buildingForm.submitted)" />
+      <input type="number" id="floors" [(ngModel)]="form.floors" name="floors" #floorsCtrl="ngModel" class="underline-input" required placeholder="Nombre d'étages" [class.invalid]="floorsCtrl.invalid && (floorsCtrl.touched || buildingForm.submitted)" />
       <label for="floors" class="label">
         <i class="fas fa-layer-group"></i>
         Nombre d'étages
       </label>
-      <div class="error" *ngIf="floorsCtrl.invalid && (floorsCtrl.touched || buildingForm.submitted)">Nombre d'étages requis.</div>
       <div class="error" *ngIf="errors.floors">{{ errors.floors }}</div>
     </div>
 
     <!-- Nombre d'appartements -->
     <div class="form-group">
-      <input type="number" id="apartments" [(ngModel)]="form.apartments" name="apartments" #apartmentsCtrl="ngModel" class="underline-input" required min="1" placeholder="Nombre d'appartements" [class.invalid]="apartmentsCtrl.invalid && (apartmentsCtrl.touched || buildingForm.submitted)" />
+      <input type="number" id="apartments" [(ngModel)]="form.apartments" name="apartments" #apartmentsCtrl="ngModel" class="underline-input" required placeholder="Nombre d'appartements" [class.invalid]="apartmentsCtrl.invalid && (apartmentsCtrl.touched || buildingForm.submitted)" />
       <label for="apartments" class="label">
         <i class="fas fa-home"></i>
         Nombre d'appartements
       </label>
-      <div class="error" *ngIf="apartmentsCtrl.invalid && (apartmentsCtrl.touched || buildingForm.submitted)">Nombre d'appartements requis.</div>
       <div class="error" *ngIf="errors.apartments">{{ errors.apartments }}</div>
     </div>
 
@@ -74,7 +69,6 @@
         <i class="fas fa-map-marker-alt"></i>
         Adresse
       </label>
-      <div class="error" *ngIf="addressCtrl.invalid && (addressCtrl.touched || buildingForm.submitted)">Adresse requise.</div>
       <div class="error" *ngIf="errors.address">{{ errors.address }}</div>
     </div>
 
@@ -85,7 +79,6 @@
         <i class="fas fa-city"></i>
         Ville
       </label>
-      <div class="error" *ngIf="cityCtrl.invalid && (cityCtrl.touched || buildingForm.submitted)">Ville requise.</div>
       <div class="error" *ngIf="errors.city">{{ errors.city }}</div>
     </div>
 
@@ -96,7 +89,6 @@
         <i class="fas fa-map-signs"></i>
         Quartier / Région
       </label>
-      <div class="error" *ngIf="regionCtrl.invalid && (regionCtrl.touched || buildingForm.submitted)">Quartier / Région requis.</div>
       <div class="error" *ngIf="errors.region">{{ errors.region }}</div>
     </div>
 
@@ -107,7 +99,6 @@
         <i class="fas fa-calendar-alt"></i>
         Date de construction
       </label>
-      <div class="error" *ngIf="constructionCtrl.invalid && (constructionCtrl.touched || buildingForm.submitted)">Date de construction requise.</div>
       <div class="error" *ngIf="errors.constructionDate">{{ errors.constructionDate }}</div>
     </div>
 
@@ -122,7 +113,6 @@
           <i class="fas fa-user-tie"></i>
           Propriétaire
         </label>
-        <div class="error" *ngIf="ownerCtrl.invalid && (ownerCtrl.touched || buildingForm.submitted)">Propriétaire requis.</div>
         <div class="error" *ngIf="errors.ownerId">{{ errors.ownerId }}</div>
       </div>
       <button type="button" class="btn btn-outline-primary btn-sm" (click)="openOwnerDialog()">
@@ -133,7 +123,13 @@
 </div>
     <div class="action-bar">
       <div class="form-actions">
-        <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
-        <button type="submit" class="btn btn-primary btn-save">Créer</button>
+        <div class="action-error-summary" *ngIf="hasErrors">
+          <i class="fas fa-exclamation-circle"></i>
+          Veuillez corriger les champs requis ci-dessous.
+        </div>
+        <div class="action-buttons">
+          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+          <button type="button" class="btn btn-primary btn-save" (click)="create(buildingForm)">Créer</button>
+        </div>
       </div>
     </div>

@@ -1,10 +1,9 @@
 <div class="page-container">
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="back()">
-      <i class="fas fa-arrow-left"></i> Propriétaires
+  
+    <button class="btn  back-btn" (click)="back()">
+      &lt;
     </button>
-    <h4 class="page-title">Détails du propriétaire</h4>
-  </div>
+    <h4 class="page-title">Détail du propriétaire</h4>
 
   <!-- Modal de suppression -->
   <div *ngIf="showDeleteConfirm" class="modal-overlay">
@@ -14,6 +13,64 @@
       <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteOwner()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'expulsion de locataire -->
+  <div *ngIf="showEvictionModal" class="modal-overlay">
+    <div class="modal-card large">
+      <h5>Avis d'expulsion</h5>
+      <p class="warning-text">
+        <i class="fas fa-exclamation-triangle"></i>
+        Vous êtes sur le point d'expulser un locataire. Veuillez remplir les informations ci-dessous.
+      </p>
+      
+      <div class="eviction-info">
+        <h6>Informations sur l'expulsion :</h6>
+        <div class="info-item">
+          <label>Appartement :</label>
+          <span>{{ selectedApartmentForEviction?.name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Locataire :</label>
+          <span>{{ selectedApartmentForEviction?.tenant ? getTenantFullNameSafe(selectedApartmentForEviction) : '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Bâtiment :</label>
+          <span>{{ getBuildingName(selectedApartmentForEviction?.buildingId) || '-' }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="evictionReason">Raison de l'expulsion <span class="required">*</span></label>
+        <textarea 
+          id="evictionReason" 
+          [(ngModel)]="evictionReason" 
+          class="form-control" 
+          rows="4" 
+          placeholder="Veuillez expliquer la raison de l'expulsion (non-paiement, comportement, etc.)..."
+          required></textarea>
+        <div class="error" *ngIf="errors.evictionReason">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.evictionReason }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="acceptEvictionConditions" />
+          Je confirme que j'ai le droit d'expulser ce locataire et que toutes les procédures légales ont été respectées
+        </label>
+        <div class="error" *ngIf="errors.evictionConditions">
+          <i class="fas fa-exclamation-circle"></i> {{ errors.evictionConditions }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" (click)="closeEvictionModal()">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmEviction()" [disabled]="!acceptEvictionConditions || !evictionReason">
+          Confirmer l'expulsion
+        </button>
       </div>
     </div>
   </div>
@@ -181,6 +238,7 @@
                 <th>Date de paiement</th>
                 <th>Recouvreur</th>
                 <th>Statut</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -195,7 +253,7 @@
             <td>{{ getMonthlyRent(apt) ? (getMonthlyRent(apt) | currency:'XOF':'symbol':'1.0') : '-' }}</td>
 
                 <!-- Date de paiement -->
-            <td>-</td>
+            <td>{{ getPaymentDate(apt) }}</td>
 
                 <!-- Recouvreur -->
             <td>{{ getCollector(apt) }}</td>
@@ -204,10 +262,23 @@
                 <td>
                   <span class="status-badge">{{ getStatus(apt) }}</span>
                 </td>
+
+                <!-- Actions -->
+                <td>
+                  <button 
+                    *ngIf="getStatus(apt) === 'Occupé' && getActiveRentalForApartment(apt.id)" 
+                    class="btn btn-sm btn-danger" 
+                    (click)="openEvictionModal(apt)" 
+                    title="Expulser le locataire"
+                    style="display: inline-block;">
+                    <i class="fas fa-user-times"></i> Expulser
+                  </button>
+                  <span *ngIf="!(getStatus(apt) === 'Occupé' && getActiveRentalForApartment(apt.id))" class="text-muted">-</span>
+                </td>
               </tr>
               <!-- Message si aucun appartement -->
               <tr *ngIf="selectedBuildingApartments.length === 0">
-                <td colspan="6" class="no-data">
+                <td colspan="7" class="no-data">
                   Aucun appartement pour ce bâtiment
                 </td>
               </tr>
@@ -218,6 +289,33 @@
         </div>
 
         <div class="tab-content" *ngIf="activeTab === 'factures'">
+          <!-- Filtres de statut pour les factures -->
+          <div class="invoice-status-filters">
+            <button 
+              class="status-filter-btn" 
+              [class.active]="!invoiceStatusFilter || invoiceStatusFilter === ''"
+              (click)="invoiceStatusFilter = ''; applyInvoiceFilters()">
+              <i class="fas fa-list"></i> Toutes
+            </button>
+            <button 
+              class="status-filter-btn status-paid" 
+              [class.active]="invoiceStatusFilter === 'Payée'"
+              (click)="invoiceStatusFilter = 'Payée'; applyInvoiceFilters()">
+              <i class="fas fa-check-circle"></i> Payée
+            </button>
+            <button 
+              class="status-filter-btn status-pending" 
+              [class.active]="invoiceStatusFilter === 'En attente'"
+              (click)="invoiceStatusFilter = 'En attente'; applyInvoiceFilters()">
+              <i class="fas fa-clock"></i> En attente
+            </button>
+            <button 
+              class="status-filter-btn status-unpaid" 
+              [class.active]="invoiceStatusFilter === 'Impayée'"
+              (click)="invoiceStatusFilter = 'Impayée'; applyInvoiceFilters()">
+              <i class="fas fa-times-circle"></i> Impayée
+            </button>
+          </div>
           <div class="table-container">
             <table class="data-table">
               <thead>
@@ -233,7 +331,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let facture of selectedBuildingFactures">
+                <tr *ngFor="let facture of filteredInvoices">
                   <td>{{ facture.invoiceNumber || '-' }}</td>
                   <td>{{ facture.apartmentName || '-' }}</td>
                   <td>{{ facture.tenantName || '-' }}</td>
@@ -251,7 +349,7 @@
                   <td>{{ facture.paymentDate ? (facture.paymentDate | date:'dd/MM/yyyy') : '-' }}</td>
                   <td>{{ facture.observations || '-' }}</td>
                 </tr>
-                <tr *ngIf="selectedBuildingFactures.length === 0">
+                <tr *ngIf="filteredInvoices.length === 0">
                   <td colspan="8" class="no-data">Aucune facture pour ce bâtiment</td>
                 </tr>
               </tbody>

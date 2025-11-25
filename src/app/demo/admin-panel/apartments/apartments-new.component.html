@@ -1,14 +1,16 @@
-<div class="page-container">
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="cancel()" title="Retour à la liste">
-      <i class="fas fa-arrow-left"></i> Retour
-    </button>
-    <h4 class="page-title">Créer un appartement</h4>
-  </div>
+<div class="page-container add-page">
+  
+      <button class="btn back-btn" (click)="cancel()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Appartements</span> 
+      </button>
+      <h4 class="page-title">Créer un appartement</h4>
+    </div>
+    <div class="header-right">
+      <!-- action slot: place add/list buttons here on listing pages -->
 
   <div class="content-container">
-    <form id="apartmentForm" (ngSubmit)="create()" class="form-card" #apartmentForm="ngForm">
-
+  <form id="apartmentForm" (ngSubmit)="create(apartmentForm)" class="form-card" #apartmentForm="ngForm">
       <div class="form-grid">
         <!-- Nom -->
         <div class="form-group">
@@ -26,9 +28,6 @@
         <!-- Type -->
         <div class="form-group">
           <input list="apartmentTypes" id="type" [(ngModel)]="form.type" name="type" class="underline-input" required #type="ngModel" placeholder="Type d'appartement" />
-          <datalist id="apartmentTypes">
-            <option *ngFor="let t of apartmentTypes" [value]="t">{{ t }}</option>
-          </datalist>
           <label for="type" class="label">
             <i class="fas fa-list"></i>
             Type <span class="required">*</span>
@@ -48,6 +47,19 @@
           </label>
           <div class="error" *ngIf="(rooms.invalid && rooms.touched) || errors.rooms">
             {{ errors.rooms || 'Le nombre de pièces doit être au moins 1' }}
+          </div>
+        </div>
+
+        <!-- Superficie totale -->
+        <div class="form-group">
+          <input type="number" id="area" [(ngModel)]="form.area" name="area" class="underline-input"
+                 min="0" step="0.5" placeholder="Superficie totale (m²)" #area="ngModel" />
+          <label for="area" class="label">
+            <i class="fas fa-ruler-combined"></i>
+            Superficie totale (m²)
+          </label>
+          <div class="error" *ngIf="(area.invalid && area.touched) || errors.area">
+            {{ errors.area || 'La superficie doit être positive' }}
           </div>
         </div>
 
@@ -140,9 +152,21 @@
             <div class="room-info">
               <div class="form-group">
                 <input type="text" id="roomLabel-{{i}}" class="underline-input"
-                       [(ngModel)]="roomLabels[i]" name="roomLabels[{{i}}]"
-                       placeholder="Ex: Salon, Chambre, Cuisine..." required />
+                         [(ngModel)]="roomLabels[i]" name="roomLabels[{{i}}]" #roomLabelModel="ngModel"
+                         placeholder="Ex: Salon, Chambre, Cuisine..." required />
                 <label for="roomLabel-{{i}}" class="label">Nom de la pièce <span class="required">*</span></label>
+                <div class="error" *ngIf="(roomLabelModel.invalid && roomLabelModel.touched)">
+                  <i class="fas fa-exclamation-circle"></i> Le nom de la pièce est requis
+                </div>
+              </div>
+              <div class="form-group">
+                <input type="number" id="roomArea-{{i}}" class="underline-input"
+                         [(ngModel)]="roomAreas[i]" name="roomAreas[{{i}}]"
+                         min="0" step="0.5" placeholder="Superficie (m²)" />
+                <label for="roomArea-{{i}}" class="label">
+                  <i class="fas fa-ruler-combined"></i>
+                  Superficie (m²)
+                </label>
               </div>
               <div class="form-group">
                 <textarea id="roomDesc-{{i}}" class="underline-input"
@@ -165,8 +189,18 @@
             </div>
             <div class="room-info">
               <div class="form-group">
-                <input type="text" id="pendingLabel-{{idx}}" [(ngModel)]="img.label" class="underline-input" placeholder="Nom de la pièce (obligatoire)" required />
+                <input type="text" id="pendingLabel-{{idx}}" [(ngModel)]="img.label" name="pendingLabel{{idx}}" #pendingLabelModel="ngModel" class="underline-input" placeholder="Nom de la pièce (obligatoire)" required />
                 <label class="label" for="pendingLabel-{{idx}}">Nom de la pièce <span class="required">*</span></label>
+                <div class="error" *ngIf="(pendingLabelModel.invalid && pendingLabelModel.touched)">
+                  <i class="fas fa-exclamation-circle"></i> Le nom de la pièce est requis
+                </div>
+              </div>
+              <div class="form-group">
+                <input type="number" id="pendingArea-{{idx}}" [(ngModel)]="img.area" name="pendingArea{{idx}}" class="underline-input" min="0" step="0.5" placeholder="Superficie (m²)" />
+                <label class="label" for="pendingArea-{{idx}}">
+                  <i class="fas fa-ruler-combined"></i>
+                  Superficie (m²)
+                </label>
               </div>
               <div class="form-group">
                 <textarea id="pendingDesc-{{idx}}" [(ngModel)]="img.description" class="underline-input" placeholder="Description (facultatif)" maxlength="200"></textarea>
@@ -206,9 +240,15 @@
   </div>
 </div>
       <!-- Actions -->
-      <div class="action-bar">
-        <div class="form-actions">
-          <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
-          <button type="submit" class="btn btn-primary btn-save" [disabled]="apartmentForm.invalid">Créer</button>
-        </div>
+    <div class="action-bar apartments-action-bar">
+          <div class="form-actions">
+            <div class="action-error-summary" *ngIf="hasErrors">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez corriger les champs requis ci-dessous.
+            </div>
+            <div class="action-buttons">
+              <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+              <button type="button" class="btn btn-primary btn-save" (click)="create(apartmentForm)">Créer</button>
+            </div>
+          </div>
       </div>

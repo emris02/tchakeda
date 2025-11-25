@@ -26,6 +26,12 @@ export class BuildingsService {
     return data ? JSON.parse(data) : [];
   }
 
+  // Récupérer les bâtiments d'un propriétaire
+  getBuildingsByOwner(ownerId: number): Building[] {
+    if (ownerId === undefined || ownerId === null) return [];
+    return this.getBuildings().filter(b => Number(b.ownerId) === Number(ownerId));
+  }
+
   // Récupérer un bâtiment par son ID
   getBuildingById(id: number): Building | undefined {
     return this.getBuildings().find(b => b.id === id);

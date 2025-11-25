@@ -3,6 +3,10 @@
     <span aria-hidden="true">&times;</span>
   </button>
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card tenant-form">
+    <div class="form-error-summary" *ngIf="submitted && form.invalid">
+      <i class="fas fa-exclamation-circle"></i>
+      Veuillez corriger les champs requis ci-dessous.
+    </div>
     <div class="form-grid grid-2x2">
       <div class="form-group">
         <input type="text" id="fullName" formControlName="fullName" class="underline-input" required placeholder="Nom complet" />

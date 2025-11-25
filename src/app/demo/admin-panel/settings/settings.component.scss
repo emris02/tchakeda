@@ -1,0 +1,221 @@
+/* Use shared form imports so variables/mixins are available */
+@use '/src/scss/form_imports.scss';
+.settings-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Ensure Settings forms use the same boxed / underline input patterns
+   as the global site. We add explicit form-group/label/underline-input
+   rules so templates that don't add classes still look consistent. */
+.settings-form {
+  .form-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+
+    /* Boxed inputs (fallback if template doesn't include .underline-input) */
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #333;
+      min-height: 44px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: none;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    /* Underline variant when templates use it */
+    input.underline-input,
+    textarea.underline-input {
+      border: none;
+      border-bottom: 2px solid #ccc;
+      background: transparent;
+      padding: 1rem 0 0.5rem 0;
+      border-radius: 0;
+    }
+
+    /* Floating label (works whether label placed after input or before) */
+    .label {
+      position: absolute;
+      left: 0;
+      top: 1rem;
+      font-size: 1rem;
+      color: #888;
+      pointer-events: none;
+      transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+      background: transparent;
+      padding: 0 0.15em;
+    }
+
+    /* Float label when input focused or contains value */
+    input:focus + .label,
+    textarea:focus + .label,
+    input:not(:placeholder-shown) + .label,
+    select:focus + .label,
+    select:not([value=""]) + .label {
+      top: -0.7rem;
+      font-size: 0.85rem;
+      color: #4099ff;
+      background: #fff;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #4099ff;
+      box-shadow: 0 6px 18px rgba(64,153,255,0.06);
+    }
+  }
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+}
+
+.settings-header h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 2rem;
+}
+
+.settings-header p {
+  margin: 10px 0 0 0;
+  opacity: 0.9;
+}
+
+.tab-content {
+  padding: 20px 0;
+}
+
+.settings-form {
+  padding: 20px 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  flex: 1;
+  min-width: 300px;
+}
+
+.toggle-row {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.toggle-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.toggle-column mat-slide-toggle,
+.toggle-row mat-slide-toggle {
+  margin: 5px 0;
+}
+
+.export-section {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Styles pour les cartes */
+mat-card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+mat-card-header {
+  margin-bottom: 20px;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+mat-card-actions {
+  padding: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Styles pour les tabs */
+::ng-deep .mat-tab-group {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+::ng-deep .mat-tab-header {
+  background: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 10px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .half-width {
+    min-width: 100%;
+  }
+  
+  .toggle-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .settings-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Styles pour les séparateurs */
+mat-divider {
+  margin: 25px 0;
+}
+
+h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: 500;
+}

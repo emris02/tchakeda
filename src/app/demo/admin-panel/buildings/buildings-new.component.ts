@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BuildingsService } from './buildings.service';
 import { OwnersService } from '../owners/owners.service';
@@ -39,6 +40,7 @@ export class BuildingsNewComponent {
   };
 
   errors: any = {};
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
   owners: any[] = [];
   isCustomType = false;
 
@@ -92,10 +94,19 @@ export class BuildingsNewComponent {
   if (!this.form.region) this.errors.region = 'Région requise';
   if (!this.form.constructionDate) this.errors.constructionDate = 'Date de construction requise';
   if (!this.form.ownerId) this.errors.ownerId = 'Propriétaire requis';
-    return Object.keys(this.errors).length === 0;
+    const valid = Object.keys(this.errors).length === 0;
+    if (!valid) {
+      const firstKey = Object.keys(this.errors)[0];
+      setTimeout(() => {
+        const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+        if (el && typeof (el as any).focus === 'function') (el as any).focus();
+      }, 0);
+    }
+    return valid;
   }
 
-  create() {
+  create(formRef?: NgForm) {
+    if (formRef && formRef.form) formRef.form.markAllAsTouched();
     if (!this.validate()) return;
 
     if (this.isCustomType) {

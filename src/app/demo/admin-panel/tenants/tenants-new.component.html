@@ -1,13 +1,16 @@
-<div class="page-container">
-  <div class="page-header">
-    <button class="btn btn-light back-btn" (click)="cancel()">
-      <i class="fas fa-arrow-left"></i> Locataires
-    </button>
-    <h4 class="page-title">Créer un locataire</h4>
-  </div>
+<div class="page-container add-page">
+  
+      <button class="btn back-btn" (click)="cancel()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Locataires</span>
+      </button>
+      <h4 class="page-title">Créer un locataire</h4>
+    </div>
+    <div class="header-right">
+      <!-- action slot: place add/list buttons here on listing pages -->
 
   <div class="content-container">
-    <form (ngSubmit)="create()" class="form-card">
+  <form #tenantForm="ngForm" (ngSubmit)="create(tenantForm)" class="form-card">
     <!-- Informations personnelles -->
     <section class="form-section">
       <div class="section-header">
@@ -306,20 +309,18 @@
         </div>
       </div>
     </section>
-
-    <!-- Actions -->
   </form>
-  </div>
-</div>
-    <div class="action-bar">
-      <div class="form-actions">
-        <button type="button" class="btn btn-light" (click)="cancel()">
-          <i class="fas fa-times"></i>
-          Annuler
-        </button>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-plus"></i>
-          Créer le locataire
-        </button>
+  <!-- Actions -->
+      <div class="action-bar">
+          <div class="form-actions">
+            <div class="action-error-summary" *ngIf="hasErrors">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez corriger les champs requis ci-dessous.
+            </div>
+            <div class="action-buttons">
+              <button type="button" class="btn btn-light btn-cancel" (click)="cancel()">Annuler</button>
+              <!-- The Create button is outside the <form> so use a click handler instead of submit -->
+              <button type="button" class="btn btn-primary btn-save" (click)="create(tenantForm)">Créer</button>
+            </div>
+          </div>
       </div>
-    </div>

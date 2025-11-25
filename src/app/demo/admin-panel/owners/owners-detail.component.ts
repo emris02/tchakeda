@@ -48,6 +48,12 @@ export class OwnersDetailComponent implements OnInit {
     return 'Non attribué';
   }
 
+  // Helper method to safely get tenant full name from apartment (handles undefined)
+  getTenantFullNameSafe(apt: Apartment | undefined): string {
+    if (!apt) return '-';
+    return this.getTenantFullName(apt);
+  }
+
   // Récupère le loyer mensuel
   getMonthlyRent(apt: Apartment): number | null {
     return apt.mention ? Number(apt.mention) : null;
@@ -111,6 +117,14 @@ export class OwnersDetailComponent implements OnInit {
   activeTab: 'appartements' | 'factures' = 'appartements';
   selectedBuildingApartments: Apartment[] = [];
   selectedBuildingFactures: any[] = [];
+  filteredInvoices: any[] = [];
+  // Eviction modal
+  showEvictionModal = false;
+  evictionReason = '';
+  acceptEvictionConditions = false;
+  selectedApartmentForEviction: Apartment | undefined;
+  // Invoice status filter
+  invoiceStatusFilter = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -201,6 +215,19 @@ export class OwnersDetailComponent implements OnInit {
         observations
       };
     });
+    // Initialiser les factures filtrées
+    this.applyInvoiceFilters();
+  }
+
+  /**
+   * Applique les filtres de statut aux factures
+   */
+  applyInvoiceFilters(): void {
+    if (!this.invoiceStatusFilter || this.invoiceStatusFilter === '') {
+      this.filteredInvoices = this.selectedBuildingFactures.slice();
+    } else {
+      this.filteredInvoices = this.selectedBuildingFactures.filter(f => f.status === this.invoiceStatusFilter);
+    }
   }
 
   enableEdit() {
@@ -231,5 +258,110 @@ export class OwnersDetailComponent implements OnInit {
 
   back() {
     this.router.navigate(['demo/admin-panel/owners']);
+  }
+
+  // ==================== Gestion de l'expulsion de locataire ====================
+  
+  /**
+   * Ouvre la modale d'expulsion de locataire
+   */
+  openEvictionModal(apartment: Apartment): void {
+    if (!this.owner) return;
+    if (!apartment.tenant) {
+      alert('Erreur: Cet appartement n\'a pas de locataire.');
+      return;
+    }
+    // Vérifier que le propriétaire est bien le propriétaire du bâtiment
+    const building = this.buildingsService.getBuildingById(apartment.buildingId);
+    if (!building || building.ownerId !== this.owner.id) {
+      alert('Erreur: Vous n\'êtes pas autorisé à expulser ce locataire.');
+      return;
+    }
+    // Vérifier qu'il y a une location active
+    const activeRental = this.getActiveRentalForApartment(apartment.id);
+    if (!activeRental) {
+      alert('Erreur: Aucune location active pour cet appartement.');
+      return;
+    }
+    if (activeRental.status === 'cancelled') {
+      alert('Cette location est déjà annulée.');
+      return;
+    }
+    this.selectedApartmentForEviction = apartment;
+    this.evictionReason = '';
+    this.acceptEvictionConditions = false;
+    this.errors = {};
+    this.showEvictionModal = true;
+  }
+
+  /**
+   * Ferme la modale d'expulsion
+   */
+  closeEvictionModal(): void {
+    this.showEvictionModal = false;
+    this.selectedApartmentForEviction = undefined;
+    this.evictionReason = '';
+    this.acceptEvictionConditions = false;
+    this.errors = {};
+  }
+
+  /**
+   * Confirme l'expulsion du locataire
+   */
+  confirmEviction(): void {
+    if (!this.selectedApartmentForEviction || !this.owner) return;
+    
+    // Validation
+    this.errors = {};
+    if (!this.evictionReason || !this.evictionReason.trim()) {
+      this.errors.evictionReason = 'La raison de l\'expulsion est requise.';
+      return;
+    }
+    if (!this.acceptEvictionConditions) {
+      this.errors.evictionConditions = 'Vous devez accepter les conditions d\'expulsion.';
+      return;
+    }
+
+    // Récupérer la location active
+    const activeRental = this.getActiveRentalForApartment(this.selectedApartmentForEviction.id);
+    if (!activeRental) {
+      alert('Erreur: Aucune location active pour cet appartement.');
+      return;
+    }
+
+    // Appeler le service pour annuler la location par expulsion
+    this.rentalsService.cancelRentalByOwnerEviction(
+      activeRental.id,
+      this.evictionReason.trim(),
+      this.owner.id
+    ).subscribe({
+      next: () => {
+        alert('Le locataire a été expulsé avec succès.');
+        this.closeEvictionModal();
+        // Recharger les données
+        if (this.selectedBuilding) {
+          this.selectBuilding(this.selectedBuilding);
+        }
+      },
+      error: (err: any) => {
+        alert('Erreur lors de l\'expulsion: ' + (err.message || 'Erreur inconnue'));
+      }
+    });
+  }
+
+  /**
+   * Récupère la location active pour un appartement
+   */
+  getActiveRentalForApartment(apartmentId: number): Rental | undefined {
+    return this.rentalsService.getActiveRental(apartmentId);
+  }
+
+  /**
+   * Récupère le nom d'un bâtiment
+   */
+  getBuildingName(buildingId: number | undefined): string {
+    if (!buildingId) return '-';
+    const building = this.buildingsService.getBuildingById(buildingId);
+    return building ? building.name : '-';
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { OwnerFormComponent } from '../owners/components/owner-form.component';
 import { BuildingFormComponent } from '../buildings/components/building-form.component';
@@ -39,8 +40,12 @@ export class RentalsNewComponent implements OnInit {
     deposit: 0
   };
 
+  // show deposit checkbox
+  showDeposit: boolean = false;
+
   // --- Erreurs validation ---
   errors: Record<string, string> = {};
+  get hasErrors(): boolean { return Object.keys(this.errors || {}).length > 0; }
 
   // --- Collections principales ---
   owners: any[] = [];
@@ -70,6 +75,24 @@ export class RentalsNewComponent implements OnInit {
     this.apartments = this.apartmentsService.getApartments();
     this.tenants = this.tenantsService.getTenants();
     this.collectors = this.collectorsService.getCollectors();
+  }
+
+  onApartmentChange() {
+    const apt = this.apartments.find(a => a.id === this.form.apartmentId);
+    if (apt) {
+      // apartments may store monthly rent in 'mention' or 'price'
+      const p = (apt as any).price ?? (apt as any).mention ?? (apt as any).rent ?? 0;
+      const parsed = Number(p) || 0;
+      if (parsed > 0) this.form.price = parsed;
+      // set apartment/building names for display
+      this.form.apartmentName = apt.name || '';
+      this.form.buildingName = this.buildings.find(b => b.id === apt.buildingId)?.name || this.form.buildingName;
+    }
+  }
+
+  onShowDepositChange(val: boolean) {
+    this.showDeposit = !!val;
+    if (!this.showDeposit) this.form.deposit = 0;
   }
 
   // --- Navigation création ---
@@ -112,6 +135,8 @@ export class RentalsNewComponent implements OnInit {
         this.apartments = this.apartmentsService.getApartments();
         this.filteredApartments = this.apartments.filter(a => a.buildingId === this.form.buildingId);
         this.form.apartmentId = result.id;
+        // ensure price and display fields updated
+        this.onApartmentChange();
       }
     });
   }
@@ -188,7 +213,8 @@ export class RentalsNewComponent implements OnInit {
   }
 
   // --- Création ---
-  create() {
+  create(formRef?: NgForm) {
+    if (formRef && formRef.form) formRef.form.markAllAsTouched();
     if (!this.validate()) return;
     this.rentalsService.createRental({ ...this.form });
     this.router.navigate(['demo/admin-panel/rentals']);

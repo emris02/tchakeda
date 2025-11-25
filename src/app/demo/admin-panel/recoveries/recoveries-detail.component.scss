@@ -23,7 +23,7 @@
     background: transparent;
     transition: border-color 0.2s;
     &:focus {
-      border-bottom-color: #1976d2;
+      border-bottom-color: #4099ff;
     }
   }
   .error {
@@ -32,9 +32,11 @@
     margin-top: 4px;
   }
 }
-.form-actions {
+.back-btn {
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
+  align-items: center;
+  gap: 10px;
 }

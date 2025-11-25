@@ -1,8 +1,16 @@
-<div class="page-header">
-  <h4>Locations</h4>
-  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i>Nouvelle location</button>
-</div>
 <div class="content-container">
+  <div class="page-header">
+  <h4>Locations</h4>
+  <button class="btn-primary add-btn" (click)="goToNew()"><i class="fas fa-plus"></i> Nouvelle location</button>
+<!-- Recherche rapide & filtre à droite -->
+      <div class="quick-search">
+        <input type="search" placeholder="Rechercher par nom, ville..." [(ngModel)]="filterName" (input)="applyFilters()" class="search-input" />
+        <select [(ngModel)]="filterCity" (change)="applyFilters()" class="search-select">
+          <option value="">Toutes les villes</option>
+          <option *ngFor="let c of cityOptions" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+</div>
   <table class="table rentals-table">
     <thead>
       <tr>
@@ -15,7 +23,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let rental of rentals" (click)="goToDetail(rental)" class="clickable-row">
+      <tr *ngFor="let rental of displayedRentals" (click)="goToDetail(rental)" class="clickable-row">
         <td>{{ rental.apartmentName }}</td>
         <td>{{ rental.tenantName }}</td>
         <td>{{ rental.price | currency:'X0F' }}</td>
@@ -25,4 +33,7 @@
       </tr>
     </tbody>
   </table>
+  <div class="list-pagination">
+    <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+  </div>
 </div>

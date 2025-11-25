@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h4>Bâtiments</h4>
-  <button class="btn btn-primary" (click)="goToNew()"><i class="fas fa-plus"></i> Nouveau bâtiment</button>
-</div>
-
 <div class="content-container">
+  <div class="page-header">
+  <h4>Bâtiments</h4>
+
+  <app-search-filter
+    [entityType]="'buildings'"
+    [placeholder]="'Rechercher par nom, adresse, ville...'"
+    (searchChange)="onSearch($event)"
+    (filterChange)="onFilter($event)"
+    (refresh)="onRefreshClicked()"
+    (print)="onPrintClicked()"
+    (addNew)="onAddNewClicked()"
+  ></app-search-filter>
+</div>
   <table class="table buildings-table">
     <thead>
       <tr>
@@ -16,10 +24,11 @@
         <th>Région</th>
         <th>Date de construction</th>
         <th>Propriétaire</th>
+        <th *ngIf="collectorContextId">Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let building of buildings" class="clickable-row" (click)="goToDetail(building)">
+      <tr *ngFor="let building of displayedBuildings" class="clickable-row" (click)="goToDetail(building)">
         <td>{{ building.name }}</td>
         <td>{{ building.type === 'autre' ? building.customType : building.type }}</td>
         <td>{{ building.floors }}</td>
@@ -31,7 +40,15 @@
         <td>
           {{ getOwnerName(building.ownerId) || 'Non attribué' }}
         </td>
+        <td *ngIf="collectorContextId">
+          <button class="btn btn-sm btn-primary" (click)="$event.stopPropagation(); goToDetail(building)" [disabled]="!collectorsService.isBuildingAffiliated(collectorContextId, building.id)">
+            Gérer
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
+  <div class="list-pagination">
+    <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+  </div>
 </div>
