@@ -1,19 +1,21 @@
-// Angular Import
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-// project import
+// Standalone components (importer, pas déclarer)
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { CardComponent } from './components/card/card.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
+import { SearchFilterComponent } from '../../shared/search-filter/search-filter.component';
+import { ContractsPanelComponent } from '../../shared/contracts/contracts-panel.component';
+import { ContractPreviewComponent } from '../../shared/contracts/contract-preview.component';
 
-// third party
+// Third-party
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import 'hammerjs';
 import 'mousetrap';
 
-// bootstrap import
+// Bootstrap
 import { NgbDropdownModule, NgbNavModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
@@ -21,9 +23,12 @@ import { NgbDropdownModule, NgbNavModule, NgbModule } from '@ng-bootstrap/ng-boo
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    BreadcrumbComponent,     // <-- standalone components doivent être importés ici
     CardComponent,
-    BreadcrumbComponent,
     PaginationComponent,
+    SearchFilterComponent,
+    ContractsPanelComponent,
+    ContractPreviewComponent,
     NgbDropdownModule,
     NgbNavModule,
     NgbModule,
@@ -33,14 +38,16 @@ import { NgbDropdownModule, NgbNavModule, NgbModule } from '@ng-bootstrap/ng-boo
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CardComponent,
     BreadcrumbComponent,
+    CardComponent,
     PaginationComponent,
+    SearchFilterComponent,
+    ContractsPanelComponent,
+    ContractPreviewComponent,
     NgbModule,
     NgbDropdownModule,
     NgbNavModule,
     NgScrollbarModule
-  ],
-  declarations: []
+  ]
 })
 export class SharedModule {}

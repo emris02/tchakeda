@@ -1,8 +1,8 @@
-<div class="page-container">
-  
-    <button class="btn  back-btn" (click)="back()">
-      &lt;
-    </button>
+<div class="page-container">      
+        <button class="btn  back-btn" (click)="back()" title="Retour à la liste">
+          <i class="fas fa-chevron-left"></i>
+          <span class="back-label">Locataires</span>
+        </button>
     <h4 class="page-title">Détail du locataire</h4>
 
   <!-- Modale de suppression -->
@@ -470,6 +470,7 @@
                 title="Abandonner la location">
                 <i class="fas fa-times"></i> Abandonner
               </button>
+              <button *ngIf="detail['rentalContract']" class="btn btn-outline-primary btn-sm" style="margin-left:8px;" (click)="openContractPreview(detail['rentalContract'])">Aperçu du contrat</button>
               <span *ngIf="!isRentalActive(detail.rental)" class="text-muted">-</span>
             </td>
           </tr>

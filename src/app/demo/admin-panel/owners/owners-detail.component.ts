@@ -7,6 +7,8 @@ import { RentalsService, Rental } from '../rentals/rentals.service';
 import { TenantsService, Tenant } from '../tenants/tenants.service';
 import { CollectorsService, Collector } from '../collectors/collectors.service';
 import { RecoveriesService, Recovery } from '../recoveries/recoveries.service';
+import { ContractService } from '../contracts/contract.service';
+import { ContractPreviewService } from 'src/app/shared/contracts/contract-preview.service';
 
 @Component({
   selector: 'app-owners-detail',
@@ -125,6 +127,8 @@ export class OwnersDetailComponent implements OnInit {
   selectedApartmentForEviction: Apartment | undefined;
   // Invoice status filter
   invoiceStatusFilter = '';
+  ownerRentalContracts: any[] = [];
+  ownerOwnerCollectorContracts: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -136,6 +140,8 @@ export class OwnersDetailComponent implements OnInit {
     private tenantsService: TenantsService,
     private collectorsService: CollectorsService,
     private recoveriesService: RecoveriesService
+    , private contractService: ContractService
+    , private contractPreviewService: ContractPreviewService
   ) {}
 
   ngOnInit(): void {
@@ -161,11 +167,20 @@ export class OwnersDetailComponent implements OnInit {
     if (this.owner) {
       this.form = { ...this.owner };
       this.buildings = this.buildingsService.getBuildings().filter((b: Building) => b.ownerId === this.owner?.id);
+      // load contracts for owner
+      const data = this.contractService.getContractsForOwner(this.owner.id);
+      this.ownerRentalContracts = data.rentalContracts || [];
+      this.ownerOwnerCollectorContracts = data.ownerCollectorContracts || [];
       // Sélectionne le premier bâtiment par défaut
       if (this.buildings.length > 0) {
         this.selectBuilding(this.buildings[0]);
       }
     }
+  }
+
+  openContractPreview(contract: any) {
+    if (!contract) return;
+    this.contractPreviewService.open(contract);
   }
 
   selectBuilding(building: Building) {

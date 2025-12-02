@@ -2,7 +2,7 @@
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 24px;
+      padding: 20px;
   max-width:  auto;
   margin: 0 auto;
 }
@@ -31,12 +31,4 @@
     font-size: 13px;
     margin-top: 4px;
   }
-}
-.back-btn {
-  border-radius: 6px;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }

@@ -1,16 +1,20 @@
 <div class="content-container">
-  <div class="page-header">
-  <h4>Bâtiments</h4>
+<!-- Page header -->
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap">
+  <h4 class="page-title">Bâtiments</h4>
 
-  <app-search-filter
-    [entityType]="'buildings'"
-    [placeholder]="'Rechercher par nom, adresse, ville...'"
-    (searchChange)="onSearch($event)"
-    (filterChange)="onFilter($event)"
-    (refresh)="onRefreshClicked()"
-    (print)="onPrintClicked()"
-    (addNew)="onAddNewClicked()"
-  ></app-search-filter>
+  <div class="header-controls d-flex align-items-center gap-2">
+    <!-- Search + Nouveau + Grid/List + Refresh/Print gérés par SearchFilterComponent -->
+    <app-search-filter
+      [entityType]="'Buildings'"
+      [placeholder]="'Rechercher par nom, adresse, ville...'"
+      (searchChange)="onSearch($event)"
+      (filterChange)="onFilter($event)"
+      (refresh)="onRefreshClicked()"
+      (print)="onPrintClicked()"
+      (addNew)="onAddNewClicked()"
+    ></app-search-filter>
+  </div>
 </div>
   <table class="table buildings-table">
     <thead>
@@ -51,4 +55,4 @@
   <div class="list-pagination">
     <app-pagination [page]="page" [pageSize]="pageSize" [total]="total" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
   </div>
-</div>
+  </div>

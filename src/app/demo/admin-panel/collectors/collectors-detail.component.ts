@@ -8,6 +8,8 @@ import { RentalsService, Rental } from '../rentals/rentals.service';
 import { BuildingsService, Building } from '../buildings/buildings.service';
 import { ApartmentsService, Apartment } from '../apartments/apartments.service';
 import { OwnersService, Owner } from '../owners/owners.service';
+import { ContractService } from '../contracts/contract.service';
+import { ContractPreviewService } from 'src/app/shared/contracts/contract-preview.service';
 
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -99,7 +101,9 @@ export class CollectorsDetailComponent implements OnInit {
     private rentalsService: RentalsService,
     private buildingsService: BuildingsService,
     private apartmentsService: ApartmentsService,
-    private ownersService: OwnersService
+    private ownersService: OwnersService,
+    private contractService: ContractService,
+    private contractPreviewService: ContractPreviewService
   ) {}
 
   goToBuildingDetail(buildingId: number) {
@@ -129,6 +133,11 @@ export class CollectorsDetailComponent implements OnInit {
     this.allBuildings = this.buildingsService.getBuildings();
     this.allApartments = this.apartmentsService.getApartments();
     this.loadAffiliations();
+    // load contracts for this collector
+    try {
+      const data = this.contractService.getContractsForCollector(this.collector.id);
+      this.collectorOwnerCollectorContracts = data.ownerCollectorContracts || [];
+    } catch (e) { this.collectorOwnerCollectorContracts = []; }
   }
 
   private fetchCollectorStats() {
@@ -379,6 +388,14 @@ export class CollectorsDetailComponent implements OnInit {
     this.owners = this.ownersService.getOwners();
     // preserve selected building if still under selected owner
     this.onOwnerChange(this.selectedOwnerId);
+  }
+
+  // Contracts related to this collector
+  collectorOwnerCollectorContracts: any[] = [];
+
+  openContractPreview(contract: any) {
+    if (!contract) return;
+    this.contractPreviewService.open(contract);
   }
 
   onOwnerChange(ownerId: number | null) {

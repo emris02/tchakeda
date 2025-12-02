@@ -54,7 +54,7 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   select.underline-input:not([value=""]):not([value="null"]) + .label {
     top: -0.7rem;
     left: 0;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #4099ff;
     background: #fff;
     padding: 0 0.2em;
@@ -62,7 +62,7 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
   .error {
     color: #d32f2f;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     margin-top: 0.3rem;
     display: block;
   }
@@ -170,7 +170,7 @@ $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 // ================================ */
 // .error {
 //   color: $danger-color;
-//   font-size: 0.85rem;
+//   font-size: 0.8rem;
 //   margin-top: 5px;
 // }
 
@@ -244,7 +244,7 @@ textarea:focus {
 .form-group .underline-input:focus + .label {
   top: -0.7rem;
   left: 0;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: $primary-color;
   background: #fff;
   padding: 0 0.2em;
@@ -572,7 +572,7 @@ body:has(.cdk-overlay-pane .mat-dialog-container) .mat-dialog-container .action-
 /* Very small devices — tighten spacing and font-size */
 @media (max-width: 430px) {
   .action-bar .action-error-summary {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     padding: 6px 8px;
   }
   .action-bar .action-buttons {

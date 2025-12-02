@@ -10,6 +10,8 @@ import { BuildingFormComponent } from '../buildings/components/building-form.com
 import { ApartmentFormComponent } from '../apartments/components/apartment-form.component';
 import { TenantFormComponent } from '../tenants/components/tenant-form.component';
 import { CollectorsFormComponent } from '../collectors/components/collectors-form.component';
+import { ContractService } from '../contracts/contract.service';
+import { ContractPreviewService } from 'src/app/shared/contracts/contract-preview.service';
 
 @Component({
   selector: 'app-rentals-detail',
@@ -112,6 +114,8 @@ export class RentalsDetailComponent implements OnInit {
   adminCancellationReason = '';
   // Payment status filter
   paymentStatusFilter = '';
+  rentalContracts: any[] = [];
+  ownerCollectorContracts: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -121,6 +125,8 @@ export class RentalsDetailComponent implements OnInit {
     private buildingsService: BuildingsService,
     private tenantsService: TenantsService
     , private recoveriesService: RecoveriesService,
+    private contractService: ContractService,
+    private contractPreviewService: ContractPreviewService,
     private dialog: MatDialog
   ) {
     this.apartments = this.apartmentsService.getApartments();
@@ -186,6 +192,10 @@ export class RentalsDetailComponent implements OnInit {
      }
    });
   }
+  openContractPreview(contract: any) {
+    if (!contract) return;
+    this.contractPreviewService.open(contract);
+  }
   // Handle contract upload
   onContractSelected(event: any) {
     const file: File = event.target.files[0];
@@ -237,6 +247,16 @@ export class RentalsDetailComponent implements OnInit {
     } else {
       this.galleryImages = [];
       this.mainImage = null;
+    }
+    // load contracts for this rental (rental may be undefined)
+    try {
+      if (this.rental) {
+        this.rentalContracts = this.contractService.getRentalContracts().filter(c => Number(c.tenantId) === Number(this.rental?.tenantId) || Number(c.assetId) === Number(this.rental?.apartmentId));
+        this.ownerCollectorContracts = this.contractService.getOwnerCollectorContracts().filter(c => Number(c.assetId) === Number(this.rental?.apartmentId));
+      }
+    } catch (e) {
+      this.rentalContracts = [];
+      this.ownerCollectorContracts = [];
     }
     // compute occupied apartments count for this building
     if (this.form && this.form.buildingId) {

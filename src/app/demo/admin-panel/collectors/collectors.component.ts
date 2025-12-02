@@ -7,13 +7,15 @@ import { CollectorsService, Collector } from './collectors.service'; // force re
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from 'src/app/theme/shared/components/pagination/pagination.component';
+import { SearchFilterComponent } from 'src/app/shared/search-filter/search-filter.component';
+
 // Keep header navigation for collectors creation
 @Component({
   selector: 'app-collectors',
   templateUrl: './collectors.component.html',
   styleUrls: ['./collectors.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent]
+  imports: [CommonModule, FormsModule, PaginationComponent, SearchFilterComponent]
 })
 export class CollectorsComponent {
   collectors: Collector[] = [];
@@ -33,6 +35,40 @@ export class CollectorsComponent {
     this.cityOptions = Array.from(new Set(this.collectors.map(c => (c.country || '').toString()).filter(Boolean)));
     this.filteredCollectors = [...this.collectors];
     this.applyFilters();
+  }
+  onSearch(term: string) {
+    this.filterName = term || '';
+    this.applyFilters();
+  }
+
+  onFilter(filters: any) {
+    if (!filters) return;
+    if (filters.category) {
+      // no category on building model by default, keep for future
+    }
+    if (filters.city !== undefined) {
+      this.filterCity = filters.city || '';
+    }
+    if (filters.q !== undefined) {
+      this.filterName = filters.q || '';
+    }
+    this.applyFilters();
+  }
+
+  onRefreshClicked() {
+    // re-fetch data from service and reapply filters
+    this.collectors = this.collectorsService.getCollectors();
+    this.cityOptions = Array.from(new Set(this.collectors.map(c => (c.country || '').toString()).filter(Boolean)));
+    this.applyFilters();
+  }
+
+  onPrintClicked() {
+    // print current filtered view
+    window.print();
+  }
+
+  onAddNewClicked() {
+    this.goToNewCollector();
   }
 
   goToNewCollector() {

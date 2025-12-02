@@ -29,12 +29,12 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 .page-header-inline .header-right{ display:flex; gap:8px }
 
 //
-.back-btn i{ font-size: 0.95rem }
+.back-btn i{ font-size: 0.65rem }
 .back-label{ font-weight:600 }
 
 /* Page container font and size adjustments for add/edit pages */
 .page-container{
-  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Poppins, 'Helvetica Neue', Arial;
   font-size: 14px;
   color: $text-color;
 }
@@ -46,7 +46,6 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   margin-bottom: 25px;
   position: relative;
   padding-bottom: 15px;
-  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
@@ -54,26 +53,14 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 18px;
-}
-
-.back-btn {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 8px 15px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    transform: translateX(-3px);
-  }
+  font-size: 14px;
 }
 // Cartes et formulaires
 .form-card {
   background: white;
   border-radius: 5px;
   box-shadow: $card-shadow;
-  padding: 25px;
+  padding: 20px;
   position: relative;
   margin-bottom: 30px;
 }
@@ -82,14 +69,13 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 .owner-form {
   .form-section {
     padding: 32px;
-    border-bottom: 1px solid $border-color;
     
     &:last-child {
       border-bottom: none;
     }
     
     @media (max-width: 768px) {
-      padding: 24px;
+          padding: 20px;
     }
   }
 }
@@ -109,7 +95,7 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   
   h5 {
     margin: 0;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: $text-color;
   }
@@ -139,7 +125,7 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 
 // Groupes de formulaire améliorés
 .form-group {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   
   &.full-width {
     grid-column: 1 / -1;
@@ -336,7 +322,7 @@ select.underline-input {
 .modal-card {
   background: white;
   border-radius: 12px;
-  padding: 24px;
+      padding: 20px;
   max-width: 400px;
   width: 100%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);

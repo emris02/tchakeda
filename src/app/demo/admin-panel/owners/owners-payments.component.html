@@ -1,93 +1,408 @@
 <div class="page-container owners-payments">
-  <div class="card">
-    <div class="card-body d-flex align-items-center justify-content-between">
-      <div class="filter-panel d-flex align-items-center">
-        <div class="form-group">
-          <select class="underline-input period-select me-2" [(ngModel)]="selectedOwnerId" (change)="computeOwnerRentals(selectedOwnerId); applyFilters()">
-            <option [ngValue]="undefined">Tous les propriétaires</option>
-            <option *ngFor="let o of owners" [ngValue]="o.id">{{ o.name }}</option>
-          </select>
-          <label class="label">Propriétaire</label>
-        </div>
-
-        <div class="form-group">
-          <select class="underline-input period-select me-2" [(ngModel)]="selectedPeriod" (change)="applyFilters()">
-            <option value="">Toutes les périodes</option>
-            <option *ngFor="let p of periods" [value]="p">{{ p }}</option>
-          </select>
-          <label class="label">Période</label>
-        </div>
-
-        <div class="form-group">
-          <input class="underline-input search-input me-2" placeholder=" " [(ngModel)]="searchTerm" (input)="applyFilters()" />
-          <label class="label">Rechercher</label>
-        </div>
-        <button class="btn btn-filter btn-outline-primary" (click)="applyFilters()"><i class="fas fa-search"></i> Filtrer</button>
-      </div>
-
+  <!-- Header avec navigation -->
+  <section class="page-header">
+    <div class="page-header__left">
+      <button class="icon-button ghost" type="button" (click)="back()" aria-label="Retour">
+        <span class="icon-chevron-left">←</span>
+      </button>
       <div>
-        <!-- reserved for actions -->
+        <h1>Paiements des propriétaires</h1>
+        <p>Suivez les encaissements et commissions par propriétaire</p>
       </div>
     </div>
-  </div>
+    <div class="page-header__right" *ngIf="selectedOwner">
+      <button class="btn btn-outline" type="button" (click)="viewOwnerDetails()">
+        Voir le profil
+      </button>
+      <button class="btn btn-primary" type="button" (click)="exportPayments()">
+        Exporter les données
+      </button>
+    </div>
+  </section>
 
-  <!-- Owner summary (distinct from recouvreurs view) -->
-  <div class="summary-card card mt-3">
-    <div class="card-body d-flex align-items-center justify-content-between">
-      <div>
-        <h6>Total collecté</h6>
-        <div class="summary-amount">{{ totalCollected | number:'1.0-0' }} Fcfa</div>
-        <div class="muted">{{ paymentsCount }} paiements</div>
+  <!-- Filtres avancés -->
+  <section class="content-wrapper">
+    <div class="filters-card card">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label class="filter-label">Propriétaire</label>
+          <select 
+            class="modern-select" 
+            [(ngModel)]="selectedOwnerId" 
+            (change)="onOwnerChange(selectedOwnerId)">
+            <option [ngValue]="undefined">Tous les propriétaires</option>
+            <option *ngFor="let owner of owners" [ngValue]="owner.id">
+              {{ owner.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Période</label>
+          <select 
+            class="modern-select" 
+            [(ngModel)]="selectedPeriod" 
+            (change)="onPeriodChange(selectedPeriod)">
+            <option value="">Toutes les périodes</option>
+            <option *ngFor="let period of periods" [value]="period">
+              {{ period }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Statut</label>
+          <select 
+            class="modern-select" 
+            [(ngModel)]="statusFilter" 
+            (change)="onStatusChange(statusFilter)">
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Mode de paiement</label>
+          <select 
+            class="modern-select" 
+            [(ngModel)]="paymentMethodFilter" 
+            (change)="onPaymentMethodChange(paymentMethodFilter)">
+            <option *ngFor="let option of paymentMethodOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group search-group">
+          <label class="filter-label">Recherche</label>
+          <div class="search-field">
+            <input
+              type="text"
+              placeholder="Locataire, appartement, bâtiment..."
+              [ngModel]="searchTerm"
+              (ngModelChange)="onSearchChange($event)" />
+            <span class="icon-search">🔍</span>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button 
+            class="btn btn-ghost" 
+            type="button" 
+            (click)="resetFilters()"
+            [disabled]="!hasActiveFilters">
+            Réinitialiser
+          </button>
+          <button 
+            class="btn btn-outline" 
+            type="button" 
+            (click)="refreshData()">
+            <span class="icon-refresh">🔄</span>
+            Actualiser
+          </button>
+        </div>
       </div>
 
-      <div class="methods">
-        <h6>Méthodes</h6>
-        <div class="method-list d-flex">
-          <span *ngFor="let m of methodBreakdown" class="method-chip">
-            {{ m.method }} — {{ m.amount | number:'1.0-0' }} Fcfa
+      <!-- Indicateur de filtres actifs -->
+      <div class="active-filters" *ngIf="hasActiveFilters">
+        <div class="filters-tags">
+          <span class="filter-tag" *ngIf="selectedPeriod">
+            Période: {{ selectedPeriod }}
+            <button (click)="selectedPeriod = ''; applyFilters()">×</button>
+          </span>
+          <span class="filter-tag" *ngIf="statusFilter">
+            Statut: {{ getStatusText(statusFilter) }}
+            <button (click)="statusFilter = ''; applyFilters()">×</button>
+          </span>
+          <span class="filter-tag" *ngIf="paymentMethodFilter">
+            Mode: {{ paymentMethodFilter }}
+            <button (click)="paymentMethodFilter = ''; applyFilters()">×</button>
+          </span>
+          <span class="filter-tag" *ngIf="searchTerm">
+            Recherche: "{{ searchTerm }}"
+            <button (click)="searchTerm = ''; applyFilters()">×</button>
           </span>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="periods">
-        <h6>Périodes</h6>
-        <div class="period-list">
-          <div *ngFor="let pt of periodTotals" class="period-row">{{ pt.period }} : {{ pt.amount | number:'1.0-0' }} Fcfa</div>
+  <!-- Cartes de statistiques -->
+  <section class="content-wrapper stats-grid" *ngIf="!loading">
+    <article 
+      class="stat-card" 
+      *ngFor="let card of dashboardCards" 
+      [ngClass]="card.accent">
+      <div class="stat-card__label">{{ card.label }}</div>
+      <div class="stat-card__value">{{ card.value }}</div>
+      <div class="stat-card__meta">
+        <span>{{ card.subLabel }}</span>
+        <small *ngIf="card.trend">{{ card.trend }}</small>
+      </div>
+    </article>
+  </section>
+
+  <!-- États de chargement et erreurs -->
+  <section class="content-wrapper" *ngIf="loading">
+    <div class="loading-state card">
+      <div class="loading-spinner"></div>
+      <p>Chargement des paiements...</p>
+    </div>
+  </section>
+
+  <section class="content-wrapper" *ngIf="errorMessage && !loading">
+    <div class="error-state card">
+      <div class="error-icon">⚠</div>
+      <h3>Erreur de chargement</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-primary" (click)="refreshData()">Réessayer</button>
+    </div>
+  </section>
+
+  <!-- Contenu principal -->
+  <section class="content-wrapper main-layout" *ngIf="!loading && !errorMessage">
+    
+    <!-- Tableau des paiements -->
+    <div class="main-panel card">
+      <div class="card-header">
+        <div class="header-content">
+          <div>
+            <h2>Historique des paiements</h2>
+            <p *ngIf="selectedOwner">
+              Paiements pour {{ selectedOwner.name }} • {{ filteredPayments.length }} résultat(s)
+            </p>
+            <p *ngIf="!selectedOwner">
+              Tous les paiements • {{ filteredPayments.length }} résultat(s)
+            </p>
+          </div>
+          <div class="header-actions">
+            <button 
+              class="btn btn-ghost" 
+              type="button"
+              [disabled]="filteredPayments.length === 0">
+              {{ filteredPayments.length }} paiement(s)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="data-table payments-table">
+            <thead>
+              <tr>
+                <th class="sortable" (click)="sortPayments('period')">
+                  <span>Période</span>
+                  <span class="sort-indicator">↕</span>
+                </th>
+                <th>Locataire</th>
+                <th>Logement</th>
+                <th class="sortable" (click)="sortPayments('amount')">
+                  <span>Montant</span>
+                  <span class="sort-indicator">↕</span>
+                </th>
+                <th>Commission</th>
+                <th>Mode</th>
+                <th class="sortable" (click)="sortPayments('paymentDate')">
+                  <span>Date</span>
+                  <span class="sort-indicator">↕</span>
+                </th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let payment of filteredPayments" 
+                class="clickable-row"
+                (click)="viewPaymentDetails(payment)"
+                [ngClass]="'row-' + payment.status">
+                <td>
+                  <div class="period-cell">
+                    <strong>{{ payment.period }}</strong>
+                    <small>{{ payment.collectorName }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="tenant-cell">
+                    <div class="tenant-avatar">
+                      {{ getInitials(payment.tenantName) }}
+                    </div>
+                    <div class="tenant-info">
+                      <strong>{{ payment.tenantName }}</strong>
+                      <small>{{ payment.buildingName }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="property-cell">
+                    <strong>{{ payment.apartmentName }}</strong>
+                    <small>{{ payment.buildingName }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="amount-cell">
+                    <strong>{{ formatCurrency(payment.amount) }}</strong>
+                    <small>Net: {{ formatCurrency(payment.netProprietaire || 0) }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="commission-cell">
+                    <span class="commission-amount">
+                      {{ formatCurrency(payment.commissionRecouvreur || 0) }}
+                    </span>
+                    <small *ngIf="payment.amount && payment.amount > 0">
+                      {{ ((payment.commissionRecouvreur || 0) / payment.amount * 100).toFixed(1) }}%
+                    </small>
+                  </div>
+                </td>
+                <td>
+                  <span class="payment-method-badge">
+                    {{ payment.paymentMethod }}
+                  </span>
+                </td>
+                <td>
+                  <div class="date-cell">
+                    <strong>{{ formatDate(payment.paymentDate) }}</strong>
+                    <small>{{ formatTime(payment.paymentDate) }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="payment.statusClass">
+                    {{ payment.statusText }}
+                  </span>
+                </td>
+              </tr>
+              
+              <tr *ngIf="filteredPayments.length === 0">
+                <td colspan="8">
+                  <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h4>Aucun paiement trouvé</h4>
+                    <p *ngIf="hasActiveFilters">
+                      Aucun résultat ne correspond à vos critères de filtrage.
+                    </p>
+                    <p *ngIf="!hasActiveFilters">
+                      Aucun paiement n'a été enregistré pour le moment.
+                    </p>
+                    <button 
+                      class="btn btn-outline" 
+                      *ngIf="hasActiveFilters"
+                      (click)="resetFilters()">
+                      Réinitialiser les filtres
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="table-footer" *ngIf="filteredPayments.length > 0">
+          <div class="pagination-info">
+            Affichage de {{ filteredPayments.length }} paiement(s)
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="content-container mt-3">
-    <div class="table-responsive">
-      <table class="table table-hover payments-table">
-        <thead>
-          <tr>
-            <th>Bâtiment</th>
-            <th>Mensualité</th>
-            <th>Date de paiement</th>
-            <th>Mode</th>
-            <th>Montant payé</th>
-            <th>Locataire</th>
-            <th>Recouvreur</th>
-            <th>Appartement</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of filteredPayments">
-            <td>{{ p.buildingName }}</td>
-            <td>{{ p.amount | number:'1.0-0' }} Fcfa</td>
-            <td>{{ p.paymentDate | date:'dd/MM/yyyy' }}</td>
-            <td>{{ p.paymentMethod }}</td>
-            <td>{{ p.amount | number:'1.0-0' }} Fcfa</td>
-            <td>{{ p.tenantName || '-' }}</td>
-            <td>{{ p.collectorName || '-' }}</td>
-            <td>{{ p.apartmentName || '-' }}</td>
-          </tr>
-          <tr *ngIf="filteredPayments.length === 0"><td colspan="8" class="text-center">Aucun paiement enregistré</td></tr>
-        </tbody>
-      </table>
+    <!-- Panneau latéral avec analyses -->
+    <aside class="side-panel">
+      
+      <!-- Breakdown par méthode de paiement -->
+      <div class="card breakdown-card">
+        <div class="card-header">
+          <h3>Répartition par mode</h3>
+        </div>
+        <div class="card-body">
+          <div class="breakdown-list">
+            <div 
+              *ngFor="let method of methodBreakdown" 
+              class="breakdown-item"
+              [style.--percentage]="method.percentage + '%'">
+              <div class="breakdown-header">
+                <span class="method-name">{{ method.method }}</span>
+                <span class="method-amount">{{ formatCurrency(method.amount) }}</span>
+              </div>
+              <div class="breakdown-bar">
+                <div class="breakdown-fill" [style.width.%]="method.percentage"></div>
+              </div>
+              <div class="breakdown-meta">
+                <span>{{ method.count }} paiement(s)</span>
+                <span>{{ formatPercentage(method.percentage) }}</span>
+              </div>
+            </div>
+            <div *ngIf="methodBreakdown.length === 0" class="empty-breakdown">
+              <p>Aucune donnée disponible</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paiements récents -->
+      <div class="card recent-payments-card">
+        <div class="card-header">
+          <h3>Derniers encaissements</h3>
+        </div>
+        <div class="card-body">
+          <div class="recent-list">
+            <div 
+              *ngFor="let payment of recentPayments" 
+              class="recent-item"
+              (click)="viewPaymentDetails(payment)">
+              <div class="recent-avatar">
+                {{ getInitials(payment.tenantName) }}
+              </div>
+              <div class="recent-content">
+                <strong>{{ payment.tenantName }}</strong>
+                <p>{{ payment.period }} • {{ formatCurrency(payment.amount) }}</p>
+              </div>
+              <span class="status-badge small" [ngClass]="payment.statusClass">
+                {{ payment.statusText }}
+              </span>
+            </div>
+            <div *ngIf="recentPayments.length === 0" class="empty-recent">
+              <p>Aucun paiement récent</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Résumé par période -->
+      <div class="card period-summary-card">
+        <div class="card-header">
+          <h3>Par période</h3>
+        </div>
+        <div class="card-body">
+          <div class="period-list">
+            <div *ngFor="let period of periodTotals" class="period-item">
+              <div class="period-header">
+                <strong>{{ period.period }}</strong>
+                <span>{{ formatCurrency(period.amount) }}</span>
+              </div>
+              <div class="period-details">
+                <span>{{ period.paymentCount }} paiement(s)</span>
+                <span class="commission">-{{ formatCurrency(period.commission) }}</span>
+              </div>
+              <div class="period-net">
+                <strong>Net: {{ formatCurrency(period.netAmount) }}</strong>
+              </div>
+            </div>
+            <div *ngIf="periodTotals.length === 0" class="empty-periods">
+              <p>Aucune donnée par période</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </section>
+
+  <!-- Toast notifications -->
+  <div class="toast-container" [class.show]="showToast">
+    <div class="toast" [ngClass]="toastType">
+      {{ toastMessage }}
     </div>
   </div>
 </div>
-

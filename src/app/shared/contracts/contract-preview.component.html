@@ -1,0 +1,33 @@
+<div *ngIf="visible" class="cp-backdrop" (click)="close()">
+  <div class="cp-modal" (click)="$event.stopPropagation()">
+    <div class="cp-header">
+      <div class="cp-title">Aperçu du contrat</div>
+      <button class="btn-close" (click)="close()">Fermer</button>
+    </div>
+
+    <div class="cp-body">
+      <div class="contract-meta">
+        <div><strong>Parties:</strong> {{ contract?.tenantName || contract?.tenant || contract?.ownerName || contract?.owner || '-' }}</div>
+        <div><strong>Date:</strong> {{ contract?.leaseStart || contract?.mandateStart || contract?.createdAt || '-' }}</div>
+        <div><strong>Adresse:</strong> {{ contract?.address || contract?.apartmentAddress || '-' }}</div>
+        <div *ngIf="contract?.rentAmount !== undefined"><strong>Montant:</strong> {{ contract?.rentAmount | number:'1.0-0' }} FCFA</div>
+        <div *ngIf="contract?.commissionValue !== undefined"><strong>Commission:</strong> {{ contract?.commissionType === 'percent' ? (contract.commissionValue + '%') : (contract.commissionValue + ' FCFA') }}</div>
+        <div *ngIf="contract?.clauses"><strong>Clauses:</strong> <div class="clauses">{{ contract.clauses }}</div></div>
+      </div>
+
+      <div class="contract-preview-area">
+        <ng-container *ngIf="safeUrl; else noFile">
+          <iframe class="cp-iframe" [src]="safeUrl"></iframe>
+        </ng-container>
+        <ng-template #noFile>
+          <div class="no-file">Aucun fichier joint au contrat.</div>
+        </ng-template>
+      </div>
+
+      <div class="cp-actions">
+        <a *ngIf="contract?.contractFileUrl" [href]="contract.contractFileUrl" download class="btn btn-success btn-sm">Télécharger le contrat</a>
+        <button class="btn btn-secondary btn-sm" (click)="close()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

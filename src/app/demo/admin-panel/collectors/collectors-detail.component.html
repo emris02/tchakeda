@@ -1,8 +1,8 @@
 <div class="page-container">
-  
-    <button class="btn  back-btn" (click)="back()">
-      &lt;
-    </button>
+     <button class="btn back-btn" (click)="back()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Recouvreurs</span>
+      </button>
     <h4 class="page-title">Détail du recouvreur</h4>
 
   <!-- ===================== AFFILIATIONS MODAL ===================== -->
@@ -350,6 +350,19 @@
                     {{ collector?.email || '-' }}
                   </a>
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Contracts for collector -->
+        <div class="contracts-card" *ngIf="collectorOwnerCollectorContracts && collectorOwnerCollectorContracts.length">
+          <div class="card-header"><h5>Contrats (Recouvreur ↔ Propriétaire)</h5></div>
+          <div class="card-body">
+            <div *ngFor="let c of collectorOwnerCollectorContracts" class="contract-row">
+              <div class="contract-summary">Mandat: {{ c.mandateStart || '-' }} → {{ c.mandateEnd || '-' }} • {{ c.commissionType === 'percent' ? (c.commissionValue + '%') : (c.commissionValue + ' FCFA') }}</div>
+              <div class="contract-actions">
+                <button class="btn btn-outline-primary btn-sm" (click)="openContractPreview(c)">Aperçu du contrat</button>
+                <a class="btn btn-success btn-sm" [href]="c.contractFileUrl" download *ngIf="c.contractFileUrl">Télécharger contrat</a>
               </div>
             </div>
           </div>

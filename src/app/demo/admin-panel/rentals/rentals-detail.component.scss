@@ -23,7 +23,6 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   margin-bottom: 12px;
   position: relative;
   padding-bottom: 8px;
-  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
@@ -31,24 +30,15 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 18px;
-}
-
-.back-btn {
-  border-radius: 6px;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 14px;
 }
 
 // Cartes et formulaires
 .form-card {
-  // background: white;
+  background: white;
   border-radius: 12px;
-  // box-shadow: $card-shadow;
-  padding: 25px;
+  box-shadow: $card-shadow;
+  padding: 20px;
   position: relative;
   margin-bottom: 30px;
 }
@@ -59,7 +49,6 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   align-items: center;
   margin-bottom: 20px;
   margin:8px 0; 
-  // border-bottom: 1px solid $border-color;
 }
 
 .card-header h5 {
@@ -122,38 +111,6 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 }
 
-// Formulaires
-.form-group {
-  margin-bottom: 0;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.underline-input {
-  border: none;
-  border-bottom: 1px solid #ced4da;
-  border-radius: 0;
-  padding: 8px 0;
-  width: 100%;
-  background: transparent;
-  transition: border-color 0.3s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 1px 0 0 $primary-color;
-  }
-}
-
-.input-with-button {
-  position: relative;
-}
-
 .currency {
   position: absolute;
   right: 0;
@@ -163,7 +120,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
 .error {
   color: $danger-color;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   margin-top: 5px;
 }
 
@@ -232,12 +189,12 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   background: #fff;
   border-radius: 12px;
   box-shadow: $card-shadow;
-  padding: 25px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
 
   h5 {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     margin-bottom: 15px;
     border-bottom: 1px solid $border-color;
@@ -334,7 +291,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   background: #fff;
   border-radius: 12px;
   box-shadow: $card-shadow;
-  padding: 25px;
+  padding: 20px;
 
   .card-header {
     display: flex;
@@ -344,7 +301,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
     h5 {
       margin: 0;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 600;
       color: $text-color;
     }
@@ -580,7 +537,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
 .tenant-bio { text-align: center; }
 .tenant-avatar img { width: 96px; height: 96px; object-fit: cover; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.tenant-name { margin: 8px 0 4px 0; font-size: 18px; font-weight: 700; }
+.tenant-name { margin: 8px 0 4px 0; font-size: 14px; font-weight: 700; }
 .tenant-country, .tenant-phone { color: $text-muted; font-size: 14px; margin-bottom: 6px; }
 .tenant-about { color: $text-muted; font-size: 13px; margin-top: 8px; }
 .tenant-actions .btn-block { width: 100%; }
@@ -624,7 +581,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 .modal-card {
   background: white;
   border-radius: 12px;
-  padding: 25px;
+  padding: 20px;
   max-width: 500px;
   width: 100%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);

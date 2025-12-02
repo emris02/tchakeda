@@ -21,7 +21,7 @@
       <div class="input-with-button">
         <select id="ownerId" [(ngModel)]="form.ownerId" name="ownerId" class="underline-input" (change)="onOwnerChange()" required>
           <option [ngValue]="0">Sélectionner...</option>
-          <option *ngFor="let owner of owners" [ngValue]="owner.id">{{ owner.name }}</option>
+          <option *ngFor="let owner of owners" [ngValue]="owner.id">{{ owner.FullName }}</option>
         </select>
         <label for="ownerId" class="label">
           <i class="fas fa-user-tie"></i>
@@ -120,17 +120,18 @@
       <div class="input-with-button">
         <select id="collectorId" [(ngModel)]="form.collectorId" name="collectorId" class="underline-input" required>
           <option [ngValue]="0">Sélectionner...</option>
-          <option *ngFor="let collector of collectors" [ngValue]="collector.id">{{ collector.name }}</option>
+          <option *ngFor="let collector of collectors" [ngValue]="collector.id">{{ collector.fullName }}</option>
         </select>
         <label for="collectorId" class="label">
           <i class="fas fa-user-shield"></i>
           Recouvreur
         </label>
+        <div class="error" *ngIf="errors['collectorId']"><i class="fas fa-exclamation-circle"></i> {{ errors['collectorId'] }}</div>
         <button type="button" class="btn btn-outline-primary btn-sm" (click)="openNewCollectorDialog()" title="Ajouter un recouvreur">
           <i class="fas fa-user-plus"></i> Nouveau recouvreur
         </button>
       </div>
-      <div class="error" *ngIf="errors['collectorId']">{{ errors['collectorId'] }}</div>
+      <!-- <div class="error" *ngIf="errors['collectorId']">{{ errors['collectorId'] }}</div> -->
     </div>
 
     <!-- Date début -->

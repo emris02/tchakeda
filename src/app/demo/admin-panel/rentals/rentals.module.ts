@@ -18,7 +18,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    RentalsComponent,
     RentalsNewComponent,
     RentalsDetailComponent
   ],
@@ -32,7 +31,6 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   exports: [
-    RentalsComponent,
     RentalsNewComponent,
     RentalsDetailComponent
   ]

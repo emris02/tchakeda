@@ -25,7 +25,6 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin-bottom: 25px;
   position: relative;
   padding-bottom: 15px;
-  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
@@ -33,16 +32,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 18px;
-}
-
-.back-btn {
-  border-radius: 6px;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 14px;
 }
 
 // Cartes
@@ -57,7 +47,6 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 16px;
     font-size: 16px;
     font-weight: 600;
-//f0f0f0;
     padding-bottom: 8px;
     color: $text-color;
   }
@@ -69,7 +58,6 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid $border-color;
 }
 
 // Grilles
@@ -335,7 +323,7 @@ input[type="file"].hidden-input {
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  padding: 24px;
+      padding: 20px;
   max-width: 500px;
   margin: 0 auto;
   box-shadow: $card-shadow;
@@ -364,7 +352,7 @@ input[type="file"].hidden-input {
 }
 
 .room-name-preview {
-  margin-top: 12px;
+  margin-top: 0px;
   font-weight: 600;
   color: $text-color;
   font-size: 1.1rem;
@@ -512,7 +500,7 @@ input[type="file"].hidden-input {
   border: none;
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   transition: background 0.2s;
   box-shadow: 0 2px 6px rgba(46, 125, 50, 0.08);
@@ -653,7 +641,7 @@ input[type="file"].hidden-input {
 
 // Informations d'image
 .image-info-edit {
-  margin-top: 12px;
+  margin-top: 0px;
   
   .form-group {
     margin-bottom: 12px;
@@ -661,7 +649,7 @@ input[type="file"].hidden-input {
 }
 
 .image-live-info, .image-permanent-info {
-  margin-top: 12px;
+  margin-top: 0px;
   padding: 12px;
   background: #f8f9fa;
   border-radius: 6px;
@@ -879,18 +867,7 @@ input[type="file"].hidden-input {
 }
 
 .btn {
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid;
-  font-size: 14px;
-  
-  &.btn-sm {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
+
   
   &.btn-outline-primary {
     background: transparent;
@@ -1034,7 +1011,7 @@ input[type="file"].hidden-input {
 .modal-card {
   background: white;
   border-radius: 12px;
-  padding: 24px;
+      padding: 20px;
   max-width: 500px;
   width: 100%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -1219,5 +1196,5 @@ input[type="file"].hidden-input {
 
 .mt-2 { margin-top: 8px; }
 .mb-2 { margin-bottom: 8px; }
-.mt-3 { margin-top: 12px; }
+.mt-3 { margin-top: 0px; }
 .mb-3 { margin-bottom: 12px; }

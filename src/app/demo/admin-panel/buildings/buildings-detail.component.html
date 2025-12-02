@@ -1,8 +1,8 @@
 <div class="page-container">
-  
-    <button class="btn  back-btn" (click)="back()">
-      &lt;
-    </button>
+     <button class="btn back-btn" (click)="back()" title="Retour à la liste">
+        <i class="fas fa-chevron-left"></i>
+        <span class="back-label">Bâtiments</span>
+      </button>
     <h4 class="page-title">Détail du bâtiment</h4>
 
   <!-- Modal suppression -->
@@ -13,6 +13,32 @@
       <div class="form-actions">
         <button type="button" class="btn btn-light" (click)="showDeleteConfirm = false">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteBuilding()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal liaison appartement -->
+  <div *ngIf="showLinkApartmentModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 500px;">
+      <h5><i class="fas fa-link"></i> Lier un appartement</h5>
+      <p>Sélectionnez un appartement existant à lier à ce bâtiment :</p>
+      
+      <div class="form-group">
+        <select [(ngModel)]="selectedApartmentId" class="underline-input" style="width: 100%;">
+          <option [ngValue]="null">Sélectionner un appartement...</option>
+          <option *ngFor="let apartment of availableApartments" [ngValue]="apartment.id">
+            {{ apartment.name }} - {{ apartment.type }} ({{ apartment.rooms }} pièces) - {{ apartment.mention ? (apartment.mention | number) + ' FCFA' : 'Prix non défini' }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" (click)="showLinkApartmentModal = false">Annuler</button>
+        <button type="button" class="btn btn-primary" 
+                (click)="linkApartment()" 
+                [disabled]="!selectedApartmentId">
+          <i class="fas fa-link"></i> Lier l'appartement
+        </button>
       </div>
     </div>
   </div>
@@ -40,7 +66,7 @@
     </div>
 
     <!-- Mode édition -->
-      <form *ngIf="editMode" id="buildingForm" (ngSubmit)="save()" class="building-form">
+    <form *ngIf="editMode" id="buildingForm" (ngSubmit)="save()" class="building-form">
       <div class="form-grid">
         <!-- Nom -->
         <div class="form-group">
@@ -59,14 +85,14 @@
           <div class="input-container">
             <select id="type" [(ngModel)]="form.type" name="type" class="underline-input" (change)="onTypeChange($event)" required>
               <option [ngValue]="null">Sélectionner...</option>
-                <option value="résidentiel">Résidentiel</option>
-                <option value="commercial">Commercial</option>
-                <option value="mixte">Mixte</option>
-                <option value="studio">Studio</option>
-                <option value="apartment">Appartement</option>
-                <option value="hotel">Hôtel</option>
-                <option value="villa">Villa</option>
-                <option value="autre">Autre...</option>
+              <option value="résidentiel">Résidentiel</option>
+              <option value="commercial">Commercial</option>
+              <option value="mixte">Mixte</option>
+              <option value="studio">Studio</option>
+              <option value="apartment">Appartement</option>
+              <option value="hotel">Hôtel</option>
+              <option value="villa">Villa</option>
+              <option value="autre">Autre...</option>
             </select>
             <label for="type" class="label">
               <i class="fas fa-list"></i>
@@ -162,61 +188,144 @@
       </div>
     </form>
 
-<!-- Mode lecture -->
-<div *ngIf="!editMode" class="card-content">
+    <!-- Mode lecture -->
+    <div *ngIf="!editMode" class="card-content">
+      <div class="details-grid">
+        <div class="form-group">
+          <label><i class="fas fa-building"></i> Nom</label>
+          <p>{{ building?.name || '-' }}</p>
+        </div>
 
-  <div class="details-grid">
-    <div class="form-group">
-      <label><i class="fas fa-building"></i> Nom</label>
-      <p>{{ building?.name || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-list"></i> Type</label>
+          <p>{{ building?.type === 'autre' ? building?.customType : building?.type || '-' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-list"></i> Type</label>
-      <p>{{ building?.type === 'autre' ? building?.customType : building?.type || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-layer-group"></i> Étages</label>
+          <p>{{ building?.floors || '-' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-layer-group"></i> Étages</label>
-      <p>{{ building?.floors || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-door-closed"></i> Appartements</label>
+          <p>{{ building?.apartments || '-' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-door-closed"></i> Appartements</label>
-      <p>{{ building?.apartments || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-map-marker-alt"></i> Adresse</label>
+          <p>{{ building?.address || '-' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-map-marker-alt"></i> Adresse</label>
-      <p>{{ building?.address || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-city"></i> Ville</label>
+          <p>{{ building?.city || '-' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-city"></i> Ville</label>
-      <p>{{ building?.city || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-map-marked-alt"></i> Région</label>
+          <p>{{ building?.region || '-' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-map-marked-alt"></i> Région</label>
-      <p>{{ building?.region || '-' }}</p>
-    </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar-alt"></i> Date construction</label>
+          <p>{{ building?.constructionDate | date:'dd/MM/yyyy' }}</p>
+        </div>
 
-    <div class="form-group">
-      <label><i class="fas fa-calendar-alt"></i> Date construction</label>
-      <p>{{ building?.constructionDate | date:'dd/MM/yyyy' }}</p>
-    </div>
-
-    <div class="form-group">
-      <label><i class="fas fa-user"></i> Propriétaire</label>
-      <p>{{ getOwnerName(building?.ownerId) || '-' }}</p>
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Propriétaire</label>
+          <p>{{ getOwnerName(building?.ownerId) || '-' }}</p>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- Appartements -->
+  <!-- Section Gestion des Appartements -->
+  <div class="form-card">
+    <div class="card-header">
+      <h5><i class="fas fa-building"></i> Gestion des Appartements</h5>
+      <div class="action-buttons">
+        <button class="btn btn-primary btn-sm" (click)="goToNewApartment()" title="Créer un nouvel appartement">
+          <i class="fas fa-plus"></i> Nouvel appartement
+        </button>
+        <button class="btn btn-outline-primary btn-sm" (click)="showLinkApartmentModal = true" title="Lier un appartement existant">
+          <i class="fas fa-link"></i> Lier un appartement
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistiques améliorées -->
+    <div class="stats-grid-enhanced">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <i class="fas fa-building"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ buildingApartments.length }}</div>
+          <div class="stat-label">Appartements total</div>
+          <div class="stat-subtext">Sur {{ building?.apartments || 0 }} prévus</div>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(buildingApartments.length / (building?.apartments || 1)) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ occupiedApartmentsCount }}</div>
+          <div class="stat-label">Occupés</div>
+          <div class="stat-subtext">{{ (occupiedApartmentsCount / buildingApartments.length * 100) || 0 | number:'1.0-0' }}% du total</div>
+        </div>
+        <div class="stat-trend" [class.trend-up]="occupancyTrend > 0" [class.trend-down]="occupancyTrend < 0">
+          <i class="fas" [class.fa-arrow-up]="occupancyTrend > 0" [class.fa-arrow-down]="occupancyTrend < 0"></i>
+          {{ Math.abs(occupancyTrend) }}%
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <i class="fas fa-door-open"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ freeApartmentsCount }}</div>
+          <div class="stat-label">Libres</div>
+          <div class="stat-subtext">{{ (freeApartmentsCount / buildingApartments.length * 100) || 0 | number:'1.0-0' }}% du total</div>
+        </div>
+      </div>
+
+      <div class="stat-card info">
+        <div class="stat-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ occupancyRate }}%</div>
+          <div class="stat-label">Taux d'occupation</div>
+          <div class="stat-subtext">Moyenne du bâtiment</div>
+        </div>
+        <div class="stat-chart">
+          <div class="mini-chart">
+            <div class="chart-bar" [style.height.%]="occupancyRate"></div>
+            <div class="chart-bar" [style.height.%]="occupancyRate * 0.8"></div>
+            <div class="chart-bar" [style.height.%]="occupancyRate * 1.2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des appartements -->
   <div class="form-card" *ngIf="buildingApartments.length > 0">
     <div class="card-header">
       <h5>Appartements du bâtiment</h5>
+      <div class="apartment-actions">
+        <button class="btn btn-outline-secondary btn-sm" (click)="exportApartmentsList()" title="Exporter la liste">
+          <i class="fas fa-download"></i> Exporter
+        </button>
+      </div>
     </div>
     <div class="table-container">
       <table class="data-table">
@@ -225,53 +334,66 @@
             <th>Nom</th>
             <th>Type</th>
             <th>Pièces</th>
+            <th>Étage</th>
             <th>Locataire</th>
             <th>Loyer</th>
             <th>Statut</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let apartment of buildingApartments" (click)="goToApartment(apartment.id)" class="clickable-row">
-            <td>{{ apartment.name }}</td>
-            <td>{{ apartment.type }}</td>
-            <td>{{ apartment.rooms }}</td>
-            <td>{{ apartment.tenant || 'Libre' }}</td>
-            <td>{{ apartment.mention ? (apartment.mention | number) + ' FCFA' : '-' }}</td>
-            <td>
-              <span class="status-badge" [ngClass]="apartment.tenant ? 'status-occupied' : 'status-free'">
-                {{ apartment.tenant ? 'Occupé' : 'Libre' }}
+          <tr *ngFor="let apartment of buildingApartments" class="clickable-row">
+            <td (click)="goToApartment(apartment.id)" class="apartment-name">
+              <i class="fas fa-home"></i>
+              {{ apartment.name }}
+            </td>
+            <td (click)="goToApartment(apartment.id)">{{ apartment.type }}</td>
+            <td (click)="goToApartment(apartment.id)">{{ apartment.rooms }}</td>
+            <td (click)="goToApartment(apartment.id)">
+              <span class="floor-badge" *ngIf="apartment.floor">Étage {{ apartment.floor }}</span>
+              <span class="text-muted" *ngIf="!apartment.floor">-</span>
+            </td>
+            <td (click)="goToApartment(apartment.id)">{{ apartment.tenant || 'Libre' }}</td>
+            <td (click)="goToApartment(apartment.id)">{{ apartment.mention ? (apartment.mention | number) + ' FCFA' : '-' }}</td>
+            <td (click)="goToApartment(apartment.id)">
+              <span class="status-badge" [ngClass]="{
+                'status-occupied': apartment.tenant,
+                'status-free': !apartment.tenant,
+                'status-maintenance': apartment.underMaintenance
+              }">
+                <i class="fas" [class.fa-user]="apartment.tenant" [class.fa-door-open]="!apartment.tenant" [class.fa-tools]="apartment.underMaintenance"></i>
+                {{ apartment.underMaintenance ? 'Maintenance' : (apartment.tenant ? 'Occupé' : 'Libre') }}
               </span>
             </td>
-          </tr>
-          <tr *ngIf="buildingApartments.length === 0">
-            <td colspan="6" class="text-center text-muted">Aucun appartement trouvé</td>
+            <td>
+              <div class="action-buttons compact">
+                <button class="action-btn edit" (click)="goToApartment(apartment.id)" title="Voir détails">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn unlink" (click)="unlinkApartment(apartment.id)" title="Délier l'appartement">
+                  <i class="fas fa-unlink"></i>
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Statistiques -->
-  <div class="form-card" *ngIf="!editMode">
-    <div class="card-header">
-      <h5>Statistiques</h5>
-    </div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value">{{ buildingApartments.length }}</div>
-        <div class="stat-label">Appartements total</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ occupiedApartmentsCount }}</div>
-        <div class="stat-label">Occupés</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ freeApartmentsCount }}</div>
-        <div class="stat-label">Libres</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ occupancyRate }}%</div>
-        <div class="stat-label">Taux d'occupation</div>
+  <!-- Message si aucun appartement -->
+  <div class="form-card" *ngIf="buildingApartments.length === 0 && !editMode">
+    <div class="empty-state">
+      <i class="fas fa-building"></i>
+      <h6>Aucun appartement lié</h6>
+      <p>Ce bâtiment ne contient aucun appartement pour le moment.</p>
+      <div class="empty-state-actions">
+        <button class="btn btn-primary" (click)="goToNewApartment()">
+          <i class="fas fa-plus"></i> Créer le premier appartement
+        </button>
+        <button class="btn btn-outline-primary" (click)="showLinkApartmentModal = true">
+          <i class="fas fa-link"></i> Lier un appartement existant
+        </button>
       </div>
     </div>
   </div>

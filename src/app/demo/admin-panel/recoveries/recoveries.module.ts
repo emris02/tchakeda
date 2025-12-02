@@ -17,7 +17,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    RecoveriesComponent,
     RecoveriesNewComponent,
     RecoveriesDetailComponent,
     RecoveriePaymentsComponent
@@ -30,7 +29,6 @@ const routes: Routes = [
     CurrencyPipe
   ],
   exports: [
-    RecoveriesComponent,
     RecoveriesNewComponent,
     RecoveriesDetailComponent,
     RecoveriePaymentsComponent

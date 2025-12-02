@@ -25,7 +25,7 @@ $card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .add-image-content .btn.btn-outline-primary {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   padding: 0.18rem 0.5rem;
   border-radius: 5px;
   min-width: 80px;
@@ -59,7 +59,7 @@ color: #fff !important;
     padding: 0.3rem;
   }
   .add-image-content .btn.btn-outline-primary {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     min-width: 90px;
     padding: 0.25rem 0.6rem;
   }
@@ -184,12 +184,12 @@ color: #fff !important;
 .page-header-inline .header-right{ display:flex; gap:8px }
 
 //
-.back-btn i{ font-size: 0.95rem }
+.back-btn i{ font-size: 0.65rem }
 .back-label{ font-weight:600 }
 
 /* Page container font and size adjustments for add/edit pages */
 .page-container{
-  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Poppins, 'Helvetica Neue', Arial;
   font-size: 14px;
   color: $text-color;
 }
@@ -209,19 +209,7 @@ color: #fff !important;
   text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 18px;
-}
-
-.back-btn {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 8px 15px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    transform: translateX(-3px);
-  }
+  font-size: 14px;
 }
 
 // Cartes et formulaires
@@ -229,9 +217,9 @@ color: #fff !important;
   background: white;
   border-radius: 5px;
   box-shadow: $card-shadow;
-  padding: 25px;
+  padding: 20px;
   position: relative;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 // ===========================
@@ -545,7 +533,7 @@ color: #fff !important;
   display: flex;
   gap: 8px;
   justify-content: center;
-  margin-top: 12px;
+  margin-top: 0px;
   
   .btn-sm {
     padding: 6px 12px;
@@ -807,5 +795,5 @@ color: #fff !important;
 
 .mt-2 { margin-top: 8px; }
 .mb-2 { margin-bottom: 8px; }
-.mt-3 { margin-top: 12px; }
+.mt-3 { margin-top: 0px; }
 .mb-3 { margin-bottom: 12px; }

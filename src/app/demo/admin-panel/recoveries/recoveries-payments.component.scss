@@ -1,6 +1,10 @@
 @use '/src/scss/form_imports';
 
-// Variables
+// =====================
+// Variables & Mixins
+// =====================
+
+// Couleurs
 $primary-color: #4099ff;
 $primary-dark: #2d7dd2;
 $success-color: #2e7d32;
@@ -10,24 +14,43 @@ $text-color: #333;
 $text-muted: #666;
 $border-color: #e0e0e0;
 $bg-light: #f8f9fa;
+
+// Ombres
 $card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-// Container principal
+// =====================
+// Animations
+// =====================
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// =====================
+// Layout Principal
+// =====================
 .payment-recovery-container {
-  padding: 0px;
+  padding: 0;
   background: $bg-light;
   min-height: 100vh;
 }
 
-// Header
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+// =====================
+// En-tête de Page
+// =====================
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid $border-color;
 
   &__left {
     display: flex;
@@ -49,41 +72,14 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-.icon-button {
-  background: #fff;
-  border: 1px solid $border-color;
-  border-radius: 6px;
-  padding: 8px 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: $bg-light;
-    border-color: $primary-color;
-  }
-
-  &.ghost {
-    background: transparent;
-    border: none;
-  }
-}
-
-// Content wrapper
-.content-wrapper {
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-// Stats grid
+// =====================
+// Cartes de Statistiques
+// =====================
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   .stat-card {
     background: #fff;
@@ -97,21 +93,11 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       box-shadow: $card-hover-shadow;
     }
 
-    &.primary {
-      border-left: 4px solid $primary-color;
-    }
-
-    &.success {
-      border-left: 4px solid $success-color;
-    }
-
-    &.warning {
-      border-left: 4px solid $warning-color;
-    }
-
-    &.danger {
-      border-left: 4px solid $danger-color;
-    }
+    // Variantes de couleurs
+    &.primary { border-left: 4px solid $primary-color; }
+    &.success { border-left: 4px solid $success-color; }
+    &.warning { border-left: 4px solid $warning-color; }
+    &.danger { border-left: 4px solid $danger-color; }
 
     &__label {
       font-size: 13px;
@@ -136,11 +122,13 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Main layout
+// =====================
+// Layout Principal Formulaire
+// =====================
 .main-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 24px;
+  grid-template-columns: 1fr 0px;
+  gap: 0px;
   margin-bottom: 32px;
 
   @media (max-width: 1024px) {
@@ -148,17 +136,18 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Form panel
+// =====================
+// Panel de Formulaire
+// =====================
 .form-panel {
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+      padding: 20px;
   box-shadow: $card-shadow;
 
   .panel-header {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 1px solid $border-color;
 
     .eyebrow {
       text-transform: uppercase;
@@ -183,12 +172,32 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Stepper
+// =====================
+// Layout Conteneur Formulaire
+// =====================
+.form-layout-container {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+  }
+}
+
+.form-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+// =====================
+// Stepper / Étapes
+// =====================
 .stepper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -205,6 +214,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     transition: all 0.2s ease;
 
+    // États du stepper
     &.current {
       border-color: $primary-color;
       background: rgba(64, 153, 255, 0.05);
@@ -251,11 +261,13 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Step content
+// =====================
+// Contenu des Étapes
+// =====================
 .step-content {
   background: $bg-light;
   border-radius: 8px;
-  padding: 24px;
+      padding: 20px;
 }
 
 .step-form {
@@ -264,6 +276,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   gap: 20px;
 }
 
+// =====================
+// Grilles de Formulaire
+// =====================
 .form-grid {
   display: grid;
   gap: 20px;
@@ -277,6 +292,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
+// =====================
+// Champs de Formulaire
+// =====================
 .form-field {
   display: flex;
   flex-direction: column;
@@ -288,47 +306,64 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     color: $text-color;
   }
 
-  input:not(.underline-input),
-  select:not(.underline-input) {
+  /* Inputs avec label flottant */
+  ._input-form {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid $border-color;
-    border-radius: 6px;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    background: transparent;
     font-size: 14px;
-    background: #fff;
-    transition: border-color 0.2s ease;
+    outline: none;
 
     &:focus {
-      outline: none;
       border-color: $primary-color;
     }
 
-    &:disabled {
-      background: $bg-light;
-      cursor: not-allowed;
+    /* Label flottant */
+    &:focus + .label,
+    &:not(:placeholder-shown) + .label {
+      transform: translateY(-20px);
+      font-size: 12px;
+      color: $primary-color;
     }
+  }
+
+  /* Label général */
+  .label {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    font-size: 14px;
+    color: #999;
+    pointer-events: none;
+    transition: all 0.2s ease;
   }
 }
 
+/* Suffix pour les inputs avec unité */
 .input-with-suffix {
   position: relative;
   display: flex;
   align-items: center;
 
-  input:not(.underline-input) {
-    padding-right: 50px;
-  }
-
   .suffix {
     position: absolute;
-    right: 12px;
-    color: $text-muted;
-    font-weight: 600;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555;
     font-size: 14px;
+  }
+
+  input._input-form {
+    padding-right: 40px; /* espace pour le suffixe */
   }
 }
 
-// Cascade preview
+// =====================
+// Aperçu en Cascade
+// =====================
 .cascade-preview {
   display: flex;
   align-items: center;
@@ -358,7 +393,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .preview-title {
@@ -374,7 +409,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Calculation summary
+// =====================
+// Résumé des Calculs
+// =====================
 .calculation-summary {
   background: #fff;
   border: 1px solid $border-color;
@@ -432,7 +469,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Step actions
+// =====================
+// Actions des Étapes
+// =====================
 .step-actions {
   display: flex;
   justify-content: flex-end;
@@ -440,60 +479,339 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin-top: 24px;
 }
 
-// Buttons
+// =====================
+// Boutons
+// =====================
+// =====================
+// Variables pour les Boutons
+// =====================
+$btn-sm-padding: 6px 12px;
+$btn-sm-font-size: 11px;
+$btn-sm-icon-size: 12px;
+$btn-border-radius: 6px;
+$btn-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// =====================
+// Styles de Base des Boutons
+// =====================
 .btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-
-  &.btn-primary {
-    background: $primary-color;
-    color: #fff;
-
-    &:hover:not(:disabled) {
-      background: $primary-dark;
-    }
-
-    &:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
+  gap: 4px;
+  padding: $btn-sm-padding;
+  border: none;
+  border-radius: $btn-border-radius;
+  font-size: $btn-sm-font-size;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $btn-transition;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1.2;
+  position: relative;
+  overflow: hidden;
+  
+  // Effets de hover
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-
-  &.btn-ghost {
-    background: transparent;
-    color: $text-color;
-    border: 1px solid $border-color;
-
-    &:hover {
-      background: $bg-light;
-    }
+  
+  // Focus state
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(64, 153, 255, 0.1);
   }
-
-  &.btn-success {
-    background: $success-color;
-    color: #fff;
-
-    &:hover:not(:disabled) {
-      background: darken($success-color, 10%);
+  
+  // Active state
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    transition-duration: 0.1s;
+  }
+  
+  // Disabled state
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  // Icônes
+  i {
+    font-size: $btn-sm-icon-size;
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover:not(:disabled) i {
+    transform: scale(1.1);
+  }
+  
+  // Taille small
+  &.btn-sm {
+    padding: 5px 10px;
+    font-size: 10px;
+    
+    i {
+      font-size: 11px;
     }
   }
 }
 
-// Side panel
+// =====================
+// Variantes de Boutons
+// =====================
+.btn-outline {
+  background: transparent;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    color: #4099ff;
+    border-color: #4099ff;
+  }
+}
+
+.btn-primary {
+  background: #4099ff;
+  color: white;
+  border: 1px solid #4099ff;
+  
+  &:hover:not(:disabled) {
+    background: #2d7dd2;
+    border-color: #2d7dd2;
+  }
+}
+
+.btn-info {
+  background: #17a2b8;
+  color: white;
+  border: 1px solid #17a2b8;
+  
+  &:hover:not(:disabled) {
+    background: #138496;
+    border-color: #138496;
+  }
+}
+
+.btn-success {
+  background: #2e7d32;
+  color: white;
+  border: 1px solid #2e7d32;
+  
+  &:hover:not(:disabled) {
+    background: #1b5e20;
+    border-color: #1b5e20;
+  }
+}
+
+// =====================
+// Modal Footer Spécifique
+// =====================
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #fafbfc;
+  
+  .footer-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    
+    // Animation d'entrée
+    .btn {
+      animation: btnSlideIn 0.4s ease-out backwards;
+      
+      @for $i from 1 through 5 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
+    }
+  }
+}
+
+// Animation d'entrée
+@keyframes btnSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// =====================
+// Responsive Design
+// =====================
+@media (max-width: 768px) {
+  .modal-footer .footer-actions {
+    gap: 6px;
+    
+    .btn {
+      flex: 1;
+      min-width: 0;
+      justify-content: center;
+      font-size: 10px;
+      padding: 4px 8px;
+      
+      // Sur très petits écrans, boutons icônes uniquement
+      @media (max-width: 480px) {
+        span:not(.icon) {
+          display: none;
+        }
+        
+        padding: 6px;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        
+        i {
+          margin: 0;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}
+
+// =====================
+// Améliorations du Modal
+// =====================
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.receipt-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 95vw;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+  
+  .modal-title {
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .modal-subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: #666;
+    }
+  }
+  
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #f8f9fa;
+      color: #333;
+    }
+  }
+}
+
+.modal-body {
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.receipt-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  border: none;
+  border-radius: 0;
+}
+
+// =====================
+// États de Chargement
+// =====================
+.btn.loading {
+  position: relative;
+  color: transparent !important;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: btnSpin 0.8s linear infinite;
+  }
+}
+
+@keyframes btnSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+// =====================
+// Panel Latéral
+// =====================
 .side-panel {
+  width: 350px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  @media (max-width: 1200px) {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
+// =====================
+// Carte Contrat Actif
+// =====================
 .contract-card {
   background: #fff;
   border-radius: 8px;
@@ -503,6 +821,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
 
   &:hover {
+    transform: translateY(-2px);
     box-shadow: $card-hover-shadow;
   }
 
@@ -512,7 +831,6 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid $border-color;
 
     h3 {
       margin: 0;
@@ -532,13 +850,14 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       .tenant-avatar {
         width: 40px;
         height: 40px;
-        border-radius: 6px;
-        background: rgba(64, 153, 255, 0.1);
-        color: $primary-color;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
       }
 
       strong {
@@ -556,55 +875,39 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
     .contract-dates {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 12px;
-      font-size: 13px;
-      color: $text-muted;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #6c757d;
+      margin-bottom: 8px;
     }
 
     .contract-price {
-      strong {
-        font-size: 18px;
-        color: $text-color;
-      }
+      text-align: center;
+      font-size: 16px;
+      color: #28a745;
     }
   }
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-
-  &.active {
-    background: rgba(46, 125, 50, 0.1);
-    color: $success-color;
-  }
-
-  &.paid {
-    background: rgba(46, 125, 50, 0.1);
-    color: $success-color;
-  }
-
-  &.late {
-    background: rgba(211, 47, 47, 0.1);
-    color: $danger-color;
-  }
-}
-
+// =====================
+// Timeline des Paiements
+// =====================
 .timeline-card {
   background: #fff;
   border-radius: 8px;
   padding: 20px;
   box-shadow: $card-shadow;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $card-hover-shadow;
+  }
 
   .card-header {
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid $border-color;
 
     h3 {
       margin: 0;
@@ -625,59 +928,98 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     align-items: center;
     gap: 12px;
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
     cursor: pointer;
-    transition: all 0.2s ease;
 
     &:hover {
-      background: $bg-light;
+      background-color: #f8f9fa;
+    }
+
+    &.clickable {
+      cursor: pointer;
     }
 
     .timeline-dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: $border-color;
+      flex-shrink: 0;
 
-      &.paid {
-        background: $success-color;
-      }
-
-      &.late {
-        background: $danger-color;
-      }
+      &.paid { background-color: #28a745; }
+      &.late { background-color: #dc3545; }
+      &.pending { background-color: #ffc107; }
     }
 
     .timeline-content {
       flex: 1;
+      min-width: 0;
 
       strong {
         display: block;
         font-size: 14px;
-        color: $text-color;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
       }
 
       p {
-        margin: 0;
         font-size: 12px;
-        color: $text-muted;
+        color: #6c757d;
+        margin: 0;
+      }
+
+      small {
+        font-size: 11px;
+        color: #adb5bd;
       }
     }
   }
 }
 
-// History section
+// =====================
+// Badges de Statut
+// =====================
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.active {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  &.paid {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  &.late {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  &.pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+}
+
+// =====================
+// Section Historique
+// =====================
 .history-section {
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+      padding: 20px;
   box-shadow: $card-shadow;
 
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid $border-color;
@@ -689,44 +1031,100 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       color: $text-color;
     }
 
-    .filters {
+    .actions-left {
       display: flex;
-      gap: 12px;
       align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
 
-      @media (max-width: 768px) {
-        flex-direction: column;
-        width: 100%;
+      .separator {
+        display: inline-block;
+        width: 1px;
+        height: 24px;
+        background: $border-color;
+        margin: 0 8px;
       }
 
-      .search-box {
-        position: relative;
+      .new-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
 
-        input {
-          padding: 8px 12px;
-          border: 1px solid $border-color;
-          border-radius: 6px;
+        .new-label {
+          font-weight: 500;
           font-size: 14px;
-          width: 200px;
+        }
+      }
 
-          @media (max-width: 768px) {
-            width: 100%;
+      .small-actions {
+        display: flex;
+        gap: 8px;
+
+        .small-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 6px;
+          border: 1px solid $border-color;
+          background: #fff;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            border-color: $primary-color;
+            background: $bg-light;
+          }
+
+          i {
+            font-size: 16px;
+          }
+        }
+
+        .refresh-icon i {
+          transition: transform 0.5s ease-in-out;
+        }
+
+        &.spinning {
+          i {
+            animation: spin 1s linear infinite;
           }
         }
       }
 
-      select {
-        padding: 8px 12px;
-        border: 1px solid $border-color;
-        border-radius: 6px;
-        font-size: 14px;
-        background: #fff;
+      .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .search-input {
+          padding: 8px 36px 8px 12px;
+          border: 1px solid $border-color;
+          border-radius: 6px;
+          font-size: 14px;
+          transition: border-color 0.2s ease;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+          }
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 10px;
+          font-size: 16px;
+          color: $text-muted;
+        }
       }
     }
   }
 }
 
-// Table
+// =====================
+// Tableau des Données
+// =====================
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -808,16 +1206,18 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Summary card
+// =====================
+// Carte de Récapitulatif
+// =====================
 .summary-card {
   background: #fff;
   border: 1px solid $border-color;
   border-radius: 8px;
-  padding: 24px;
+      padding: 20px;
 
   h3 {
     margin: 0 0 20px 0;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: $text-color;
   }
@@ -893,7 +1293,18 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-top: 1px solid $border-color;
 }
 
-// Toast
+// =====================
+// États Vides
+// =====================
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+// =====================
+// Toast & Notifications
+// =====================
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -918,7 +1329,9 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Modals
+// =====================
+// Modals & Overlays
+// =====================
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -944,13 +1357,8 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   flex-direction: column;
   box-shadow: $card-hover-shadow;
 
-  &.large {
-    max-width: 800px;
-  }
-
-  &.xlarge {
-    max-width: 1000px;
-  }
+  &.large { max-width: 800px; }
+  &.xlarge { max-width: 1000px; }
 
   .modal-header {
     padding: 20px 24px;
@@ -961,7 +1369,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
     h3 {
       margin: 0;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 600;
       color: $text-color;
     }
@@ -989,7 +1397,7 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   .modal-body {
-    padding: 24px;
+        padding: 20px;
     overflow-y: auto;
     flex: 1;
   }
@@ -1003,14 +1411,351 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
+// =====================
+// Modal Quittance
+// =====================
+// =====================
+// Modal de Quittance
+// =====================
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.receipt-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 95vw;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+      padding: 20px;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+
+  .modal-title {
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: $text-color;
+    }
+
+    .modal-subtitle {
+      margin: 0;
+      font-size: 14px;
+      color: $text-muted;
+    }
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: $text-muted;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $bg-light;
+      color: $text-color;
+    }
+  }
+}
+
+.modal-body {
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+// Prévisualisation de la quittance
+.receipt-preview {
+  padding: 32px;
+  background: #fff;
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+
+  .company-info {
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: $primary-color;
+    }
+
+    .company-address {
+      margin: 0;
+      font-size: 14px;
+      color: $text-muted;
+    }
+  }
+
+  .receipt-meta {
+    text-align: right;
+    font-size: 14px;
+
+    .receipt-number {
+      margin-bottom: 8px;
+      
+      strong {
+        color: $text-color;
+      }
+    }
+
+    .receipt-date,
+    .receipt-period {
+      color: $text-muted;
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.receipt-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, $border-color 50%, transparent 100%);
+  margin: 20px 0;
+}
+
+.receipt-content {
+  .recipient-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .info-section {
+      strong {
+        color: $text-color;
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+      
+      &:last-child {
+        color: $text-muted;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+
+  thead {
+    th {
+      padding: 12px 16px;
+      background: $bg-light;
+      font-weight: 600;
+      color: $text-muted;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  tbody {
+    td {
+      padding: 16px;
+      border-bottom: 1px solid $border-color;
+      font-size: 14px;
+
+      &.text-right {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      &.commission {
+        color: $danger-color;
+      }
+    }
+
+    .total-row {
+      td {
+        border-top: 2px solid $border-color;
+        border-bottom: none;
+        padding-top: 20px;
+        font-size: 16px;
+
+        &.total-amount {
+          color: $success-color;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+.payment-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+
+  .late-days {
+    color: $danger-color;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 40px;
+
+  .signature-box {
+    text-align: center;
+
+    .signature-line {
+      height: 1px;
+      background: $text-color;
+      margin: 40px 0 8px 0;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+}
+
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid $border-color;
+  background: $bg-light;
+
+  .footer-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// Iframe pour l'impression
 .receipt-iframe {
   width: 100%;
   height: 600px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: #fff;
 }
 
 // Responsive
+@media (max-width: 768px) {
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .receipt-modal {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .receipt-preview {
+    padding: 20px;
+  }
+
+  .receipt-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .receipt-meta {
+      text-align: left;
+    }
+  }
+
+  .modal-footer .footer-actions {
+    flex-direction: column;
+    
+    .btn {
+      justify-content: center;
+    }
+  }
+}
+
+// Styles d'impression
+@media print {
+  .modal-backdrop {
+    position: static;
+    background: none;
+  }
+
+  .receipt-modal {
+    box-shadow: none;
+    max-width: none;
+  }
+
+  .modal-header,
+  .modal-footer {
+    display: none;
+  }
+
+  .receipt-preview {
+    padding: 0;
+  }
+}
+// =====================
+// Responsive Design
+// =====================
 @media (max-width: 768px) {
   .payment-recovery-container {
     padding: 12px;
@@ -1040,5 +1785,34 @@ $card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   .form-grid.two {
     grid-template-columns: 1fr;
+  }
+
+  .history-section {
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .actions-left {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        width: 100%;
+
+        .search-input {
+          width: 100%;
+        }
+      }
+    }
+
+    .data-table {
+      thead {
+        th {
+          font-size: 12px;
+        }
+      }
+    }
   }
 }

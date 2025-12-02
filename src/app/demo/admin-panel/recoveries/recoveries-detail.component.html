@@ -1,8 +1,8 @@
-<div class="page-container">
-  
-    <button class="btn  back-btn" (click)="back()">
-      &lt;
-    </button>
+<div class="page-container">      
+        <button class="btn  back-btn" (click)="back()" title="Retour à la liste">
+          <i class="fas fa-chevron-left"></i>
+          <span class="back-label">Recouvrements</span>
+        </button>
     <h4 class="page-title">Détail du recouvrement</h4>
 <div class="content-container">
   <form *ngIf="editMode" (ngSubmit)="save()" class="form-card recoverie-grid">

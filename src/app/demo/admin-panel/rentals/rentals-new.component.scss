@@ -27,12 +27,12 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 .page-header-inline .header-right{ display:flex; gap:8px }
 
 //
-.back-btn i{ font-size: 0.95rem }
-.back-label{ font-weight:600 }
+.back-btn i{ font-size: 0.8rem }
+.back-label{ font-weight:400 }
 
 /* Page container font and size adjustments for add/edit pages */
 .page-container{
-  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Poppins, 'Helvetica Neue', Arial;
   font-size: 14px;
   color: $text-color;
 }
@@ -52,27 +52,22 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 18px;
-}
-
-.back-btn {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 8px 15px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    transform: translateX(-3px);
-  }
+  font-size: 14px;
 }
 
 .content-container {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 24px;
+      padding: 20px;
 }
+.btn {
+  
+  &.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+   }
 
 /* Formulaire en grille 2x2 */
 .rental-grid {
@@ -86,7 +81,7 @@ $card-hover-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 24px;
+      padding: 20px;
   max-width: auto;
   margin: 0 auto;
 }

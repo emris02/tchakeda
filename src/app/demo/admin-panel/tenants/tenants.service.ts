@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 
 export interface TenantDocument {
   id: number;
-  type: string; // Type de document (identity, rent_receipt, electricity_bill, tax_notice, pay_slip, employment_certificate, contract, edl, quittance, etc.)
-  name: string; // Nom du document
-  fileUrl: string; // URL du fichier (base64 ou chemin)
-  fileName: string; // Nom du fichier original
-  fileSize: number; // Taille du fichier en bytes
-  uploadedAt: string; // Date de téléchargement
-  status?: 'pending' | 'approved' | 'rejected'; // Statut du document
-  notes?: string; // Notes additionnelles
+  type: string;
+  name: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  uploadedAt: string;
+  status?: 'pending' | 'approved' | 'rejected';
+  notes?: string;
 }
 
 export interface Tenant {
@@ -26,7 +26,7 @@ export interface Tenant {
   maritalStatus?: string;
   emergencyContact?: string;
   rentalType?: string;
-  mention?: string;    // Loyer ou note
+  mention?: string;
   country?: string;
   address?: string;
   profession?: string;
@@ -40,53 +40,23 @@ export interface Tenant {
   };
   apartments?: number[]; // IDs des appartements loués
   rental?: number[]; // IDs des locations
-  documents?: TenantDocument[]; // Documents complémentaires
+  documents?: TenantDocument[];
 }
 
 @Injectable({ providedIn: 'root' })
 export class TenantsService {
   private storageKey = 'tenants';
 
-  /** Ajoute un appartement à la liste d'appartements du locataire (évite les doublons) */
-  addApartmentToTenant(tenantId: number, apartmentId: number): void {
-    const tenants = this.getTenants();
-    const idx = tenants.findIndex(t => t.id === tenantId);
-    if (idx === -1) return;
-    const tenant = { ...tenants[idx] };
-    if (!tenant.apartments) tenant.apartments = [];
-    if (!tenant.apartments.includes(apartmentId)) tenant.apartments.push(apartmentId);
-    tenants[idx] = tenant;
-    localStorage.setItem(this.storageKey, JSON.stringify(tenants));
-  }
-
-  /** Retire un appartement de la liste du locataire (quand la location prend fin) */
-  removeApartmentFromTenant(tenantId: number, apartmentId: number): void {
-    const tenants = this.getTenants();
-    const idx = tenants.findIndex(t => t.id === tenantId);
-    if (idx === -1) return;
-    const tenant = { ...tenants[idx] };
-    if (tenant.apartments && tenant.apartments.length) {
-      tenant.apartments = tenant.apartments.filter(a => a !== apartmentId);
-    }
-    tenants[idx] = tenant;
-    localStorage.setItem(this.storageKey, JSON.stringify(tenants));
-  }
-
-  /** Ajoute l'id d'une location à l'historique du locataire */
-  addRentalToTenant(tenantId: number, rentalId: number): void {
-    const tenants = this.getTenants();
-    const idx = tenants.findIndex(t => t.id === tenantId);
-    if (idx === -1) return;
-    const tenant = { ...tenants[idx] };
-    if (!tenant.rental) tenant.rental = [];
-    if (!tenant.rental.includes(rentalId)) tenant.rental.push(rentalId);
-    tenants[idx] = tenant;
-    localStorage.setItem(this.storageKey, JSON.stringify(tenants));
-  }
+  // ==================== Gestion des locataires ====================
 
   getTenants(): Tenant[] {
     const data = localStorage.getItem(this.storageKey);
-    return data ? JSON.parse(data) : [];
+    try {
+      return data ? JSON.parse(data) : [];
+    } catch {
+      localStorage.removeItem(this.storageKey);
+      return [];
+    }
   }
 
   getTenantById(id: number): Tenant | undefined {
@@ -98,7 +68,10 @@ export class TenantsService {
     const newTenant: Tenant = {
       ...tenant,
       id: Date.now(),
-      registeredAt: new Date().toISOString()
+      registeredAt: new Date().toISOString(),
+      apartments: [],
+      rental: [],
+      documents: []
     };
     tenants.push(newTenant);
     localStorage.setItem(this.storageKey, JSON.stringify(tenants));
@@ -106,16 +79,7 @@ export class TenantsService {
   }
 
   updateTenant(updated: Tenant): void {
-    // Accept and persist ALL changes
-    const tenants = this.getTenants().map(t => {
-      if (t.id === updated.id) {
-        return {
-          ...t,
-          ...updated
-        };
-      }
-      return t;
-    });
+    const tenants = this.getTenants().map(t => t.id === updated.id ? { ...t, ...updated } : t);
     localStorage.setItem(this.storageKey, JSON.stringify(tenants));
   }
 
@@ -124,83 +88,84 @@ export class TenantsService {
     localStorage.setItem(this.storageKey, JSON.stringify(tenants));
   }
 
+  // ==================== Gestion des appartements ====================
+
+  addApartmentToTenant(tenantId: number, apartmentId: number): void {
+    const tenant = this.getTenantById(tenantId);
+    if (!tenant) return;
+    tenant.apartments = tenant.apartments || [];
+    if (!tenant.apartments.includes(apartmentId)) tenant.apartments.push(apartmentId);
+    this.updateTenant(tenant);
+  }
+
+  removeApartmentFromTenant(tenantId: number, apartmentId: number): void {
+    const tenant = this.getTenantById(tenantId);
+    if (!tenant || !tenant.apartments) return;
+    tenant.apartments = tenant.apartments.filter(a => a !== apartmentId);
+    this.updateTenant(tenant);
+  }
+
+  // ==================== Gestion des locations ====================
+
+  addRentalToTenant(tenantId: number, rentalId: number): void {
+    const tenant = this.getTenantById(tenantId);
+    if (!tenant) return;
+    tenant.rental = tenant.rental || [];
+    if (!tenant.rental.includes(rentalId)) tenant.rental.push(rentalId);
+    this.updateTenant(tenant);
+  }
+
+  removeRentalFromTenant(tenantId: number, rentalId: number): void {
+    const tenant = this.getTenantById(tenantId);
+    if (!tenant || !tenant.rental) return;
+    tenant.rental = tenant.rental.filter(r => r !== rentalId);
+    this.updateTenant(tenant);
+  }
+
+  hasActiveRental(tenantId: number, rentals: number[], rentalsService?: any): boolean {
+    // Vérifie si le locataire a une location active
+    if (!rentalsService) return false;
+    return (tenantId ? this.getTenantById(tenantId)?.rental || [] : [])
+      .some(rId => {
+        const r = rentalsService.getRentalById(rId);
+        return r && r.status === 'active';
+      });
+  }
+
   // ==================== Gestion des documents ====================
 
-  /**
-   * Ajoute un document à un locataire
-   */
   addDocumentToTenant(tenantId: number, document: Omit<TenantDocument, 'id' | 'uploadedAt'>): TenantDocument {
-    const tenants = this.getTenants();
-    const idx = tenants.findIndex(t => t.id === tenantId);
-    if (idx === -1) {
-      throw new Error('Locataire non trouvé');
-    }
-
-    const tenant = { ...tenants[idx] };
-    if (!tenant.documents) {
-      tenant.documents = [];
-    }
-
-    const newDocument: TenantDocument = {
-      ...document,
-      id: Date.now(),
-      uploadedAt: new Date().toISOString()
-    };
-
-    tenant.documents.push(newDocument);
-    tenants[idx] = tenant;
-    localStorage.setItem(this.storageKey, JSON.stringify(tenants));
-    return newDocument;
-  }
-
-  /**
-   * Supprime un document d'un locataire
-   */
-  removeDocumentFromTenant(tenantId: number, documentId: number): void {
-    const tenants = this.getTenants();
-    const idx = tenants.findIndex(t => t.id === tenantId);
-    if (idx === -1) return;
-
-    const tenant = { ...tenants[idx] };
-    if (tenant.documents) {
-      tenant.documents = tenant.documents.filter(d => d.id !== documentId);
-      tenants[idx] = tenant;
-      localStorage.setItem(this.storageKey, JSON.stringify(tenants));
-    }
-  }
-
-  /**
-   * Met à jour un document d'un locataire
-   */
-  updateTenantDocument(tenantId: number, documentId: number, updates: Partial<TenantDocument>): void {
-    const tenants = this.getTenants();
-    const idx = tenants.findIndex(t => t.id === tenantId);
-    if (idx === -1) return;
-
-    const tenant = { ...tenants[idx] };
-    if (tenant.documents) {
-      const docIdx = tenant.documents.findIndex(d => d.id === documentId);
-      if (docIdx !== -1) {
-        tenant.documents[docIdx] = { ...tenant.documents[docIdx], ...updates };
-        tenants[idx] = tenant;
-        localStorage.setItem(this.storageKey, JSON.stringify(tenants));
-      }
-    }
-  }
-
-  /**
-   * Récupère les documents d'un locataire
-   */
-  getTenantDocuments(tenantId: number): TenantDocument[] {
     const tenant = this.getTenantById(tenantId);
-    return tenant?.documents || [];
+    if (!tenant) throw new Error('Locataire non trouvé');
+    tenant.documents = tenant.documents || [];
+    const newDoc: TenantDocument = { ...document, id: Date.now(), uploadedAt: new Date().toISOString() };
+    tenant.documents.push(newDoc);
+    this.updateTenant(tenant);
+    return newDoc;
   }
 
-  /**
-   * Vérifie si un type de document existe pour un locataire
-   */
-  hasDocumentType(tenantId: number, documentType: string): boolean {
-    const documents = this.getTenantDocuments(tenantId);
-    return documents.some(d => d.type === documentType);
+  removeDocumentFromTenant(tenantId: number, documentId: number): void {
+    const tenant = this.getTenantById(tenantId);
+    if (!tenant || !tenant.documents) return;
+    tenant.documents = tenant.documents.filter(d => d.id !== documentId);
+    this.updateTenant(tenant);
+  }
+
+  updateTenantDocument(tenantId: number, documentId: number, updates: Partial<TenantDocument>): void {
+    const tenant = this.getTenantById(tenantId);
+    if (!tenant || !tenant.documents) return;
+    const idx = tenant.documents.findIndex(d => d.id === documentId);
+    if (idx !== -1) {
+      tenant.documents[idx] = { ...tenant.documents[idx], ...updates };
+      this.updateTenant(tenant);
+    }
+  }
+
+  getTenantDocuments(tenantId: number): TenantDocument[] {
+    return this.getTenantById(tenantId)?.documents || [];
+  }
+
+  hasDocumentType(tenantId: number, type: string): boolean {
+    return this.getTenantDocuments(tenantId).some(d => d.type === type);
   }
 }

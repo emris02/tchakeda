@@ -1,8 +1,8 @@
-<div class="page-container">
-  
-    <button class="btn  back-btn" (click)="back()">
-      &lt;
-    </button>
+  <div class="page-container">      
+        <button class="btn  back-btn" (click)="back()" title="Retour à la liste">
+          <i class="fas fa-chevron-left"></i>
+          <span class="back-label">Location</span>
+        </button>
     <h4 class="page-title">Détail de la location</h4>
 
   <!-- ✅ Modal de suppression -->
@@ -130,6 +130,27 @@
       </div>
 
       <!-- Contrat de location (moved lower) -->
+
+      <div class="contracts-section" style="margin-top:12px;">
+        <h6>Contrats associés</h6>
+        <div *ngIf="(!rentalContracts || rentalContracts.length === 0) && (!ownerCollectorContracts || ownerCollectorContracts.length === 0)" class="muted">Aucun contrat associé</div>
+
+        <div *ngFor="let c of rentalContracts" class="contract-row">
+          <div class="contract-summary">Contrat de location — {{ c.leaseStart || '-' }} → {{ c.leaseEnd || '-' }}</div>
+          <div class="contract-actions">
+            <button class="btn btn-outline-primary btn-sm" (click)="openContractPreview(c)">Aperçu du contrat</button>
+            <a class="btn btn-success btn-sm" [href]="c.contractFileUrl" download *ngIf="c.contractFileUrl">Télécharger contrat</a>
+          </div>
+        </div>
+
+        <div *ngFor="let c of ownerCollectorContracts" class="contract-row">
+          <div class="contract-summary">Contrat Recouvreur ↔ Propriétaire — Mandat: {{ c.mandateStart || '-' }} → {{ c.mandateEnd || '-' }}</div>
+          <div class="contract-actions">
+            <button class="btn btn-outline-primary btn-sm" (click)="openContractPreview(c)">Aperçu du contrat</button>
+            <a class="btn btn-success btn-sm" [href]="c.contractFileUrl" download *ngIf="c.contractFileUrl">Télécharger contrat</a>
+          </div>
+        </div>
+      </div>
 
       <!-- New layout: gallery left, tenant card right, details below -->
       <div class="rental-top-grid">

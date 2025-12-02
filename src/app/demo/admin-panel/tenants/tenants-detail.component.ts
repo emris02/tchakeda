@@ -5,12 +5,15 @@ import { RentalsService, Rental } from '../rentals/rentals.service';
 import { ApartmentsService, Apartment } from '../apartments/apartments.service';
 import { OwnersService, Owner } from '../owners/owners.service';
 import { BuildingsService, Building } from '../buildings/buildings.service';
+import { ContractService } from '../contracts/contract.service';
+import { ContractPreviewService } from 'src/app/shared/contracts/contract-preview.service';
 
 interface RentalDetail {
   rental?: Rental;
   apartment?: Apartment;
   owner?: Owner;
   recoveredAmount?: number;
+  rentalContract?: any;
 }
 
 @Component({
@@ -87,6 +90,8 @@ export class TenantsDetailComponent implements OnInit {
     private apartmentsService: ApartmentsService,
     private ownersService: OwnersService,
     private buildingsService: BuildingsService
+    , private contractService: ContractService
+    , private contractPreviewService: ContractPreviewService
   ) {
     this.buildings = this.buildingsService.getBuildings();
   }
@@ -135,6 +140,11 @@ export class TenantsDetailComponent implements OnInit {
       this.loadRentalDetails();
       this.loadTenantDocuments();
     }
+  }
+
+  openContractPreview(contract: any) {
+    if (!contract) return;
+    this.contractPreviewService.open(contract);
   }
 
   /**
@@ -191,12 +201,18 @@ export class TenantsDetailComponent implements OnInit {
           const building = this.buildingsService.getBuildingById(Number(currentApartment.buildingId));
           const owner = building && building.ownerId ? this.ownersService.getOwnerById(Number(building.ownerId)) : undefined;
 
+          // attach any rental contract available
+          const rentalContract = currentRental ? this.contractService.getRentalContracts().find(c => Number(c.tenantId) === Number(this.tenant?.id) && Number(c.assetId) === Number(currentApartment.id)) : undefined;
+
           this.rentalDetails.push({
             rental: currentRental,
             apartment: currentApartment,
             owner: owner,
             recoveredAmount: this.calculateRecoveredAmount(currentRental)
           });
+          if (this.rentalDetails.length > 0 && rentalContract) {
+            (this.rentalDetails[this.rentalDetails.length - 1] as any).rentalContract = rentalContract;
+          }
         }
       }
 
@@ -230,6 +246,11 @@ export class TenantsDetailComponent implements OnInit {
             owner: owner,
             recoveredAmount: this.calculateRecoveredAmount(rental)
           });
+          // attach rental contract if present (guard apartment may be undefined)
+          const rc = apartment
+            ? this.contractService.getRentalContracts().find(c => Number(c.tenantId) === Number(this.tenant?.id) && Number(c.assetId) === Number(apartment.id))
+            : undefined;
+          if (rc) (this.rentalDetails[this.rentalDetails.length - 1] as any).rentalContract = rc;
         }
       });
     }

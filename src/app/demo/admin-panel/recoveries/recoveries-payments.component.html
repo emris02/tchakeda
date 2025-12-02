@@ -1,4 +1,9 @@
-<div class="payment-recovery-container">
+<div class="payment-recovery-container">      
+        <button class="btn  back-btn" (click)="back()" title="Retour à la liste">
+          <i class="fas fa-chevron-left"></i>
+          <span class="back-label">Recouvrements</span>
+        </button>
+    <h4 class="page-title">Détail du recouvrement</h4>
 
   <!-- Statistiques -->
   <section class="content-wrapper stats-grid">
@@ -22,459 +27,512 @@
         </div>
       </header>
 
-      <!-- Stepper -->
-      <div class="stepper">
-        <div
-          class="step"
-          *ngFor="let step of progressSteps"
-          [ngClass]="getStepStatus(step.id)"
-          (click)="goToStep(step.id)">
-          <span class="step-index">{{ step.id }}</span>
-          <span class="step-body">
-            <strong>{{ step.title }}</strong>
-            <small>{{ step.caption }}</small>
-          </span>
-        </div>
-      </div>
-
-      <!-- Contenu des étapes -->
-      <div class="step-content" [ngSwitch]="currentStep">
-        
-        <!-- Étape 1: Sélection locataire -->
-        <form *ngSwitchCase="1" class="step-form" novalidate>
-          <div class="form-grid two">
-            <label class="form-field form-group">
-              <select
-                name="owner"
-                [(ngModel)]="paymentForm.ownerId"
-                (ngModelChange)="onOwnerChange($event)"
-                class="underline-input"
-                required>
-                <option [ngValue]="undefined">Sélectionner un propriétaire</option>
-                <option *ngFor="let owner of owners" [ngValue]="owner.id">
-                  {{ owner.name }}
-                </option>
-              </select>
-              <span class="label">Propriétaire</span>
-            </label>
-
-            <label class="form-field form-group">
-              <select
-                name="building"
-                [(ngModel)]="paymentForm.buildingId"
-                (ngModelChange)="onBuildingChange($event)"
-                class="underline-input"
-                [disabled]="!paymentForm.ownerId">
-                <option [ngValue]="undefined">Sélectionner un bâtiment</option>
-                <option *ngFor="let building of buildingsForOwner" [ngValue]="building.id">
-                  {{ building.name }}
-                </option>
-              </select>
-              <span class="label">Bâtiment</span>
-            </label>
-          </div>
-
-          <div class="form-grid two">
-            <label class="form-field form-group">
-              <select
-                name="apartment"
-                [(ngModel)]="paymentForm.apartmentId"
-                (ngModelChange)="onApartmentChange($event)"
-                class="underline-input"
-                [disabled]="!paymentForm.buildingId">
-                <option [ngValue]="undefined">Sélectionner un appartement</option>
-                <option *ngFor="let apt of apartmentsForBuilding" [ngValue]="apt.id">
-                  {{ apt.name || ('Appartement ' + apt.id) }}
-                </option>
-              </select>
-              <span class="label">Appartement</span>
-            </label>
-
-            <label class="form-field form-group">
-              <select
-                name="tenant"
-                [(ngModel)]="paymentForm.tenantId"
-                class="underline-input"
-                [disabled]="!paymentForm.apartmentId || (!tenantsForApartment.length && !paymentForm.tenantId)">
-                <option [ngValue]="undefined">Sélectionner un locataire</option>
-                <option *ngFor="let tenant of tenantsForApartment" [ngValue]="tenant.id">
-                  {{ tenant.fullName }}
-                </option>
-              </select>
-              <small *ngIf="paymentForm.tenantId && !tenantsForApartment.length" style="color: #ed6c02; font-size: 12px; margin-top: 4px;">
-                Locataire récupéré depuis l'appartement
-              </small>
-              <span class="label">Locataire</span>
-            </label>
-          </div>
-
-          <!-- Aperçu locataire -->
-          <div class="cascade-preview" *ngIf="paymentForm.apartmentId && paymentForm.tenantId" 
-               [class.clickable]="currentRental" 
-               (click)="currentRental && openViewContract()">
-            <div class="preview-avatar">
-              {{ getInitials(getTenantName(paymentForm.tenantId)) }}
-            </div>
-            <div>
-              <p class="preview-title">{{ getTenantName(paymentForm.tenantId) }}</p>
-              <p class="preview-meta">
-                {{ getBuildingNameFromApartment(paymentForm.apartmentId) }} • 
-                {{ getApartmentName(paymentForm.apartmentId) }}
-              </p>
-              <p class="preview-meta" *ngIf="currentRental">
-                Contrat du {{ formatDate(currentRental.startDate) }} au {{ formatDate(currentRental.endDate) }}
-              </p>
-              <p class="preview-meta" *ngIf="!currentRental" style="color: #ed6c02; font-style: italic;">
-                Aucun contrat actif pour cet appartement
-              </p>
-            </div>
-          </div>
-
-          <div class="step-actions">
-            <button class="btn btn-ghost" type="button" (click)="cancelPayment()">Annuler</button>
-            <button class="btn btn-primary" type="button" (click)="nextStep()" 
-                    [disabled]="!paymentForm.ownerId || !paymentForm.buildingId || !paymentForm.apartmentId">
-              Suivant
-            </button>
-          </div>
-        </form>
-
-        <!-- Étape 2: Détails paiement -->
-        <form *ngSwitchCase="2" class="step-form" novalidate>
-          <div class="form-grid two">
-            <label class="form-field form-group">
-              <span class="label">Mois concerné</span>
-              <input
-                type="month"
-                name="period"
-                [(ngModel)]="paymentForm.period"
-                [min]="minPaymentMonth"
-                [max]="maxPaymentMonth"
-                class="underline-input"
-                required />
-            </label>
-
-            <label class="form-field form-group">
-              <span class="label">Date de paiement</span>
-              <input
-                type="date"
-                name="paymentDate"
-                [(ngModel)]="paymentForm.paymentDate"
-                [max]="todayISO"
-                class="underline-input"
-                required />
-            </label>
-          </div>
-
-          <div class="form-grid two">
-            <label class="form-field form-group">
-              <span class="label">Montant encaissé</span>
-              <div class="input-with-suffix">
-                <input
-                  type="number"
-                  name="amount"
-                  min="0"
-                  [(ngModel)]="paymentForm.amount"
-                  (input)="onAmountChange()"
-                  class="underline-input"
-                  required />
-                <span>XOF</span>
-              </div>
-            </label>
-
-            <label class="form-field form-group">
-              <span class="label">Mode de paiement</span>
-              <select
-                name="method"
-                [(ngModel)]="paymentForm.paymentMethod"
-                class="underline-input"
-                required>
-                <option value="">Sélectionner</option>
-                <option value="Espèce">Espèce</option>
-                <option value="Virement">Virement</option>
-                <option value="Mobile Money">Mobile Money</option>
-              </select>
-            </label>
-          </div>
-
-          <!-- Calculs automatiques -->
-          <div class="calculation-summary">
-            <h4>Répartition automatique</h4>
-            <div class="calculation-grid">
-              <div class="calc-item">
-                <span>Montant total</span>
-                <strong>{{ paymentForm.amount | number:'1.0-0' }} XOF</strong>
-              </div>
-              <div class="calc-item">
-                <span>Commission (8%)</span>
-                <strong class="commission">- {{ getCommissionAmount(paymentForm.amount) | number:'1.0-0' }} XOF</strong>
-              </div>
-              <div class="calc-item total">
-                <span>Net propriétaire</span>
-                <strong>{{ getNetAmount(paymentForm.amount) | number:'1.0-0' }} XOF</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="step-actions">
-            <button class="btn btn-ghost" type="button" (click)="previousStep()">Retour</button>
-            <button class="btn btn-primary" type="button" (click)="nextStep()"
-                    [disabled]="!paymentForm.period || !paymentForm.paymentDate || !paymentForm.amount || !paymentForm.paymentMethod">
-              Suivant
-            </button>
-            <button class="btn btn-ghost" type="button" (click)="cancelPayment()">Annuler</button>
-          </div>
-        </form>
-
-        <!-- Étape 3: Confirmation -->
-        <div *ngSwitchCase="3" class="step-form confirmation-step">
-          <div class="summary-card">
-            <h3>Confirmation du paiement</h3>
-            <div class="summary-grid">
-              <div class="summary-section">
-                <h4>Informations locataire</h4>
-                <div class="summary-item">
-                  <span>Locataire</span>
-                  <strong>{{ getTenantName(paymentForm.tenantId) }}</strong>
-                </div>
-                <div class="summary-item">
-                  <span>Appartement</span>
-                  <span>{{ getApartmentName(paymentForm.apartmentId) }}</span>
-                </div>
-                <div class="summary-item">
-                  <span>Bâtiment</span>
-                  <span>{{ getBuildingNameFromApartment(paymentForm.apartmentId) }}</span>
-                </div>
-              </div>
-
-              <div class="summary-section">
-                <h4>Détails paiement</h4>
-                <div class="summary-item">
-                  <span>Période</span>
-                  <strong>{{ paymentForm.period }}</strong>
-                </div>
-                <div class="summary-item">
-                  <span>Date</span>
-                  <span>{{ formatDate(paymentForm.paymentDate) }}</span>
-                </div>
-                <div class="summary-item">
-                  <span>Mode</span>
-                  <span class="payment-badge">{{ paymentForm.paymentMethod }}</span>
-                </div>
-              </div>
-
-              <div class="summary-section financial">
-                <h4>Répartition</h4>
-                <div class="summary-item">
-                  <span>Montant total</span>
-                  <strong>{{ paymentForm.amount | number:'1.0-0' }} XOF</strong>
-                </div>
-                <div class="summary-item">
-                  <span>Commission</span>
-                  <span class="commission">- {{ getCommissionAmount(paymentForm.amount) | number:'1.0-0' }} XOF</span>
-                </div>
-                <div class="summary-item total">
-                  <span>Net propriétaire</span>
-                  <strong>{{ getNetAmount(paymentForm.amount) | number:'1.0-0' }} XOF</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="confirmation-actions">
-            <button class="btn btn-ghost" type="button" (click)="previousStep()">Modifier</button>
-            <button class="btn btn-ghost" type="button" (click)="cancelPayment()">Annuler</button>
-            <button class="btn btn-success" type="button" (click)="savePayment()" [disabled]="saving">
-              <span *ngIf="!saving">✅ Confirmer le paiement</span>
-              <span *ngIf="saving">⏳ Enregistrement...</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Panel latéral -->
-    <aside class="side-panel">
-      <!-- Contrat actif -->
-      <div class="card contract-card" *ngIf="currentRental" (click)="openViewContract()">
-        <div class="card-header">
-          <h3>Contrat actif</h3>
-          <span class="status-badge active">Actif</span>
-        </div>
-        <div class="card-body">
-          <div class="contract-info">
-            <div class="tenant-avatar">
-              {{ getInitials(getTenantName(currentRental.tenantId)) }}
-            </div>
-            <div>
-              <strong>{{ getTenantName(currentRental.tenantId) }}</strong>
-              <p>{{ getApartmentName(currentRental.apartmentId) }}</p>
-            </div>
-          </div>
-          <div class="contract-dates">
-            <span>Du {{ formatDate(currentRental.startDate) }}</span>
-            <span>Au {{ formatDate(currentRental.endDate) }}</span>
-          </div>
-          <div class="contract-price">
-            <strong>{{ getRentalPrice(currentRental) | number:'1.0-0' }} XOF/mois</strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- Derniers paiements -->
-      <div class="card timeline-card">
-        <div class="card-header">
-          <h3>Derniers paiements</h3>
-        </div>
-        <div class="card-body">
-          <div class="timeline-list">
-            <div *ngFor="let payment of recentPayments" class="timeline-item" (click)="previewReceipt(payment)">
-              <div class="timeline-dot" [ngClass]="payment.status"></div>
-              <div class="timeline-content">
-                <strong>{{ getTenantName(payment.tenantId) }}</strong>
-                <p>{{ payment.period }} • {{ payment.amount | number:'1.0-0' }} XOF</p>
-              </div>
-              <span class="status-badge" [ngClass]="payment.status">
-                {{ payment.status === 'paid' ? 'Payé' : 'En retard' }}
+      <div class="form-layout-container">
+        <!-- Contenu principal du formulaire -->
+        <div class="form-main-content">
+          <!-- Stepper -->
+          <div class="stepper">
+            <div
+              class="step"
+              *ngFor="let step of progressSteps"
+              [ngClass]="getStepStatus(step.id)"
+              (click)="goToStep(step.id)">
+              <span class="step-index">{{ step.id }}</span>
+              <span class="step-body">
+                <strong>{{ step.title }}</strong>
+                <small>{{ step.caption }}</small>
               </span>
             </div>
-            <div *ngIf="!recentPayments.length" class="empty-state">
-              <p>Aucun paiement récent</p>
+          </div>
+
+          <!-- Contenu des étapes -->
+          <div class="step-content" [ngSwitch]="currentStep">
+            
+            <!-- Étape 1: Sélection locataire -->
+            <form *ngSwitchCase="1" class="step-form" novalidate>
+              <div class="form-grid two">
+                <label class="form-field form-group">
+                  <select
+                    name="owner"
+                    [(ngModel)]="paymentForm.ownerId"
+                    (ngModelChange)="onOwnerChange($event)"
+                    class="underline-input"
+                    required>
+                    <option [ngValue]="undefined">Sélectionner un propriétaire</option>
+                    <option *ngFor="let owner of owners" [ngValue]="owner.id">
+                      {{ owner.name }}
+                    </option>
+                  </select>
+                  <span class="label">Propriétaire</span>
+                </label>
+
+                <label class="form-field form-group">
+                  <select
+                    name="building"
+                    [(ngModel)]="paymentForm.buildingId"
+                    (ngModelChange)="onBuildingChange($event)"
+                    class="underline-input"
+                    [disabled]="!paymentForm.ownerId">
+                    <option [ngValue]="undefined">Sélectionner un bâtiment</option>
+                    <option *ngFor="let building of buildingsForOwner" [ngValue]="building.id">
+                      {{ building.name }}
+                    </option>
+                  </select>
+                  <span class="label">Bâtiment</span>
+                </label>
+              </div>
+
+              <div class="form-grid two">
+                <label class="form-field form-group">
+                  <select
+                    name="apartment"
+                    [(ngModel)]="paymentForm.apartmentId"
+                    (ngModelChange)="onApartmentChange($event)"
+                    class="underline-input"
+                    [disabled]="!paymentForm.buildingId">
+                    <option [ngValue]="undefined">Sélectionner un appartement</option>
+                    <option *ngFor="let apt of apartmentsForBuilding" [ngValue]="apt.id">
+                      {{ apt.name || ('Appartement ' + apt.id) }}
+                    </option>
+                  </select>
+                  <span class="label">Appartement</span>
+                </label>
+
+                <label class="form-field form-group">
+                  <select
+                    name="tenant"
+                    [(ngModel)]="paymentForm.tenantId"
+                    class="underline-input"
+                    [disabled]="!paymentForm.apartmentId || (!tenantsForApartment.length && !paymentForm.tenantId)">
+                    <option [ngValue]="undefined">Sélectionner un locataire</option>
+                    <option *ngFor="let tenant of tenantsForApartment" [ngValue]="tenant.id">
+                      {{ tenant.fullName }}
+                    </option>
+                  </select>
+                  <small *ngIf="paymentForm.tenantId && !tenantsForApartment.length" style="color: #ed6c02; font-size: 12px; margin-top: 4px;">
+                    Locataire récupéré depuis l'appartement
+                  </small>
+                  <span class="label">Locataire</span>
+                </label>
+              </div>
+
+              <!-- Aperçu locataire -->
+              <div class="cascade-preview" *ngIf="paymentForm.apartmentId && paymentForm.tenantId" 
+                   [class.clickable]="currentRental" 
+                   (click)="currentRental && openViewContract()">
+                <div class="preview-avatar">
+                  {{ getInitials(getTenantName(paymentForm.tenantId)) }}
+                </div>
+                <div>
+                  <p class="preview-title">{{ getTenantName(paymentForm.tenantId) }}</p>
+                  <p class="preview-meta">
+                    {{ getBuildingNameFromApartment(paymentForm.apartmentId) }} • 
+                    {{ getApartmentName(paymentForm.apartmentId) }}
+                  </p>
+                  <p class="preview-meta" *ngIf="currentRental">
+                    Contrat du {{ formatDate(currentRental.startDate) }} au {{ formatDate(currentRental.endDate) }}
+                  </p>
+                  <p class="preview-meta" *ngIf="!currentRental" style="color: #ed6c02; font-style: italic;">
+                    Aucun contrat actif pour cet appartement
+                  </p>
+                </div>
+              </div>
+
+              <div class="step-actions">
+                <button class="btn btn-ghost" type="button" (click)="cancelPayment()">Annuler</button>
+                <button class="btn btn-primary" type="button" (click)="nextStep()" 
+                        [disabled]="!paymentForm.ownerId || !paymentForm.buildingId || !paymentForm.apartmentId">
+                  Suivant
+                </button>
+              </div>
+            </form>
+
+            <!-- Étape 2: Détails paiement -->
+            <form *ngSwitchCase="2" class="step-form" novalidate>
+              <div class="form-grid two">
+                <!-- Mois concerné -->
+                <label class="form-field form-group">
+                  <input
+                    type="month"
+                    name="period"
+                    [(ngModel)]="paymentForm.period"
+                    [min]="minPaymentMonth"
+                    [max]="maxPaymentMonth"
+                    class="underline-input"
+                    required />
+                  <span class="label">Mois concerné</span>
+                </label>
+
+                <!-- Date de paiement -->
+                <label class="form-field form-group">
+                  <input
+                    type="date"
+                    name="paymentDate"
+                    [(ngModel)]="paymentForm.paymentDate"
+                    [max]="todayISO"
+                    class="underline-input"
+                    required />
+                  <span class="label">Date de paiement</span>
+                </label>
+              </div>
+
+              <div class="form-grid two">
+                <!-- Montant encaissé -->
+                <label class="form-field form-group">
+                  <div class="input-with-suffix">
+                    <input
+                      type="number"
+                      name="amount"
+                      min="0"
+                      [(ngModel)]="paymentForm.amount"
+                      (input)="onAmountChange()"
+                      class="underline-input"
+                      placeholder=" "
+                      required />
+                    <span class="label">Montant encaissé</span>
+                    <span class="suffix">XOF</span>
+                  </div>          
+                </label>
+
+                <!-- Mode de paiement -->
+                <label class="form-field form-group">
+                  <select
+                    name="method"
+                    [(ngModel)]="paymentForm.paymentMethod"
+                    class="underline-input"
+                    required>
+                    <option value="">Sélectionner</option>
+                    <option value="Espèce">Espèce</option>
+                    <option value="Virement">Virement</option>
+                    <option value="Mobile Money">Mobile Money</option>
+                  </select>
+                  <span class="label">Mode de paiement</span>
+                </label>
+              </div>
+
+              <!-- Calculs automatiques -->
+              <div class="calculation-summary">
+                <h4>Répartition automatique</h4>
+                <div class="calculation-grid">
+                  <div class="calc-item">
+                    <span>Montant total</span>
+                    <strong>{{ paymentForm.amount | number:'1.0-0' }} XOF</strong>
+                  </div>
+                  <div class="calc-item">
+                    <span>Commission (8%)</span>
+                    <strong class="commission">- {{ getCommissionAmount(paymentForm.amount) | number:'1.0-0' }} XOF</strong>
+                  </div>
+                  <div class="calc-item total">
+                    <span>Net propriétaire</span>
+                    <strong>{{ getNetAmount(paymentForm.amount) | number:'1.0-0' }} XOF</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-actions">
+                <button class="btn btn-ghost" type="button" (click)="previousStep()">Retour</button>
+                <button class="btn btn-primary" type="button" (click)="nextStep()"
+                        [disabled]="!paymentForm.period || !paymentForm.paymentDate || !paymentForm.amount || !paymentForm.paymentMethod">
+                  Suivant
+                </button>
+                <button class="btn btn-ghost" type="button" (click)="cancelPayment()">Annuler</button>
+              </div>
+            </form>
+
+            <!-- Étape 3: Confirmation -->
+            <div *ngSwitchCase="3" class="step-form confirmation-step">
+              <div class="summary-card">
+                <h3>Confirmation du paiement</h3>
+
+                <div class="summary-grid">
+                  <!-- Informations locataire -->
+                  <div class="summary-section">
+                    <h4>Informations locataire</h4>
+                    <div class="summary-item">
+                      <span>Locataire</span>
+                      <strong>{{ getTenantName(paymentForm.tenantId) }}</strong>
+                    </div>
+                    <div class="summary-item">
+                      <span>Appartement</span>
+                      <span>{{ getApartmentName(paymentForm.apartmentId) }}</span>
+                    </div>
+                    <div class="summary-item">
+                      <span>Bâtiment</span>
+                      <span>{{ getBuildingNameFromApartment(paymentForm.apartmentId) }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Détails paiement -->
+                  <div class="summary-section">
+                    <h4>Détails paiement</h4>
+                    <div class="summary-item">
+                      <span>Période</span>
+                      <strong>{{ paymentForm.period }}</strong>
+                    </div>
+                    <div class="summary-item">
+                      <span>Date</span>
+                      <span>{{ formatDate(paymentForm.paymentDate) }}</span>
+                    </div>
+                    <div class="summary-item">
+                      <span>Mode</span>
+                      <span class="payment-badge">{{ paymentForm.paymentMethod }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Répartition financière -->
+                  <div class="summary-section financial">
+                    <h4>Répartition</h4>
+                    <div class="summary-item">
+                      <span>Montant total</span>
+                      <strong>{{ paymentForm.amount | number:'1.0-0' }} XOF</strong>
+                    </div>
+                    <div class="summary-item">
+                      <span>Commission</span>
+                      <span class="commission">- {{ getCommissionAmount(paymentForm.amount) | number:'1.0-0' }} XOF</span>
+                    </div>
+                    <div class="summary-item total">
+                      <span>Net propriétaire</span>
+                      <strong>{{ getNetAmount(paymentForm.amount) | number:'1.0-0' }} XOF</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Confirmation finale -->
+              <div class="form-check mt-3">
+                <input type="checkbox" id="acknowledge" class="form-check-input"
+                      [(ngModel)]="finalAcknowledgement">
+                <label for="acknowledge" class="form-check-label">
+                  Je confirme que les informations ci-dessus sont correctes
+                </label>
+              </div>
+
+              <!-- Actions -->
+              <div class="confirmation-actions mt-3 d-flex gap-2">
+                <button class="btn btn-ghost" type="button" (click)="previousStep()">Modifier</button>
+                <button class="btn btn-ghost" type="button" (click)="cancelPayment()">Annuler</button>
+                <button class="btn btn-success"
+                        type="button"
+                        (click)="savePayment()"
+                        [disabled]="saving || !finalAcknowledgement">
+                  <span *ngIf="!saving">✅ Confirmer le paiement</span>
+                  <span *ngIf="saving">⏳ Enregistrement...</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Panel latéral droit -->
+        <aside class="side-panel">
+          <!-- Contrat actif -->
+          <div class="card contract-card" *ngIf="currentRental" (click)="openViewContract()">
+            <div class="card-header">
+              <h3>Contrat actif</h3>
+              <span class="status-badge active">Actif</span>
+            </div>
+            <div class="card-body">
+              <div class="contract-info">
+                <div class="tenant-avatar">
+                  {{ getInitials(getTenantName(currentRental.tenantId)) }}
+                </div>
+                <div>
+                  <strong>{{ getTenantName(currentRental.tenantId) }}</strong>
+                  <p>{{ getApartmentName(currentRental.apartmentId) }}</p>
+                </div>
+              </div>
+              <div class="contract-dates">
+                <span>Du {{ formatDate(currentRental.startDate) }}</span>
+                <span>Au {{ formatDate(currentRental.endDate) }}</span>
+              </div>
+              <div class="contract-price">
+                <strong>{{ getRentalPrice(currentRental) | number:'1.0-0' }} XOF/mois</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Derniers paiements -->
+          <div class="card timeline-card">
+            <div class="card-header">
+              <h3>Derniers paiements</h3>
+            </div>
+            <div class="card-body">
+              <div class="timeline-list">
+                <div *ngFor="let payment of recentPayments" class="timeline-item clickable" (click)="previewReceipt(payment)">
+                  <div class="timeline-dot" [ngClass]="payment.status"></div>
+                  <div class="timeline-content">
+                    <strong>{{ getTenantName(payment.tenantId) }}</strong>
+                    <p>{{ payment.period }} • {{ payment.amount | number:'1.0-0' }} XOF</p>
+                    <small>{{ formatDate(payment.paymentDate) }}</small>
+                  </div>
+                  <span class="status-badge" [ngClass]="payment.status">
+                    {{ payment.status === 'paid' ? 'Payé' : payment.status === 'late' ? 'En retard' : 'En attente' }}
+                  </span>
+                </div>
+                <div *ngIf="!recentPayments.length" class="empty-state">
+                  <p>Aucun paiement récent</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
-    </aside>
+    </div>
   </section>
 
   <!-- Historique des paiements -->
   <section class="content-wrapper history-section">
-    <div class="card">
-      <div class="card-header">
-        <h2>Historique des paiements</h2>
-        <div class="actions-left">
-          <button class="btn btn-primary" type="button" (click)="openPaymentForm()">Enregistrer un paiement</button>
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
+      <h2>Historique des paiements</h2>
+
+      <div class="actions-left d-flex align-items-center gap-2">
+        <!-- Nouveau paiement -->
+        <button class="btn btn-primary new-btn" type="button" (click)="openPaymentForm()">
+          <span class="new-label">Enregistrer un paiement</span>
+        </button>
+
+        <!-- Separator -->
+        <span class="separator"></span>
+
+        <!-- Petits boutons refresh/print -->
+        <div class="small-actions d-flex gap-2">
+          <button class="btn btn-light small-icon refresh-icon" (click)="refreshPayments()" title="Rafraîchir">
+            <i class="icon feather icon-rotate-ccw"></i>
+          </button>
+          <button class="btn btn-light small-icon" (click)="printPayments()" title="Imprimer">
+            <i class="icon feather icon-printer"></i>
+          </button>
         </div>
-        <div class="filters">
-          <div class="search-box">
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              [(ngModel)]="searchTerm"
-              (input)="applyFilters()" />
-          </div>
-          <select [(ngModel)]="selectedPeriod" (change)="applyFilters()">
-            <option value="">Toutes périodes</option>
-            <option *ngFor="let period of periods" [value]="period">{{ period }}</option>
-          </select>
+
+        <!-- Separator -->
+        <span class="separator"></span>
+
+        <!-- Barre de recherche avec ngModel -->
+        <div class="search-box">
+          <input type="text" class="search-input" placeholder="Rechercher un paiement..." 
+                [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+          <i class="icon feather icon-search search-icon"></i>
         </div>
       </div>
+    </div>
 
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Période</th>
-                <th>Locataire</th>
-                <th>Appartement</th>
-                <th>Montant</th>
-                <th>Commission</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let payment of filteredPayments" 
-                  (click)="previewReceipt(payment)"
-                  class="clickable-row">
-                <td>
-                  <strong>{{ payment.period }}</strong>
-                  <small>{{ formatDate(payment.paymentDate) }}</small>
-                </td>
-                <td>
-                  <div class="tenant-cell">
-                    <div class="tenant-avatar-small">
-                      {{ getInitials(getTenantName(payment.tenantId)) }}
-                    </div>
-                    {{ getTenantName(payment.tenantId) }}
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Période</th>
+              <th>Locataire</th>
+              <th>Appartement</th>
+              <th>Montant</th>
+              <th>Commission</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payment of filteredPayments" 
+                (click)="previewReceipt(payment)" 
+                class="clickable-row">
+              <td>
+                <strong>{{ payment.period }}</strong>
+                <small>{{ formatDate(payment.paymentDate) }}</small>
+              </td>
+              <td>
+                <div class="tenant-cell d-flex align-items-center gap-2">
+                  <div class="tenant-avatar-small">
+                    {{ getInitials(getTenantName(payment.tenantId)) }}
                   </div>
-                </td>
-                <td>
-                  {{ getApartmentName(payment.apartmentId) }}
-                  <small>{{ getBuildingNameFromApartment(payment.apartmentId) }}</small>
-                </td>
-                <td>
-                  <strong>{{ payment.amount | number:'1.0-0' }} XOF</strong>
-                </td>
-                <td>{{ payment.commissionRecouvreur | number:'1.0-0' }} XOF</td>
-                <td>
-                  <span class="status-badge" [ngClass]="payment.status">
-                    {{ payment.status === 'paid' ? 'Payé' : payment.status === 'late' ? 'En retard' : 'En attente' }}
-                  </span>
-                </td>
-              </tr>
-              <tr *ngIf="filteredPayments.length === 0">
-                <td colspan="6" class="empty-state">
-                  <p>Aucun paiement trouvé</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  {{ getTenantName(payment.tenantId) }}
+                </div>
+              </td>
+              <td>
+                {{ getApartmentName(payment.apartmentId) }}
+                <small>{{ getBuildingNameFromApartment(payment.apartmentId) }}</small>
+              </td>
+              <td>
+                <strong>{{ payment.amount | number:'1.0-0' }} XOF</strong>
+              </td>
+              <td>{{ payment.commissionRecouvreur | number:'1.0-0' }} XOF</td>
+              <td>
+                <span class="status-badge" [ngClass]="payment.status">
+                  {{ payment.status === 'paid' ? 'Payé' : payment.status === 'late' ? 'En retard' : 'En attente' }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="filteredPayments.length === 0">
+              <td colspan="6" class="empty-state text-center">
+                <p>Aucun paiement trouvé</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
+</div>
 
-  <!-- Toast -->
-  <div class="toast-container" [class.show]="showToast">
-    <div class="toast">
-      {{ toastMessage }}
-    </div>
-  </div>
-
-  <!-- Modals existants (conservés) -->
-  <div *ngIf="showExtendModal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Étendre le contrat</h3>
-        <button class="btn-close" (click)="showExtendModal = false">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-field form-group">
-          <label class="label">Nouvelle date de fin</label>
-          <input class="underline-input" type="date" [(ngModel)]="extendDate" [min]="minExtendDate" />
-        </div>
-        <div *ngIf="calculateExtensionPeriod()" class="extension-info">
-          {{ calculateExtensionPeriod() }}
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" (click)="showExtendModal = false">Annuler</button>
-        <button class="btn btn-primary" (click)="confirmExtend()">Confirmer</button>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="showViewContractModal" class="modal-overlay">
-    <div class="modal-card large">
-      <div class="modal-header">
-        <h3>Contrat de location</h3>
-        <button class="btn-close" (click)="showViewContractModal = false">×</button>
-      </div>
-      <div class="modal-body">
-        <!-- Contenu du contrat -->
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="showReceiptPreview" class="modal-overlay">
-    <div class="modal-card xlarge">
-      <div class="modal-header">
+<!-- Modal de quittance amélioré -->
+<div class="modal-backdrop" *ngIf="showReceiptPreview" (click)="closePreview()">
+  <div class="modal-content receipt-modal" (click)="$event.stopPropagation()">
+    
+    <!-- En-tête du modal -->
+    <div class="modal-header">
+      <div class="modal-title">
         <h3>Quittance de loyer</h3>
-        <button class="btn-close" (click)="closePreview()">×</button>
+        <p class="modal-subtitle">Aperçu et actions</p>
       </div>
-      <div class="modal-body">
-        <iframe #receiptIframe class="receipt-iframe"></iframe>
+      <button class="btn-close" (click)="closePreview()" title="Fermer">
+        <i class="icon feather icon-x"></i>
+      </button>
+    </div>
+
+    <!-- Corps du modal -->
+    <div class="modal-body">
+      <iframe #receiptIframe class="receipt-iframe"></iframe>
+    </div>
+
+    <!-- Pied de page avec boutons améliorés -->
+    <div class="modal-footer">
+      <div class="footer-actions">
+        <!-- Bouton Fermer -->
+        <button class="btn btn-sm btn-outline" 
+                (click)="closePreview()"
+                title="Fermer la fenêtre">
+          <i class="icon feather icon-x"></i>
+          <span>Fermer</span>
+        </button>
+        
+        <!-- Bouton Imprimer -->
+        <button class="btn btn-sm btn-outline" 
+                (click)="printPreview()"
+                title="Imprimer la quittance">
+          <i class="icon feather icon-printer"></i>
+          <span>Imprimer</span>
+        </button>
+        
+        <!-- Bouton Envoyer au Locataire -->
+        <button class="btn btn-sm btn-primary" 
+                (click)="sendFromPreview('tenant')"
+                title="Envoyer la quittance au locataire">
+          <i class="icon feather icon-send"></i>
+          <span>Locataire</span>
+        </button>
+        
+        <!-- Bouton Envoyer au Propriétaire -->
+        <button class="btn btn-sm btn-info" 
+                (click)="sendFromPreview('owner')"
+                title="Envoyer la quittance au propriétaire">
+          <i class="icon feather icon-user"></i>
+          <span>Propriétaire</span>
+        </button>
+
+        <!-- Bouton Envoyer aux Deux (optionnel) -->
+        <button class="btn btn-sm btn-success" 
+                (click)="sendFromPreview('both')"
+                title="Envoyer la quittance aux deux parties">
+          <i class="icon feather icon-users"></i>
+          <span>Les deux</span>
+        </button>
       </div>
     </div>
   </div>

@@ -21,18 +21,18 @@ export interface Rental {
   endDate: string;
   price: number;
   createdAt: string;
-  // statut de la location : 'active' | 'ended' | 'cancelled' (optionnel)
   status?: 'active' | 'ended' | 'cancelled';
-  // Champs d'annulation
   cancellationType?: 'tenant_abandonment' | 'owner_eviction' | 'collector_cancellation' | 'admin_cancellation';
   cancellationReason?: string;
-  cancelledBy?: number; // ID de l'entité qui a annulé (tenantId, ownerId, collectorId, ou adminId)
+  cancelledBy?: number;
   cancellationDate?: string;
-  cancellationConditions?: string; // Conditions spécifiques à l'annulation (ex: clauses d'abandon)
+  cancellationConditions?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class RentalsService {
+  private storageKey = 'rentals';
+
   constructor(
     private apartmentsService: ApartmentsService,
     private buildingsService: BuildingsService,
@@ -40,40 +40,25 @@ export class RentalsService {
     private paymentsService: PaymentsService,
     private collectorsService: CollectorsService
   ) {}
-  private storageKey = 'rentals';
 
-  /**
-   * Vérifie si un appartement est disponible pour une nouvelle location.
-   * Accepte plusieurs synonymes de statut pour la compatibilité avec le dépôt existant.
-   */
   private isApartmentAvailable(apartmentId: number): boolean {
     const apt = this.apartmentsService.getApartmentById(apartmentId);
     if (!apt) return false;
-    const status = (apt.status || '').toString().toLowerCase();
-    // Considérer loué si status contient 'rent' ou 'lou' (loué) ou 'occupied'
-    const occupiedKeywords = ['rent', 'lou', 'occupied', 'leased'];
-    return !occupiedKeywords.some(k => status.includes(k));
+    const status = (apt.status || '').toLowerCase();
+    return !['rent', 'lou', 'occupied', 'leased'].some(k => status.includes(k));
   }
 
-  /**
-   * Vérifie si les dates [start, end] chevauchent une location existante pour le même appartement.
-   */
   private hasOverlap(apartmentId: number, start: Date, end: Date): boolean {
     const rentals = this.getRentalsByApartment(apartmentId);
     for (const r of rentals) {
-      // Ignorer les locations terminées ou annulées
       if (r.status === 'ended' || r.status === 'cancelled') continue;
       const s = new Date(r.startDate);
       const e = new Date(r.endDate);
-      // chevauchement: start <= e && s <= end
       if (start <= e && s <= end) return true;
     }
     return false;
   }
 
-  /**
-   * Retourne toutes les locations, ou un tableau vide si le localStorage est corrompu.
-   */
   getRentals(): Rental[] {
     const data = localStorage.getItem(this.storageKey);
     try {
@@ -84,19 +69,12 @@ export class RentalsService {
     }
   }
 
-  /**
-   * Retourne une location par son ID.
-   */
   getRentalById(id: number): Rental | undefined {
     return this.getRentals().find(r => r.id === id);
   }
 
-  /**
-   * Crée une nouvelle location et la sauvegarde.
-   */
   createRental(rental: Omit<Rental, 'id' | 'createdAt' | 'apartmentName' | 'tenantName'>): Rental {
     const rentals = this.getRentals();
-    // Récupère le nom de l'appartement et du locataire
     let apartmentName = '';
     let tenantName = '';
     if (this.apartmentsService && rental.apartmentId) {
@@ -110,7 +88,7 @@ export class RentalsService {
     const newRental: Rental = {
       ...rental,
       apartmentName,
-  tenantName,
+      tenantName,
       id: Date.now(),
       createdAt: new Date().toISOString()
     };
@@ -119,193 +97,116 @@ export class RentalsService {
     return newRental;
   }
 
-  /**
-   * Met à jour une location existante.
-   */
   updateRental(updated: Rental): void {
     const rentals = this.getRentals().map(r => r.id === updated.id ? updated : r);
     localStorage.setItem(this.storageKey, JSON.stringify(rentals));
   }
 
-  /**
-   * Supprime une location par son ID.
-   */
   deleteRental(id: number): void {
     const rentals = this.getRentals().filter(r => r.id !== id);
     localStorage.setItem(this.storageKey, JSON.stringify(rentals));
   }
 
-  /**
-   * Supprime toutes les locations (administration).
-   */
   clearRentals(): void {
     localStorage.removeItem(this.storageKey);
   }
 
-  /**
-   * Filtre les locations par locataire.
-   */
   getRentalsByTenant(tenantId: number): Rental[] {
     return this.getRentals().filter(r => r.tenantId === tenantId);
   }
 
-  /**
-   * Filtre les locations par appartement.
-   */
   getRentalsByApartment(apartmentId: number): Rental[] {
     return this.getRentals().filter(r => r.apartmentId === apartmentId);
   }
 
-  /**
-   * Retourne la location active d'un appartement (s'il y en a une).
-   * Une location est considérée comme active si :
-   * 1. Elle n'a pas de statut (compatibilité avec les anciennes données) OU son statut est 'active'
-   * 2. ET elle n'est pas 'cancelled' ou 'ended'
-   * 3. ET la date de fin est dans le futur ou aujourd'hui
-   */
   getActiveRental(apartmentId: number): Rental | undefined {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
     return this.getRentalsByApartment(apartmentId).find(r => {
-      // Exclure les locations annulées ou terminées
       if (r.status === 'cancelled' || r.status === 'ended') return false;
-      
-      // Accepter les locations sans statut (compatibilité) ou avec statut 'active'
       const isActiveStatus = !r.status || r.status === 'active';
-      
-      // Vérifier que la date de fin est dans le futur ou aujourd'hui
       const endDate = new Date(r.endDate);
       endDate.setHours(0, 0, 0, 0);
       const isDateValid = endDate >= today;
-      
       return isActiveStatus && isDateValid;
     });
   }
 
-  /**
-   * Termine une location en définissant la date de fin et met le statut à 'ended'.
-   */
-  endRentalWithDate(rentalId: number, endDate: string): Observable<Rental> {
-    const rentals = this.getRentals();
-    const idx = rentals.findIndex(r => r.id === rentalId);
-    if (idx === -1) return throwError(() => new Error('Location introuvable.'));
-    rentals[idx].status = 'ended';
-    rentals[idx].endDate = new Date(endDate).toISOString();
-    localStorage.setItem(this.storageKey, JSON.stringify(rentals));
-    const aptId = rentals[idx].apartmentId;
-    const tenantId = rentals[idx].tenantId;
-    this.releaseApartment(aptId);
-    if (tenantId) {
-      try { this.tenantsService.removeApartmentFromTenant(tenantId, aptId); } catch {}
-    }
-    return of(rentals[idx]);
-  }
-
-  /**
-   * Ajoute une nouvelle location après validations.
-   * Input properties expected (French names accepted and mapped):
-   * { clientId, apartmentId, dateDebut, dateFin, prixTotal, statutLocation, modePaiement?, montantPaye?, montantDu? }
-   * Retourne un Observable qui émet la location créée ou une erreur avec message clair.
-   */
+  // --- Nouvelle logique ajoutée pour marquer l'appartement comme occupé automatiquement ---
   addRental(input: {
     clientId: number;
     apartmentId: number;
     dateDebut: string;
     dateFin: string;
     prixTotal: number;
-    statutLocation?: 'active' | 'ended' | 'cancelled' | string;
+    statutLocation?: 'active' | 'ended' | 'cancelled';
+    
     modePaiement?: string;
     montantPaye?: number;
     montantDu?: number;
   }): Observable<Rental> {
-    // Validation des champs obligatoires
     if (!input || !input.clientId || !input.apartmentId) {
       return throwError(() => new Error('Champs obligatoires manquants : clientId ou apartmentId'));
     }
-    if (!input.dateDebut || !input.dateFin) {
-      return throwError(() => new Error('Les dates de début et de fin sont requises.'));
-    }
     const start = new Date(input.dateDebut);
     const end = new Date(input.dateFin);
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return throwError(() => new Error('Dates invalides.')); 
-    }
-    if (start >= end) {
-      return throwError(() => new Error('La date de début doit être antérieure à la date de fin.'));
-    }
-    if (!input.prixTotal || isNaN(Number(input.prixTotal)) || Number(input.prixTotal) <= 0) {
-      return throwError(() => new Error('Le prix total est invalide.'));
-    }
+    if (start >= end) return throwError(() => new Error('La date de début doit être antérieure à la date de fin.'));
+    if (!input.prixTotal || Number(input.prixTotal) <= 0) return throwError(() => new Error('Le prix total est invalide.'));
 
     const apartmentId = Number(input.apartmentId);
     const clientId = Number(input.clientId);
 
-    // Vérifier qu'un même locataire n'a pas déjà une location active
-    const existingActive = this.getRentalsByTenant(clientId).some(r => r.status === 'active');
-    if (existingActive) {
-      return throwError(() => new Error('Le locataire a déjà une location active.')); 
-    }
-
-    // Vérifier disponibilité de l'appartement
-    const apt = this.apartmentsService.getApartmentById(apartmentId);
-    if (!apt) {
-      return throwError(() => new Error('Appartement introuvable.'));
-    }
     if (!this.isApartmentAvailable(apartmentId)) {
       return throwError(() => new Error("L'appartement n'est pas disponible."));
     }
-
-    // Vérifier chevauchement avec d'autres locations
     if (this.hasOverlap(apartmentId, start, end)) {
-      return throwError(() => new Error('Les dates de la location chevauchent une location existante pour cet appartement.'));
+      return throwError(() => new Error('Les dates de la location chevauchent une location existante.'));
     }
 
-    // Construire l'objet attendu par createRental (réutilise la logique existante pour stocker)
-    // Résoudre collectorId éventuel via affiliations (apartment/building)
+    const apt = this.apartmentsService.getApartmentById(apartmentId);
+    if (!apt) return throwError(() => new Error('Appartement introuvable.'));
+
+    const existingActive = this.getRentalsByTenant(clientId).some(r => r.status === 'active');
+    if (existingActive) return throwError(() => new Error('Le locataire a déjà une location active.'));
+
     let resolvedCollectorId: number | undefined = this.collectorsService.findCollectorByApartment(apartmentId);
     if (resolvedCollectorId === undefined) {
       resolvedCollectorId = this.collectorsService.findCollectorByBuilding(apt.buildingId);
     }
 
-    const rentalPayload: Omit<Rental, 'id' | 'createdAt' | 'apartmentName' | 'tenantName'> & { status?: string } = {
+    const collector = this.collectorsService.getCollectors().find(c => c.id === resolvedCollectorId);
+
+    const rentalPayload: Omit<Rental, 'id' | 'createdAt' | 'apartmentName' | 'tenantName'> & { status?: 'active' | 'ended' | 'cancelled' } = {
       apartmentId: apartmentId,
       buildingId: apt.buildingId || 0,
-      collectorId: resolvedCollectorId as any,
+      buildingName: this.buildingsService.getBuildingById(apt.buildingId)?.name || '',
+      collectorId: resolvedCollectorId as number,
+      collectorName: collector ? collector.fullName : '',
       tenantId: clientId,
       startDate: start.toISOString(),
       endDate: end.toISOString(),
       price: Number(input.prixTotal),
-      // statut de la location (normaliser en 'active' par défaut)
-      status: (input.statutLocation as string) || 'active'
-    } as any;
+      status: input.statutLocation as 'active' | 'ended' | 'cancelled' || 'active'
+    };
+
 
     try {
       const created = this.createRental(rentalPayload);
 
-      // Après sauvegarde, mettre à jour le statut de l'appartement en 'rent' et lier le locataire
+      // --- Mise à jour automatique de l'appartement comme occupé ---
       const tenant = this.tenantsService.getTenantById(clientId);
       const tenantName = tenant ? (tenant.fullName || '') : '';
-      const updatedApt: Apartment = { ...apt, status: 'rent', tenant: tenantName, tenantId: clientId } as Apartment;
+      const updatedApt: Apartment = { ...apt, status: 'rent', tenant: tenantName, tenantId: clientId };
       this.apartmentsService.updateApartment(updatedApt);
 
-      // Mettre à jour le locataire: associer l'appartement et l'historique de location
+      // Mise à jour du locataire
       this.tenantsService.addApartmentToTenant(clientId, apartmentId);
       this.tenantsService.addRentalToTenant(clientId, created.id);
 
-      // Assurer que le statut est enregistré dans la location (createRental inclut status si fourni)
-      const rentals = this.getRentals();
-      const idx = rentals.findIndex(r => r.id === created.id);
-      if (idx !== -1) {
-        rentals[idx].status = (rentalPayload.status as any) || 'active';
-        localStorage.setItem(this.storageKey, JSON.stringify(rentals));
-      }
-
-      // Enregistrer un paiement initial (mode de paiement, montant payé, montant dû)
+      // Paiement initial
       const paidAmount = Number(input.montantPaye || 0);
       const dueAmount = Number(input.montantDu ?? (Number(input.prixTotal) - paidAmount));
-      const period = new Date(input.dateDebut).toISOString().slice(0, 7); // YYYY-MM
-      // Déterminer statut du paiement initial
+      const period = new Date(input.dateDebut).toISOString().slice(0, 7);
       const status = paidAmount >= dueAmount ? 'paid' : 'pending';
       const paymentRecord: Omit<PaymentRecordDto, 'id' | 'paymentDate'> = {
         rentalId: created.id,
@@ -318,7 +219,6 @@ export class RentalsService {
         paymentMethod: input.modePaiement || 'cash',
         period
       };
-      // fire-and-forget; subscription side-effects not strictly needed here
       this.paymentsService.createPayment(paymentRecord).subscribe({ next: () => {}, error: () => {} });
 
       return of(created);
@@ -327,24 +227,13 @@ export class RentalsService {
     }
   }
 
-  /**
-   * Libère un appartement (le rend disponible) — utilisé quand une location est terminée ou annulée.
-   */
   releaseApartment(apartmentId: number): Observable<boolean> {
     const apt = this.apartmentsService.getApartmentById(apartmentId);
     if (!apt) return throwError(() => new Error('Appartement introuvable.'));
-    const updated: Apartment = { ...apt, status: 'free' } as Apartment;
-    // clear tenant name when releasing
-    if ((updated as any).tenant !== undefined) {
-      delete (updated as any).tenant;
-    }
-    // If we have tenantId recorded on apartment, remove the apartment from tenant record
+    const updated: Apartment = { ...apt, status: 'free' };
+    if ((updated as any).tenant !== undefined) delete (updated as any).tenant;
     if ((updated as any).tenantId) {
-      try {
-        this.tenantsService.removeApartmentFromTenant((updated as any).tenantId, apartmentId);
-      } catch {
-        // ignore
-      }
+      try { this.tenantsService.removeApartmentFromTenant((updated as any).tenantId, apartmentId); } catch {}
       delete (updated as any).tenantId;
     }
     this.apartmentsService.updateApartment(updated);

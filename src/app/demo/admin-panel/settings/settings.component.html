@@ -1,374 +1,751 @@
-<div class="settings-container">
-  <div class="settings-header">
-    <h1>
-      <mat-icon>settings</mat-icon>
-      Paramètres de l'Agence
-    </h1>
-    <p>Gérez les paramètres et configurations de votre agence immobilière</p>
+<div class="page-container settings-page">
+  <!-- En-tête amélioré -->
+  <div class="page-header">
+    <button class="btn btn-back" (click)="back()">
+      <i class="fas fa-arrow-left"></i>
+      <span>Retour</span>
+    </button>
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="resetToDefaults()">
+        <i class="fas fa-undo"></i>
+        Réinitialiser
+      </button>
+      <button class="btn btn-primary" (click)="saveAllSettings()">
+        <i class="fas fa-save"></i>
+        Sauvegarder tout
+      </button>
+    </div>
   </div>
 
-  <mat-tab-group (selectedTabChange)="onTabChange($event)" [selectedIndex]="selectedTab">
-    
-    <!-- Onglet Général -->
-    <mat-tab label="Général">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>business</mat-icon>
-              Informations Générales
-            </mat-card-title>
-            <mat-card-subtitle>Informations de base de votre agence immobilière</mat-card-subtitle>
-          </mat-card-header>
+  <div class="settings-container">
+    <!-- En-tête amélioré avec statut -->
+    <div class="settings-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="fas fa-cog"></i>
+        </div>
+        <div class="header-text">
+          <h1>Paramètres de l'Agence</h1>
+          <p>Personnalisez l'apparence et les fonctionnalités de votre application</p>
+        </div>
+        <div class="header-status">
+          <div class="status-badge" [class.modified]="hasUnsavedChanges">
+            {{ hasUnsavedChanges ? 'Modifications non sauvegardées' : 'Tout est à jour' }}
+          </div>
+        </div>
+      </div>
+    </div>
 
-          <mat-card-content>
+    <!-- Navigation par onglets améliorée -->
+    <div class="tabs-navigation">
+      <div class="tabs-list">
+        <button *ngFor="let tab of tabs; let i = index" 
+                class="tab-button" 
+                [class.active]="selectedTab === i"
+                (click)="selectTab(i)">
+          <div class="tab-icon">
+            <i [class]="tab.icon"></i>
+          </div>
+          <span class="tab-label">{{ tab.label }}</span>
+          <span class="tab-badge" *ngIf="tab.hasChanges && getTabChanges(i)">
+            {{ getTabChanges(i) }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu des onglets -->
+    <div class="tabs-content">
+      
+      <!-- Onglet Général -->
+      <div *ngIf="selectedTab === 0" class="tab-pane active">
+        <div class="settings-grid">
+          <!-- Informations Générales -->
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-building"></i>
+                <h5>Informations Générales</h5>
+              </div>
+              <p class="card-subtitle">Informations de base de votre agence immobilière</p>
+            </div>
+            
             <form [formGroup]="generalForm" class="settings-form">
-              <div class="form-row">
+              <div class="form-grid">
                 <div class="form-group full-width">
-                  <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Nom de l'agence</mat-label>
-                    <input matInput class="underline-input" formControlName="agencyName" placeholder="Ex: TCHAK Immobilier">
-                    <mat-icon matSuffix>business</mat-icon>
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Email</mat-label>
-                    <input matInput class="underline-input" formControlName="email" type="email" placeholder="contact@agence.com">
-                    <mat-icon matSuffix>email</mat-icon>
-                  </mat-form-field>
+                  <input type="text" id="agencyName" formControlName="agencyName" 
+                         class="underline-input" placeholder="Ex: TCHAK Immobilier">
+                  <label for="agencyName" class="label">Nom de l'agence <span class="required">*</span></label>
+                  <i class="fas fa-building input-icon"></i>
+                  <div class="error" *ngIf="generalFormControls['agencyName']?.invalid && generalFormControls['agencyName']?.touched">
+                    Le nom de l'agence est requis (2-100 caractères)
+                  </div>
                 </div>
 
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Téléphone</mat-label>
-                    <input matInput class="underline-input" formControlName="phone" placeholder="+221 XX XXX XX XX">
-                    <mat-icon matSuffix>phone</mat-icon>
-                  </mat-form-field>
+                <div class="form-group">
+                  <input type="email" id="email" formControlName="email" 
+                         class="underline-input" placeholder="contact@agence.com">
+                  <label for="email" class="label">Email <span class="required">*</span></label>
+                  <i class="fas fa-envelope input-icon"></i>
+                  <div class="error" *ngIf="generalFormControls['email']?.invalid && generalFormControls['email']?.touched">
+                    Format d'email invalide
+                  </div>
                 </div>
-              </div>
 
-              <div class="form-row">
+                <div class="form-group">
+                  <input type="tel" id="phone" formControlName="phone" 
+                         class="underline-input" [value]="getCurrentPhoneCode()"
+                         placeholder="+223 XX XXX XX XX">
+                  <label for="phone" class="label">Téléphone <span class="required">*</span></label>
+                  <i class="fas fa-phone input-icon"></i>
+                  <div class="error" *ngIf="generalFormControls['phone']?.invalid && generalFormControls['phone']?.touched">
+                    Numéro de téléphone invalide
+                  </div>
+                </div>
+
                 <div class="form-group full-width">
-                  <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Adresse</mat-label>
-                    <input matInput class="underline-input" formControlName="address" placeholder="Adresse complète">
-                    <mat-icon matSuffix>location_on</mat-icon>
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Ville</mat-label>
-                    <input matInput class="underline-input" formControlName="city" placeholder="Dakar">
-                  </mat-form-field>
+                  <input type="text" id="address" formControlName="address" 
+                         class="underline-input" placeholder="Adresse complète">
+                  <label for="address" class="label">Adresse</label>
+                  <i class="fas fa-map-marker-alt input-icon"></i>
                 </div>
 
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Pays</mat-label>
-                    <mat-select class="underline-input" formControlName="country">
-                      <mat-option *ngFor="let country of countries" [value]="country.value">
-                        {{ country.label }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Devise</mat-label>
-                    <mat-select class="underline-input" formControlName="currency">
-                      <mat-option *ngFor="let currency of currencies" [value]="currency.value">
-                        {{ currency.label }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                <div class="form-group">
+                  <input type="text" id="city" formControlName="city" 
+                         class="underline-input" placeholder="Bamako">
+                  <label for="city" class="label">Ville</label>
                 </div>
 
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Langue</mat-label>
-                    <mat-select class="underline-input" formControlName="language">
-                      <mat-option value="fr">Français</mat-option>
-                      <mat-option value="en">English</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                <div class="form-group">
+                  <select id="country" formControlName="country" class="underline-input">
+                    <option value="">Sélectionner un pays</option>
+                    <option *ngFor="let country of countries" [value]="country.value">
+                      {{ country.label }} ({{ country.phoneCode }})
+                    </option>
+                  </select>
+                  <label for="country" class="label">Pays <span class="required">*</span></label>
+                </div>
+
+                <div class="form-group">
+                  <select id="currency" formControlName="currency" class="underline-input">
+                    <option value="">Sélectionner une devise</option>
+                    <option *ngFor="let currency of currencies" [value]="currency.value">
+                      {{ currency.label }} ({{ currency.symbol }})
+                    </option>
+                  </select>
+                  <label for="currency" class="label">Devise <span class="required">*</span></label>
+                </div>
+
+                <div class="form-group">
+                  <select id="language" formControlName="language" class="underline-input">
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                  </select>
+                  <label for="language" class="label">Langue</label>
                 </div>
               </div>
             </form>
-          </mat-card-content>
+          </div>
 
-          <mat-card-actions align="end">
-            <button mat-button (click)="generalForm.reset()">Annuler</button>
-            <button mat-raised-button color="primary" (click)="onSaveGeneral()" [disabled]="!generalForm.valid">
-              <mat-icon>save</mat-icon>
-              Sauvegarder
-            </button>
-          </mat-card-actions>
-        </mat-card>
+          <!-- Paramètres d'affichage -->
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-palette"></i>
+                <h5>Apparence</h5>
+              </div>
+              <p class="card-subtitle">Personnalisez l'apparence de votre application</p>
+            </div>
+
+            <div class="appearance-settings">
+              <!-- Sélecteur de thème -->
+              <div class="setting-group">
+                <label class="setting-label">Thème de l'application</label>
+                <div class="theme-selector">
+                  <div *ngFor="let theme of themes" 
+                       class="theme-option" 
+                       [class.active]="currentTheme === theme.id"
+                       (click)="selectTheme(theme.id)">
+                    <div class="theme-preview" [style.background]="theme.primaryColor">
+                      <div class="theme-accent" [style.background]="theme.accentColor"></div>
+                    </div>
+                    <span class="theme-name">{{ theme.name }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Densité de l'interface -->
+              <div class="setting-group">
+                <label class="setting-label">Densité de l'interface</label>
+                <div class="density-selector">
+                  <button class="density-option" 
+                          [class.active]="uiDensity === 'comfortable'"
+                          (click)="setUIDensity('comfortable')">
+                    Confortable
+                  </button>
+                  <button class="density-option" 
+                          [class.active]="uiDensity === 'compact'"
+                          (click)="setUIDensity('compact')">
+                    Compact
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-light" (click)="resetGeneralForm()">
+            <i class="fas fa-undo"></i> Annuler
+          </button>
+          <button type="button" class="btn btn-primary" 
+                  (click)="onSaveGeneral()" 
+                  [disabled]="!generalForm.valid || isLoading">
+            <i class="fas fa-save"></i> 
+            {{ isLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
+          </button>
+        </div>
       </div>
-    </mat-tab>
 
-    <!-- Onglet Notifications -->
-    <mat-tab label="Notifications">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>notifications</mat-icon>
-              Préférences de Notification
-            </mat-card-title>
-            <mat-card-subtitle>Configurez comment vous souhaitez recevoir les alertes et notifications</mat-card-subtitle>
-          </mat-card-header>
+      <!-- Onglet Personnalisation -->
+      <div *ngIf="selectedTab === 1" class="tab-pane active">
+        <div class="settings-grid">
+          <!-- Personnalisation des couleurs -->
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-paint-brush"></i>
+                <h5>Personnalisation des Couleurs</h5>
+              </div>
+              <p class="card-subtitle">Personnalisez les couleurs de votre interface</p>
+            </div>
 
-          <mat-card-content>
-            <form [formGroup]="notificationForm" class="settings-form">
-              <h3>Canaux de notification</h3>
-              <div class="toggle-row">
-                <mat-slide-toggle formControlName="emailNotifications" color="primary">
-                  Notifications par Email
-                </mat-slide-toggle>
-                <mat-slide-toggle formControlName="smsNotifications" color="primary">
-                  Notifications par SMS
-                </mat-slide-toggle>
+            <div class="color-customization-advanced">
+              <!-- Couleurs principales -->
+              <div class="color-section">
+                <h6>Couleurs principales</h6>
+                <div class="color-grid">
+                  <div class="color-item">
+                    <label>Header</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.header" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.header }}</span>
+                    </div>
+                  </div>
+                  <div class="color-item">
+                    <label>Boutons primaires</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.primary" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.primary }}</span>
+                    </div>
+                  </div>
+                  <div class="color-item">
+                    <label>Cartes</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.cards" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.cards }}</span>
+                    </div>
+                  </div>
+                  <div class="color-item">
+                    <label>Arrière-plan</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.background" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.background }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <mat-divider></mat-divider>
-
-              <h3>Types d'alertes</h3>
-              <div class="toggle-column">
-                <mat-slide-toggle formControlName="newPropertyAlerts" color="primary">
-                  Nouvelles propriétés ajoutées
-                </mat-slide-toggle>
-                <mat-slide-toggle formControlName="newClientAlerts" color="primary">
-                  Nouveaux clients inscrits
-                </mat-slide-toggle>
-                <mat-slide-toggle formControlName="paymentReminders" color="primary">
-                  Rappels de paiement
-                </mat-slide-toggle>
-                <mat-slide-toggle formControlName="maintenanceAlerts" color="primary">
-                  Alertes de maintenance
-                </mat-slide-toggle>
+              <!-- Couleurs d'état -->
+              <div class="color-section">
+                <h6>Couleurs d'état</h6>
+                <div class="color-grid">
+                  <div class="color-item">
+                    <label>Succès</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.success" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.success }}</span>
+                    </div>
+                  </div>
+                  <div class="color-item">
+                    <label>Avertissement</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.warning" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.warning }}</span>
+                    </div>
+                  </div>
+                  <div class="color-item">
+                    <label>Erreur</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.error" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.error }}</span>
+                    </div>
+                  </div>
+                  <div class="color-item">
+                    <label>Information</label>
+                    <div class="color-input">
+                      <input type="color" [(ngModel)]="themeColors.info" 
+                             (change)="applyThemeColors()">
+                      <span>{{ themeColors.info }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <mat-divider></mat-divider>
-
-              <h3>Rapports automatiques</h3>
-              <div class="toggle-column">
-                <mat-slide-toggle formControlName="weeklyReports" color="primary">
-                  Rapport hebdomadaire
-                </mat-slide-toggle>
-                <mat-slide-toggle formControlName="monthlyReports" color="primary">
-                  Rapport mensuel
-                </mat-slide-toggle>
+              <!-- Prévisualisation -->
+              <div class="color-section">
+                <h6>Prévisualisation</h6>
+                <div class="theme-preview">
+                  <div class="preview-header" [style.background]="themeColors.header">
+                    <div class="preview-logo">Votre Agence</div>
+                    <div class="preview-nav">
+                      <button class="preview-btn">Menu</button>
+                      <button class="preview-btn primary" [style.background]="themeColors.primary">
+                        Action
+                      </button>
+                    </div>
+                  </div>
+                  <div class="preview-content" [style.background]="themeColors.background">
+                    <div class="preview-card" [style.background]="themeColors.cards">
+                      <h4>Carte d'exemple</h4>
+                      <p>Ceci est une prévisualisation de votre thème</p>
+                      <div class="preview-actions">
+                        <button class="preview-btn success" [style.background]="themeColors.success">
+                          Succès
+                        </button>
+                        <button class="preview-btn warning" [style.background]="themeColors.warning">
+                          Avertissement
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </form>
-          </mat-card-content>
+            </div>
+          </div>
 
-          <mat-card-actions align="end">
-            <button mat-button (click)="notificationForm.reset()">Réinitialiser</button>
-            <button mat-raised-button color="primary" (click)="onSaveNotifications()">
-              <mat-icon>save</mat-icon>
-              Sauvegarder
-            </button>
-          </mat-card-actions>
-        </mat-card>
+          <!-- Fonctionnalités -->
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-sliders-h"></i>
+                <h5>Fonctionnalités</h5>
+              </div>
+              <p class="card-subtitle">Activez ou désactivez les fonctionnalités de l'application</p>
+            </div>
+
+            <div class="features-settings">
+              <div class="feature-category">
+                <h6>Gestion des biens</h6>
+                <div class="feature-list">
+                  <div class="feature-item" *ngFor="let feature of propertyFeatures">
+                    <label class="feature-label">
+                      <input type="checkbox" [(ngModel)]="feature.enabled" 
+                             (change)="toggleFeature(feature.id)">
+                      <span class="feature-slider"></span>
+                      <div class="feature-info">
+                        <strong>{{ feature.name }}</strong>
+                        <p>{{ feature.description }}</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="feature-category">
+                <h6>Gestion financière</h6>
+                <div class="feature-list">
+                  <div class="feature-item" *ngFor="let feature of financialFeatures">
+                    <label class="feature-label">
+                      <input type="checkbox" [(ngModel)]="feature.enabled" 
+                             (change)="toggleFeature(feature.id)">
+                      <span class="feature-slider"></span>
+                      <div class="feature-info">
+                        <strong>{{ feature.name }}</strong>
+                        <p>{{ feature.description }}</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="feature-category">
+                <h6>Rapports et analytics</h6>
+                <div class="feature-list">
+                  <div class="feature-item" *ngFor="let feature of analyticsFeatures">
+                    <label class="feature-label">
+                      <input type="checkbox" [(ngModel)]="feature.enabled" 
+                             (change)="toggleFeature(feature.id)">
+                      <span class="feature-slider"></span>
+                      <div class="feature-info">
+                        <strong>{{ feature.name }}</strong>
+                        <p>{{ feature.description }}</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </mat-tab>
 
-    <!-- Onglet Agence -->
-    <mat-tab label="Agence">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>corporate_fare</mat-icon>
-              Informations Agence
-            </mat-card-title>
-            <mat-card-subtitle>Détails administratifs et professionnels de votre agence</mat-card-subtitle>
-          </mat-card-header>
+      <!-- Onglet Notifications -->
+      <div *ngIf="selectedTab === 2" class="tab-pane active">
+        <div class="form-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-bell"></i>
+              <h5>Préférences de Notification</h5>
+            </div>
+            <p class="card-subtitle">Configurez comment vous souhaitez recevoir les alertes et notifications</p>
+          </div>
 
-          <mat-card-content>
-            <form [formGroup]="agencyForm" class="settings-form">
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Numéro de licence</mat-label>
-                    <input matInput class="underline-input" formControlName="licenseNumber" placeholder="N° licence professionnelle">
-                  </mat-form-field>
+          <form [formGroup]="notificationForm" class="settings-form">
+            <!-- Canaux de notification -->
+            <div class="settings-section">
+              <h6>Canaux de notification</h6>
+              <div class="toggle-grid">
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="emailNotifications" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Notifications par Email
+                  </label>
                 </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Identifiant fiscal</mat-label>
-                    <input matInput class="underline-input" formControlName="taxId" placeholder="N° identification fiscale">
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group full-width">
-                  <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Nom du gérant</mat-label>
-                    <input matInput class="underline-input" formControlName="managerName" placeholder="Nom du responsable">
-                  </mat-form-field>
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="smsNotifications" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Notifications par SMS
+                  </label>
                 </div>
               </div>
+            </div>
 
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Année de création</mat-label>
-                    <input matInput class="underline-input" formControlName="foundationYear" type="number" min="1900" max="2030">
-                  </mat-form-field>
+            <!-- Types d'alertes -->
+            <div class="settings-section">
+              <h6>Types d'alertes</h6>
+              <div class="toggle-grid">
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="newPropertyAlerts" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Nouvelles propriétés ajoutées
+                  </label>
                 </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Spécialités</mat-label>
-                    <input matInput class="underline-input" formControlName="specialties" placeholder="Ex: Résidentiel, Commercial...">
-                  </mat-form-field>
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="newClientAlerts" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Nouveaux clients inscrits
+                  </label>
+                </div>
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="paymentReminders" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Rappels de paiement
+                  </label>
+                </div>
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="maintenanceAlerts" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Alertes de maintenance
+                  </label>
                 </div>
               </div>
+            </div>
 
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Nombre de biens gérés</mat-label>
-                    <input matInput class="underline-input" formControlName="propertyCount" type="number" min="0">
-                  </mat-form-field>
+            <!-- Rapports automatiques -->
+            <div class="settings-section">
+              <h6>Rapports automatiques</h6>
+              <div class="toggle-grid">
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="weeklyReports" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Rapport hebdomadaire
+                  </label>
                 </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Nombre d'employés</mat-label>
-                    <input matInput class="underline-input" formControlName="employeeCount" type="number" min="0">
-                  </mat-form-field>
+                <div class="toggle-item">
+                  <label class="toggle-label">
+                    <input type="checkbox" formControlName="monthlyReports" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    Rapport mensuel
+                  </label>
                 </div>
               </div>
-            </form>
-          </mat-card-content>
+            </div>
+          </form>
 
-          <mat-card-actions align="end">
-            <button mat-button (click)="agencyForm.reset()">Annuler</button>
-            <button mat-raised-button color="primary" (click)="onSaveAgency()" [disabled]="!agencyForm.valid">
-              <mat-icon>save</mat-icon>
-              Sauvegarder
+          <div class="form-actions">
+            <button type="button" class="btn btn-light" (click)="resetNotificationForm()">
+              <i class="fas fa-undo"></i> Réinitialiser
             </button>
-          </mat-card-actions>
-        </mat-card>
-      </div>
-    </mat-tab>
-
-    <!-- Onglet Financier -->
-    <mat-tab label="Financier">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>euro</mat-icon>
-              Paramètres Financiers
-            </mat-card-title>
-            <mat-card-subtitle>Configuration des taux, commissions et paramètres de paiement</mat-card-subtitle>
-          </mat-card-header>
-
-          <mat-card-content>
-            <form [formGroup]="financialForm" class="settings-form">
-              <h3>Commissions et taxes</h3>
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Commission par défaut (%)</mat-label>
-                    <input matInput class="underline-input" formControlName="defaultCommission" type="number" min="0" max="100" step="0.1">
-                  </mat-form-field>
-                </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Taux de TVA (%)</mat-label>
-                    <input matInput class="underline-input" formControlName="vatRate" type="number" min="0" max="100" step="0.1">
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <h3>Paramètres de paiement</h3>
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Jours avant échéance</mat-label>
-                    <input matInput class="underline-input" formControlName="paymentDueDays" type="number" min="1" max="90">
-                  </mat-form-field>
-                </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Pénalité de retard (%)</mat-label>
-                    <input matInput class="underline-input" formControlName="latePaymentFee" type="number" min="0" max="20" step="0.1">
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Dépôt de garantie (mois)</mat-label>
-                    <input matInput class="underline-input" formControlName="securityDepositMonths" type="number" min="1" max="6" step="0.5">
-                  </mat-form-field>
-                </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Début année fiscale</mat-label>
-                    <input matInput class="underline-input" formControlName="fiscalYearStart" placeholder="JJ/MM">
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <h3>Informations bancaires</h3>
-              <div class="form-row">
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Banque</mat-label>
-                    <input matInput class="underline-input" formControlName="bankName" placeholder="Nom de la banque">
-                  </mat-form-field>
-                </div>
-
-                <div class="form-group half-width">
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Numéro de compte</mat-label>
-                    <input matInput class="underline-input" formControlName="accountNumber" placeholder="N° de compte">
-                  </mat-form-field>
-                </div>
-              </div>
-            </form>
-          </mat-card-content>
-
-          <mat-card-actions align="end">
-            <button mat-button (click)="financialForm.reset()">Annuler</button>
-            <button mat-raised-button color="primary" (click)="onSaveFinancial()" [disabled]="!financialForm.valid">
-              <mat-icon>save</mat-icon>
-              Sauvegarder
+            <button type="button" class="btn btn-primary" (click)="onSaveNotifications()" [disabled]="isLoading">
+              <i class="fas fa-save"></i> 
+              {{ isLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
             </button>
-          </mat-card-actions>
-        </mat-card>
+          </div>
+        </div>
       </div>
-    </mat-tab>
 
-  </mat-tab-group>
+      <!-- Onglet Sécurité -->
+      <div *ngIf="selectedTab === 3" class="tab-pane active">
+        <div class="settings-grid">
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-shield-alt"></i>
+                <h5>Sécurité et Accès</h5>
+              </div>
+              <p class="card-subtitle">Gérez la sécurité et les accès utilisateurs</p>
+            </div>
 
-  <!-- Bouton d'export global -->
-  <div class="export-section">
-    <button mat-stroked-button color="primary" (click)="exportSettings()">
-      <mat-icon>download</mat-icon>
-      Exporter tous les paramètres
-    </button>
+            <div class="security-settings">
+              <div class="setting-group">
+                <label class="setting-label">Durée de session</label>
+                <select class="form-select" [(ngModel)]="securitySettings.sessionTimeout">
+                  <option value="30">30 minutes</option>
+                  <option value="60">1 heure</option>
+                  <option value="120">2 heures</option>
+                  <option value="240">4 heures</option>
+                </select>
+              </div>
+
+              <div class="setting-group">
+                <label class="setting-label">Authentification à deux facteurs</label>
+                <label class="toggle-label large">
+                  <input type="checkbox" [(ngModel)]="securitySettings.twoFactorAuth">
+                  <span class="toggle-slider"></span>
+                  <div class="toggle-text">
+                    <strong>Activer la 2FA</strong>
+                    <p>Renforcez la sécurité de votre compte</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="setting-group">
+                <label class="setting-label">Export des données</label>
+                <button class="btn btn-outline" (click)="exportUserData()">
+                  <i class="fas fa-download"></i>
+                  Exporter mes données
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Onglet Agence -->
+      <div *ngIf="selectedTab === 4" class="tab-pane active">
+        <div class="form-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-landmark"></i>
+              <h5>Informations Agence</h5>
+            </div>
+            <p class="card-subtitle">Détails administratifs et professionnels de votre agence</p>
+          </div>
+
+          <form [formGroup]="agencyForm" class="settings-form">
+            <div class="form-grid">
+              <!-- Numéro de licence et Identifiant fiscal -->
+              <div class="form-group">
+                <input type="text" id="licenseNumber" formControlName="licenseNumber" 
+                       class="underline-input" placeholder="N° licence professionnelle">
+                <label for="licenseNumber" class="label">Numéro de licence</label>
+              </div>
+
+              <div class="form-group">
+                <input type="text" id="taxId" formControlName="taxId" 
+                       class="underline-input" placeholder="N° identification fiscale">
+                <label for="taxId" class="label">Identifiant fiscal</label>
+              </div>
+
+              <!-- Nom du gérant -->
+              <div class="form-group full-width">
+                <input type="text" id="managerName" formControlName="managerName" 
+                       class="underline-input" placeholder="Nom du responsable">
+                <label for="managerName" class="label">Nom du gérant</label>
+              </div>
+
+              <!-- Année de création et Spécialités -->
+              <div class="form-group">
+                <input type="number" id="foundationYear" formControlName="foundationYear" 
+                       class="underline-input" min="1900" max="2030" placeholder="Année">
+                <label for="foundationYear" class="label">Année de création</label>
+                <div class="error" *ngIf="agencyFormControls['foundationYear']?.invalid && agencyFormControls['foundationYear']?.touched">
+                  Année entre 1900 et {{ currentYear }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <input type="text" id="specialties" formControlName="specialties" 
+                       class="underline-input" placeholder="Ex: Résidentiel, Commercial...">
+                <label for="specialties" class="label">Spécialités</label>
+              </div>
+
+              <!-- Nombre de biens et employés -->
+              <div class="form-group">
+                <input type="number" id="propertyCount" formControlName="propertyCount" 
+                       class="underline-input" min="0" placeholder="0">
+                <label for="propertyCount" class="label">Nombre de biens gérés</label>
+              </div>
+
+              <div class="form-group">
+                <input type="number" id="employeeCount" formControlName="employeeCount" 
+                       class="underline-input" min="0" placeholder="0">
+                <label for="employeeCount" class="label">Nombre d'employés</label>
+              </div>
+            </div>
+          </form>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-light" (click)="resetAgencyForm()">
+              <i class="fas fa-undo"></i> Annuler
+            </button>
+            <button type="button" class="btn btn-primary" 
+                    (click)="onSaveAgency()" 
+                    [disabled]="!agencyForm.valid || isLoading">
+              <i class="fas fa-save"></i> 
+              {{ isLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Onglet Financier -->
+      <div *ngIf="selectedTab === 5" class="tab-pane active">
+        <div class="form-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-money-bill-wave"></i>
+              <h5>Paramètres Financiers</h5>
+            </div>
+            <p class="card-subtitle">Configuration des taux, commissions et paramètres de paiement</p>
+          </div>
+
+          <form [formGroup]="financialForm" class="settings-form">
+            <!-- Commissions et taxes -->
+            <div class="settings-section">
+              <h6>Commissions et taxes</h6>
+              <div class="form-grid">
+                <div class="form-group">
+                  <input type="number" id="defaultCommission" formControlName="defaultCommission" 
+                         class="underline-input" min="0" max="100" step="0.1" placeholder="0.0">
+                  <label for="defaultCommission" class="label">Commission par défaut (%) <span class="required">*</span></label>
+                  <div class="error" *ngIf="validatePercentage('defaultCommission', financialForm)">
+                    Doit être entre 0% et 50%
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <input type="number" id="vatRate" formControlName="vatRate" 
+                         class="underline-input" min="0" max="100" step="0.1" placeholder="0.0">
+                  <label for="vatRate" class="label">Taux de TVA (%) <span class="required">*</span></label>
+                  <div class="error" *ngIf="validatePercentage('vatRate', financialForm)">
+                    Doit être entre 0% et 100%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paramètres de paiement -->
+            <div class="settings-section">
+              <h6>Paramètres de paiement</h6>
+              <div class="form-grid">
+                <div class="form-group">
+                  <input type="number" id="paymentDueDays" formControlName="paymentDueDays" 
+                         class="underline-input" min="1" max="90" placeholder="30">
+                  <label for="paymentDueDays" class="label">Jours avant échéance <span class="required">*</span></label>
+                  <div class="error" *ngIf="validateNumber('paymentDueDays', financialForm)">
+                    Doit être entre 1 et 90 jours
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <input type="number" id="latePaymentFee" formControlName="latePaymentFee" 
+                         class="underline-input" min="0" max="20" step="0.1" placeholder="0.0">
+                  <label for="latePaymentFee" class="label">Pénalité de retard (%)</label>
+                </div>
+
+                <div class="form-group">
+                  <input type="number" id="securityDepositMonths" formControlName="securityDepositMonths" 
+                         class="underline-input" min="1" max="6" step="0.5" placeholder="1">
+                  <label for="securityDepositMonths" class="label">Dépôt de garantie (mois)</label>
+                </div>
+
+                <div class="form-group">
+                  <input type="text" id="fiscalYearStart" formControlName="fiscalYearStart" 
+                         class="underline-input" placeholder="JJ/MM">
+                  <label for="fiscalYearStart" class="label">Début année fiscale</label>
+                  <div class="error" *ngIf="financialFormControls['fiscalYearStart']?.invalid && financialFormControls['fiscalYearStart']?.touched">
+                    Format JJ/MM requis
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Informations bancaires -->
+            <div class="settings-section">
+              <h6>Informations bancaires</h6>
+              <div class="form-grid">
+                <div class="form-group">
+                  <input type="text" id="bankName" formControlName="bankName" 
+                         class="underline-input" placeholder="Nom de la banque">
+                  <label for="bankName" class="label">Banque</label>
+                </div>
+
+                <div class="form-group">
+                  <input type="text" id="accountNumber" formControlName="accountNumber" 
+                         class="underline-input" placeholder="N° de compte">
+                  <label for="accountNumber" class="label">Numéro de compte</label>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-light" (click)="resetFinancialForm()">
+              <i class="fas fa-undo"></i> Annuler
+            </button>
+            <button type="button" class="btn btn-primary" 
+                    (click)="onSaveFinancial()" 
+                    [disabled]="!financialForm.valid || isLoading">
+              <i class="fas fa-save"></i> 
+              {{ isLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions globales améliorées -->
+    <div class="global-actions">
+      <div class="actions-grid">
+        <button class="action-btn export" (click)="exportSettings()">
+          <i class="fas fa-file-export"></i>
+          <span>Exporter configuration</span>
+        </button>
+        <button class="action-btn import" (click)="importSettings()">
+          <i class="fas fa-file-import"></i>
+          <span>Importer configuration</span>
+        </button>
+        <button class="action-btn reset" (click)="resetToDefaults()">
+          <i class="fas fa-trash-restore"></i>
+          <span>Restaurer défauts</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

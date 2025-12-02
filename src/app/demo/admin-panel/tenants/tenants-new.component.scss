@@ -37,12 +37,12 @@ $border-radius-sm: 6px;
 .page-header-inline .header-right{ display:flex; gap:8px }
 
 //
-.back-btn i{ font-size: 0.95rem }
+.back-btn i{ font-size: 0.65rem }
 .back-label{ font-weight:600 }
 
 /* Page container font and size adjustments for add/edit pages */
 .page-container{
-  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Poppins, 'Helvetica Neue', Arial;
   font-size: 14px;
   color: $text-color;
 }
@@ -54,7 +54,6 @@ $border-radius-sm: 6px;
   margin-bottom: 25px;
   position: relative;
   padding-bottom: 15px;
-  border-bottom: 1px solid $border-color;
 }
 
 .page-title {
@@ -62,19 +61,7 @@ $border-radius-sm: 6px;
   text-align: left;
   font-weight: 600;
   color: $text-color;
-  font-size: 18px;
-}
-
-.back-btn {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 8px 15px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    transform: translateX(-3px);
-  }
+  font-size: 14px;
 }
 
 // Cartes et formulaires
@@ -82,7 +69,7 @@ $border-radius-sm: 6px;
   background: white;
   border-radius: 5px;
   box-shadow: $card-shadow;
-  padding: 25px;
+  padding: 20px;
   position: relative;
   margin-bottom: 30px;
 }
@@ -114,7 +101,6 @@ $border-radius-sm: 6px;
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid $border-light;
   
   .section-icon {
     font-size: 1.25rem;
@@ -186,32 +172,6 @@ $border-radius-sm: 6px;
     }
   }
 }
-
-// // Groupes de formulaire améliorés
-// .form-group {
-//   margin-bottom: 1.5rem;
-//   position: relative;
-  
-//   .input-container {
-//     position: relative;
-    
-//     .underline-input {
-//       transition: $transition;
-      
-//       &:focus {
-//         border-bottom-color: $primary-color;
-//         background: lighten($primary-color, 45%);
-//       }
-      
-//       &.has-value {
-//         background: $background-light;
-//       }
-//     }
-    
-//     .floating-label {
-//       transition: $transition;
-//     }
-//   }
   
   .required {
     color: $danger-color;
@@ -227,7 +187,6 @@ $border-radius-sm: 6px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid $border-light;
   background: $background-light;
   border-radius: $border-radius;
 
@@ -326,7 +285,7 @@ $border-radius-sm: 6px;
 // Messages d'erreur améliorés
 .error {
   color: $danger-color;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   margin-top: 0.5rem;
   display: flex;
   align-items: center;

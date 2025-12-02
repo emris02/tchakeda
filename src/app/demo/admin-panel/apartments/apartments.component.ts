@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApartmentsService, Apartment } from './apartments.service';
-// Keep header navigation for apartment creation
 
+// Extension pour gestion du carrousel
 interface ApartmentWithCarousel extends Apartment {
   _carouselIndex: number;
   _showOverlay?: boolean;
@@ -16,78 +16,72 @@ interface ApartmentWithCarousel extends Apartment {
   standalone: false
 })
 export class ApartmentsComponent implements OnInit {
-  // Simule l'utilisateur connecté (à remplacer par le vrai service d'authentification)
-  currentUser = { id: 'owner-123', role: 'owner' };
-  // Get the number of rooms for an apartment
-  getRoomCount(apartment: ApartmentWithCarousel): number {
-    if (apartment.images && apartment.images.length) {
-      return apartment.images.length;
-    }
-    if (apartment.rooms) {
-      return apartment.rooms;
-    }
-    return 0;
-  }
 
-  // Switch navigation to a specific room (carousel index)
-  goToRoom(apartment: ApartmentWithCarousel, index: number): void {
-    if (apartment.images && index >= 0 && index < apartment.images.length) {
-      apartment._carouselIndex = index;
-    }
-  }
-  getRoomImages(apartment: ApartmentWithCarousel): string[] {
-    return apartment.images || [];
-  }
-  sortOrder: 'recent' | 'oldest' = 'recent';
-  filterType: string = '';
-  filterRooms: number | null = null;
-  filterStatus: 'all' | 'occupied' | 'free' | 'sale' | 'rent' | 'construction' = 'all';
-  filterMention: 'all' | 'high' | 'low' = 'all';
-  activeFilter: 'name' | 'city' | 'region' | null = null;
+  /** Utilisateur connecté (à remplacer par AuthService) */
+  currentUser = { id: 'owner-123', role: 'owner' };
+
+  /** Données */
   apartments: ApartmentWithCarousel[] = [];
   filteredApartments: ApartmentWithCarousel[] = [];
-  viewMode: 'list' | 'grid' = 'grid';
-  filterName: string = '';
-  filterCity: string = '';
-  filterRegion: string = '';
-  cityOptions: string[] = [];
-  // pagination
-  page: number = 1;
-  pageSize: number = 10;
-  total: number = 0;
   displayedApartments: ApartmentWithCarousel[] = [];
-  description?: string;
-    // Utilitaires pour récupérer le nom et la description de la pièce courante
 
-    getCurrentRoomLabel(apartment: ApartmentWithCarousel): string {
-      return apartment.roomLabels && apartment.roomLabels[apartment._carouselIndex || 0]
-        ? apartment.roomLabels[apartment._carouselIndex || 0]
-        : 'Nom de la pièce';
-    }
+  /** Filtres */
+  filterName = '';
+  filterCity = '';
+  filterRegion = '';
+  filterType = '';
+  filterRooms: number | null = null;
 
-    getCurrentRoomDescription(apartment: ApartmentWithCarousel): string {
-      return apartment.roomDescriptions && apartment.roomDescriptions[apartment._carouselIndex || 0]
-        ? apartment.roomDescriptions[apartment._carouselIndex || 0]
-        : 'Aucune description';
-    }
+  filterStatus: 'all' | 'occupied' | 'free' | 'sale' | 'rent' | 'construction' = 'all';
+  filterMention: 'all' | 'high' | 'low' = 'all';
+
+  activeFilter: 'name' | 'city' | 'region' | null = null;
+
+  /** Pagination */
+  page = 1;
+  pageSize = 10;
+  total = 0;
+
+  /** Affichage */
+  viewMode: 'list' | 'grid' = 'grid';
+  sortOrder: 'recent' | 'oldest' = 'recent';
+
+  cityOptions: string[] = [];
 
   constructor(
     private apartmentsService: ApartmentsService,
     private router: Router
   ) {}
 
-  // Utilitaire pour afficher le statut de disponibilité
-  getTenantDisplay(apartment: ApartmentWithCarousel): string {
-    // Affiche toujours 'Libre' si pas de locataire, sinon 'Occupé'
-    return apartment && apartment.tenant ? 'Occupé' : 'Libre';
-  }
+  // =====================================
+  //  INIT
+  // =====================================
 
   ngOnInit(): void {
-  this.apartments = this.apartmentsService.getApartments().map(a => ({ ...a, _carouselIndex: 0, _showOverlay: false }));
-  // compute city options
-  this.cityOptions = Array.from(new Set(this.apartments.map(a => a.city).filter(Boolean)));
-  this.applyFilters();
+    this.loadApartments();
   }
+
+  /** Charge les appartements depuis le service */
+  loadApartments(): void {
+    this.apartments = this.apartmentsService
+      .getApartments()
+      .map(a => ({
+        ...a,
+        _carouselIndex: 0,
+        _showOverlay: false
+      }));
+
+    // Récupère la liste des villes uniques
+    this.cityOptions = Array.from(
+      new Set(this.apartments.map(a => a.city).filter(Boolean))
+    );
+
+    this.applyFilters();
+  }
+
+  // =====================================
+  //  FILTRES
+  // =====================================
 
   applyFilters(): void {
     let result = this.apartmentsService.filterApartments(this.apartments, {
@@ -96,56 +90,150 @@ export class ApartmentsComponent implements OnInit {
       status: this.filterStatus,
       mention: this.filterMention
     });
+
+    // Tri
     result = this.apartmentsService.sortApartments(result, this.sortOrder);
-    // text filters
+
+    // Recherche par nom/adresse
     if (this.filterName) {
       const q = this.filterName.toLowerCase();
-      result = result.filter(a => (a.name || '').toLowerCase().includes(q) || (a.address || '').toLowerCase().includes(q));
+      result = result.filter(a =>
+        (a.name || '').toLowerCase().includes(q) ||
+        (a.address || '').toLowerCase().includes(q)
+      );
     }
+
+    // Filtre par ville
     if (this.filterCity) {
       result = result.filter(a => (a.city || '') === this.filterCity);
     }
+
+    // Filtre par région
     if (this.filterRegion) {
-      result = result.filter(a => (a.region || '').toLowerCase().includes(this.filterRegion.toLowerCase()));
+      result = result.filter(a =>
+        (a.region || '')
+          .toLowerCase()
+          .includes(this.filterRegion.toLowerCase())
+      );
     }
-    // Ensure _carouselIndex is present
-  this.filteredApartments = result.map(a => ({ ...a, _carouselIndex: 0, _showOverlay: false }));
-  // pagination
-  this.total = this.filteredApartments.length;
-  this.updateDisplayed();
+
+    // Normalise les objets pour le carrousel
+    this.filteredApartments = result.map(a => ({
+      ...a,
+      _carouselIndex: 0,
+      _showOverlay: false
+    }));
+
+    this.total = this.filteredApartments.length;
+    this.updateDisplayed();
   }
 
-  updateDisplayed() {
+  // =====================================
+  //  PAGINATION
+  // =====================================
+
+  updateDisplayed(): void {
     const start = (this.page - 1) * this.pageSize;
     const end = start + this.pageSize;
     this.displayedApartments = this.filteredApartments.slice(start, end);
   }
 
-  onPageChange(p: number) {
-    this.page = p;
+  onPageChange(page: number): void {
+    this.page = page;
     this.updateDisplayed();
   }
 
-  onPageSizeChange(size: number) {
+  onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.page = 1;
     this.updateDisplayed();
   }
+
+  // =====================================
+  //  EVENTS SEARCH-FILTER COMPONENT
+  // =====================================
+
+  onSearch(term: string): void {
+    this.filterName = term || '';
+    this.applyFilters();
+  }
+
+  onFilter(filters: any): void {
+    if (!filters) return;
+
+    if (filters.city !== undefined) this.filterCity = filters.city || '';
+    if (filters.q !== undefined) this.filterName = filters.q || '';
+
+    this.applyFilters();
+  }
+
+  onRefreshClicked(): void {
+    this.loadApartments();
+  }
+
+  onPrintClicked(): void {
+    window.print();
+  }
+
+  onAddNewClicked(): void {
+    this.goToNew();
+  }
+ // ===== Handlers UI =====
+    onViewChange(mode: 'grid' | 'list') {
+    this.viewMode = mode;
+  }
+  // =====================================
+  //  NAVIGATION
+  // =====================================
+
+  goToDetail(apartment: Apartment): void {
+    this.router.navigate(['demo/admin-panel/apartments', apartment.id]);
+  }
+
+  goToNew(): void {
+    this.router.navigate(['demo/admin-panel/apartments/new']);
+  }
+
+  // =====================================
+  //  TRI & AFFICHAGE
+  // =====================================
 
   setSortOrder(order: 'recent' | 'oldest'): void {
     this.sortOrder = order;
     this.applyFilters();
   }
 
-  goToDetail(apartment: Apartment) {
-    this.router.navigate(['demo/admin-panel/apartments', apartment.id]);
+  toggleView(): void {
+    this.viewMode = this.viewMode === 'list' ? 'grid' : 'list';
   }
 
-  goToNew() {
-    this.router.navigate(['demo/admin-panel/apartments/new']);
+  // =====================================
+  //  CARROUSEL
+  // =====================================
+
+  getRoomCount(apartment: ApartmentWithCarousel): number {
+    return apartment.images?.length || apartment.rooms || 0;
   }
 
-  toggleView() {
-    this.viewMode = this.viewMode === 'list' ? 'grid' : 'grid';
+  getRoomImages(apartment: ApartmentWithCarousel): string[] {
+    return apartment.images || [];
+  }
+
+  goToRoom(apartment: ApartmentWithCarousel, index: number): void {
+    if (!apartment.images) return;
+    if (index < 0 || index >= apartment.images.length) return;
+    apartment._carouselIndex = index;
+  }
+
+  getCurrentRoomLabel(apartment: ApartmentWithCarousel): string {
+    return apartment.roomLabels?.[apartment._carouselIndex] || 'Nom de la pièce';
+  }
+
+  getCurrentRoomDescription(apartment: ApartmentWithCarousel): string {
+    return apartment.roomDescriptions?.[apartment._carouselIndex] || 'Aucune description';
+  }
+
+  getTenantDisplay(apartment: ApartmentWithCarousel): string {
+    return apartment.tenant ? 'Occupé' : 'Libre';
   }
 }

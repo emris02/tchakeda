@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
 import { PaymentsService } from 'src/app/demo/admin-panel/recoveries/payments.service';
-import { RecoveriesService } from './recoveries.service';
+import { Router } from '@angular/router';
 import { RentalsService, Rental } from 'src/app/demo/admin-panel/rentals/rentals.service';
 import { TenantsService, Tenant } from 'src/app/demo/admin-panel/tenants/tenants.service';
 import { CollectorsService, Collector } from 'src/app/demo/admin-panel/collectors/collectors.service';
@@ -25,6 +25,7 @@ interface PaymentRecord {
   commissionRecouvreur?: number;
   netProprietaire?: number;
   commissionRate?: number;
+  occupied?: boolean;
   status?: 'paid' | 'late' | 'pending';
   daysLate?: number;
   receiptSentToTenant?: boolean;
@@ -99,6 +100,29 @@ export class RecoveriePaymentsComponent implements OnInit {
   previewPayment: PaymentRecord | null = null;
 
   @ViewChild('receiptIframe') receiptIframe?: ElementRef<HTMLIFrameElement>;
+  
+  // Dans recoveries-payments.component.ts
+loadReceiptInIframe() {
+  if (this.receiptIframe && this.receiptIframe.nativeElement && this.previewHtml) {
+    try {
+      const iframe = this.receiptIframe.nativeElement;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      
+      if (iframeDoc) {
+        iframeDoc.open();
+        iframeDoc.write(this.previewHtml);
+        iframeDoc.close();
+        
+        // Ajuster la hauteur de l'iframe après le chargement
+        setTimeout(() => {
+          iframe.style.height = iframeDoc.body.scrollHeight + 'px';
+        }, 100);
+      }
+    } catch (e) {
+      console.error('Erreur lors du chargement de la quittance:', e);
+    }
+  }
+}
 
   // contract modals
   showExtendModal = false;
@@ -181,8 +205,8 @@ export class RecoveriePaymentsComponent implements OnInit {
   minExtendDate: string = new Date().toISOString().split('T')[0];
 
   constructor(
+    private router: Router,
     private paymentsService: PaymentsService,
-    private recoveriesService: RecoveriesService,
     private rentalsService: RentalsService,
     private tenantsService: TenantsService,
     private collectorsService: CollectorsService,
@@ -191,6 +215,38 @@ export class RecoveriePaymentsComponent implements OnInit {
     private ownersService: OwnersService,
     private location: Location
   ) {}
+
+  // MÉTHODES AJOUTÉES POUR CORRIGER LES ERREURS
+  refreshPayments(): void {
+    console.log('Rafraîchissement des paiements...');
+    this.loadPayments();
+    this.showTemporaryToast('Liste des paiements rafraîchie');
+  }
+
+  // Compatibility alias used by some templates / shared components
+  onRefreshClick(): void {
+    this.refreshPayments();
+  }
+
+  // Compatibility alias for print button handlers
+  onPrint(): void {
+    this.printPayments();
+  }
+
+  // Some templates bind to `searchText` instead of `searchTerm` — keep both in sync
+  get searchText(): string {
+    return this.searchTerm;
+  }
+  set searchText(v: string) {
+    this.searchTerm = v || '';
+    this.historyFilters.search = this.searchTerm;
+    this.applyFilters();
+  }
+
+  printPayments(): void {
+    console.log('Impression des paiements...');
+    window.print();
+  }
 
   goBack(): void {
     this.location.back();
@@ -204,6 +260,10 @@ export class RecoveriePaymentsComponent implements OnInit {
     this.buildingsForOwner = [];
     this.apartmentsForBuilding = [];
     this.tenantsForApartment = [];
+    this.currentRental = null;
+    this.updateContractSnapshot(null);
+    this.stepErrors = { 1: [], 2: [], 3: [] };
+    this.touchedSteps = new Set<number>([1]);
   }
 
   private prefillOwnerFromBuilding(buildingId?: number) {
@@ -249,6 +309,8 @@ export class RecoveriePaymentsComponent implements OnInit {
       this.currentRental = null;
       this.updateContractSnapshot(null);
       this.validateStep(1, true);
+      this.stepErrors = { 1: [], 2: [], 3: [] };
+      this.touchedSteps = new Set<number>([1]);
       return;
     }
     this.buildingsForOwner = (this.buildingsService && (this.buildingsService as any).getBuildingsByOwner) ? (this.buildingsService as any).getBuildingsByOwner(Number(ownerId)) : [];
@@ -258,6 +320,9 @@ export class RecoveriePaymentsComponent implements OnInit {
       this.apartmentsForBuilding = [];
       this.paymentForm.apartmentId = undefined;
       this.paymentForm.tenantId = undefined;
+      this.tenantsForApartment = [];
+      this.currentRental = null;
+      this.updateContractSnapshot(null);
     }
     if (this.buildingsForOwner.length === 1 && !this.paymentForm.buildingId) {
       this.paymentForm.buildingId = this.buildingsForOwner[0].id;
@@ -283,20 +348,24 @@ export class RecoveriePaymentsComponent implements OnInit {
     this.validateStep(1, true);
   }
 
-  onApartmentChange(apartmentId?: number) {
+    onApartmentChange(apartmentId?: number) {
+    // Réinitialisation du formulaire et des listes
     this.paymentForm.apartmentId = apartmentId;
     this.tenantsForApartment = [];
+    this.currentRental = null;
+    this.paymentForm.tenantId = undefined;
+    this.paymentForm.rentalId = undefined;
+    this.paymentForm.collectorId = undefined;
+    this.paymentForm.buildingId = undefined;
+    this.updateContractSnapshot(null);
+
     if (!apartmentId) {
-      this.paymentForm.tenantId = undefined;
-      this.paymentForm.rentalId = undefined;
-      this.currentRental = null;
-      this.updateContractSnapshot(null);
       this.updateCalculations();
       this.validateStep(1, true);
       return;
     }
 
-    // 1. D'abord, chercher via le service de locations (rental actif)
+    // 1️⃣ Chercher un rental actif pour l'appartement
     const rental = this.rentalsService.getActiveRental(Number(apartmentId));
     if (rental) {
       this.currentRental = rental;
@@ -307,40 +376,37 @@ export class RecoveriePaymentsComponent implements OnInit {
       this.prefillOwnerFromBuilding(rental.buildingId);
       this.updateContractSnapshot(rental);
     } else {
-      this.currentRental = null;
-      this.updateContractSnapshot(null);
-      
-      // 2. Si pas de rental actif, récupérer le locataire directement depuis l'appartement
+      // Pas de rental actif
       const apartment = this.apartmentsService.getApartmentById(Number(apartmentId));
-      if (apartment && apartment.tenantId) {
-        // Vérifier que le locataire existe
+      if (apartment?.tenantId) {
         const tenant = this.tenantsService.getTenantById(Number(apartment.tenantId));
         if (tenant) {
-          this.paymentForm.tenantId = Number(apartment.tenantId);
+          this.paymentForm.tenantId = tenant.id;
         }
       }
     }
 
-    // 3. Remplir la liste des locataires pour cet appartement
-    // D'abord depuis les tenants qui ont cet appartement dans leur liste
+    // 2️⃣ Construire la liste des locataires pour l'appartement
     this.tenantsForApartment = this.tenants.filter(t => (t.apartments || []).includes(Number(apartmentId)));
-    
-    // Si le tenantId est défini mais pas dans la liste, l'ajouter
+
+    // Ajouter le locataire prérempli s'il n'est pas dans la liste
     if (this.paymentForm.tenantId) {
       const tenant = this.tenantsService.getTenantById(Number(this.paymentForm.tenantId));
-      if (tenant && !this.tenantsForApartment.find(t => t.id === tenant.id)) {
+      if (tenant && !this.tenantsForApartment.some(t => t.id === tenant.id)) {
         this.tenantsForApartment.push(tenant);
       }
     }
 
-    // 4. Si aucun locataire n'est encore sélectionné et qu'il n'y en a qu'un, le sélectionner automatiquement
+    // 3️⃣ Si un seul locataire possible, le sélectionner automatiquement
     if (!this.paymentForm.tenantId && this.tenantsForApartment.length === 1) {
       this.paymentForm.tenantId = this.tenantsForApartment[0].id;
     }
 
+    // 🔄 Calculs et validation
     this.updateCalculations();
     this.validateStep(1, true);
   }
+
 
   loadPayments() {
     this.paymentsService.getPayments().subscribe({
@@ -386,6 +452,8 @@ export class RecoveriePaymentsComponent implements OnInit {
       daysLate: p.daysLate ?? 0,
       receiptSentToTenant: !!p.receiptSentToTenant,
       receiptSentToOwner: !!p.receiptSentToOwner,
+      receiptSentToTenantAt: p.receiptSentToTenantAt || null,
+      receiptSentToOwnerAt: p.receiptSentToOwnerAt || null
     };
 
     // Attempt to resolve tenant information from various sources
@@ -1209,6 +1277,9 @@ export class RecoveriePaymentsComponent implements OnInit {
       }
     });
   }
+  back() {
+    this.router.navigate(['demo/admin-panel/recoveries']);
+  }
 
   // open an in-app preview modal for the quittance
   previewReceipt(payment: PaymentRecord) {
@@ -1302,8 +1373,8 @@ export class RecoveriePaymentsComponent implements OnInit {
   }
 
   private buildReceiptHtml(payment: PaymentRecord, tenant: Tenant | null | undefined, ownerName: string, collector?: Collector) {
-    // issuedAt: always use current date/time for the receipt issuance
-    const issuedAt = new Date().toLocaleString('fr-FR');
+    // Use current date/time for the issued timestamp
+    const date = new Date().toLocaleString('fr-FR');
     const tenantLine = tenant ? `${(tenant as any).fullName || (tenant as any).name || '-'}` : 'Locataire inconnu';
 
     // Resolve apartment display (name or address) from cache or service
@@ -1329,18 +1400,10 @@ export class RecoveriePaymentsComponent implements OnInit {
       }
     } catch {}
 
-    // Resolve collector display: prefer passed collector, then look up by payment.collectorId, then via rental
+    // Resolve collector display
     let collectorLine = 'Collecteur inconnu';
     try {
-      let col = collector || this.collectors.find(c => Number((c as any).id) === Number(payment.collectorId));
-      if (!col && payment.rentalId && (this.rentalsService as any).getRentalById) {
-        try {
-          const r = (this.rentalsService as any).getRentalById(Number(payment.rentalId));
-          if (r && (r as any).collectorId) {
-            col = this.collectors.find(c => Number((c as any).id) === Number((r as any).collectorId));
-          }
-        } catch {}
-      }
+      const col = collector || this.collectors.find(c => Number((c as any).id) === Number(payment.collectorId));
       if (col) collectorLine = (col as any).fullName || (col as any).name || `Collecteur ${col.id}`;
     } catch {}
 
@@ -1382,9 +1445,9 @@ export class RecoveriePaymentsComponent implements OnInit {
                 <div class="brand">Tchak Immobilier</div>
                 <div class="address">BP 12345, Bamako • +223 77 00 00 00 • contact@tchak.example</div>
               </div>
-                <div class="receipt-meta">
+              <div class="receipt-meta">
                 <div><strong>Quittance N°</strong> ${receiptNumber}</div>
-                <div class="meta">Émise le: ${issuedAt}</div>
+                <div class="meta">Émise le: ${date}</div>
                 <div class="meta">Période: ${payment.period}</div>
               </div>
             </div>
@@ -1423,11 +1486,6 @@ export class RecoveriePaymentsComponent implements OnInit {
               <div class="sig-box">Reçu par / Nom & signature</div>
               <div class="sig-box">Pour le propriétaire / Nom & signature</div>
             </div>
-
-            <div class="actions no-print">
-              <button onclick="window.print()">Imprimer</button>
-              <button onclick="window.close()">Fermer</button>
-            </div>
           </div>
         </body>
       </html>
@@ -1449,7 +1507,7 @@ export class RecoveriePaymentsComponent implements OnInit {
     return max + 1;
   }
 
-  // Méthodes manquantes pour le template
+  // Méthodes pour la navigation dans les étapes
   nextStep() {
     if (this.currentStep < 3) {
       if (this.validateStep(this.currentStep, true)) {
@@ -1533,5 +1591,9 @@ export class RecoveriePaymentsComponent implements OnInit {
     this.touchedSteps = new Set([1]);
     this.finalAcknowledgement = false;
     this.forceDuplicateSubmission = false;
+  }
+
+  filterPayments(): void {
+    this.applyFilters();
   }
 }

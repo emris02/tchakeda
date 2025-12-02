@@ -1,0 +1,41 @@
+<div *ngIf="showPanel" class="contracts-panel-backdrop">
+  <div class="contracts-panel">
+    <header>
+      <h4>Contrats</h4>
+      <button class="btn-close" (click)="closePanel()">✕</button>
+    </header>
+
+    <section class="contract-section">
+      <h5>Contrat de location</h5>
+      <div *ngIf="visibleContracts.rental.length === 0">Aucun contrat de location</div>
+      <div *ngFor="let c of visibleContracts.rental" class="contract-item">
+        <p><strong>Loyer:</strong> {{ c.rentAmount | number:'1.0-0' }} FCFA</p>
+        <p><strong>Période:</strong> {{ c.leaseStart || '-' }} → {{ c.leaseEnd || '-' }}</p>
+        <div class="actions">
+          <button (click)="openPreview(c.contractFileUrl)" class="btn btn-sm btn-outline-primary">Voir</button>
+          <a class="btn btn-sm btn-success" [href]="c.contractFileUrl" download>Télécharger contrat</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contract-section">
+      <h5>Contrat Recouvreur ↔ Propriétaire</h5>
+      <div *ngIf="visibleContracts.ownerCollector.length === 0">Aucun contrat Recouvreur ↔ Propriétaire</div>
+      <div *ngFor="let c of visibleContracts.ownerCollector" class="contract-item">
+        <p><strong>Commission:</strong> {{ c.commissionType === 'percent' ? (c.commissionValue + '%') : (c.commissionValue + ' FCFA') }}</p>
+        <p><strong>Durée mandat:</strong> {{ c.mandateStart || '-' }} → {{ c.mandateEnd || '-' }}</p>
+        <div class="actions">
+          <button (click)="openPreview(c.contractFileUrl)" class="btn btn-sm btn-outline-primary">Voir</button>
+          <a class="btn btn-sm btn-success" [href]="c.contractFileUrl" download>Télécharger contrat</a>
+        </div>
+      </div>
+    </section>
+
+    <div *ngIf="previewUrl" class="preview-modal">
+      <div class="preview-header">
+        <button class="btn-close" (click)="previewUrl = null">Fermer</button>
+      </div>
+      <iframe [src]="previewUrl" class="preview-iframe"></iframe>
+    </div>
+  </div>
+</div>
